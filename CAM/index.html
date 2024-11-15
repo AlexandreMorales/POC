@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style type="text/css">
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Courier";
+        background-color: white;
+        color: black;
+      }
+
+      #video {
+        display: none;
+      }
+
+      @keyframes rotate {
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      #canvas {
+        /* display: block; */
+        display: none;
+
+        /* filter: sepia(100%);
+  animation: rotate 5s infinite linear; */
+      }
+
+      #canvas2 {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <video id="video" autoplay></video>
+    <canvas id="canvas"></canvas>
+    <canvas id="canvas2"></canvas>
+    <div id="ascii"></div>
+
+    <svg xmlns:svg="http://www.w3.org/2000/svg" id="svg"></svg>
+
+    <script type="text/javascript">
+      const canvas = document.getElementById("canvas");
+      const canvas2 = document.getElementById("canvas2");
+      const context = canvas.getContext("2d");
+      const context2 = canvas2.getContext("2d");
+      const video = document.getElementById("video");
+      const asciiDiv = document.getElementById("ascii");
+      const vendorUrl = window.URL || window.webkitURL;
+
+      const density = "█▓▒Ñ@#W$9876543210?!abc;:+=-,._                      ";
+      //   const density = "█▓▒░:. ";
+
+      const width = 400;
+      const height = 300;
+      const pixelSize = 10;
+      const fps = 100;
+      const nEmptySpaces = 1;
+      const withVideo = true;
+      const withImage = false;
+      const ascii = false;
+      const ascii2 = true;
+      const grey = false;
+      const blurs = false;
+
+      const interval = 1000 / fps;
+
+      canvas2.width = canvas.width = width;
+      canvas2.height = canvas.height = height;
+
+      asciiDiv.style.lineHeight = height / pixelSize + "px";
+      asciiDiv.style.fontSize = width / pixelSize + "px";
+
+      navigator.getMedia =
+        navigator.getUserMedia ||
+        navigator.webkitGetUserMedia ||
+        navigator.mozGetUserMedia ||
+        navigator.msGetUserMedia ||
+        navigator.oGetUserMedia;
+
+      if (withVideo) {
+        navigator.getMedia(
+          { video: true, audio: false },
+          (stream) => {
+            video.srcObject = stream;
+            video.play();
+            setInterval(() => {
+              context.drawImage(video, 0, 0, width, height);
+
+              const image = context.getImageData(0, 0, width, height);
+
+              updateVideo(image);
+
+              context.putImageData(image, 0, 0);
+            }, interval);
+          },
+          () => {}
+        );
+      }
+
+      if (withImage) {
+        const img = new Image();
+
+        img.onload = () => {
+          context.drawImage(img, 0, 0);
+          const image = context.getImageData(0, 0, width, height);
+          updateVideo(image);
+        };
+
+        img.src = "download1.png";
+      }
+
+      const updateVideo = (image) => {
+        let asciiImage = "";
+        if (ascii2) {
+          context2.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        for (let i = 0; i < height; i += pixelSize) {
+          for (let j = 0; j < width; j += pixelSize) {
+            let aa = 0;
+            let ar = 0;
+            let ag = 0;
+            let ab = 0;
+
+            let r = 0;
+            let g = 0;
+            let b = 0;
+
+            for (let ip = 0; ip < pixelSize; ip++) {
+              for (let jp = 0; jp < pixelSize; jp++) {
+                const pixelIndex = (jp + j + (ip + i) * width) * 4;
+                r = image.data[pixelIndex];
+                g = image.data[pixelIndex + 1];
+                b = image.data[pixelIndex + 2];
+
+                ar += r;
+                ag += g;
+                ab += b;
+                aa += r + g + b;
+              }
+            }
+
+            const mr = ar / (pixelSize * pixelSize);
+            const mg = ag / (pixelSize * pixelSize);
+            const mb = ab / (pixelSize * pixelSize);
+            const a = aa / (pixelSize * pixelSize * 3);
+
+            if (grey) {
+              for (let ip = 0; ip < pixelSize; ip++) {
+                for (let jp = 0; jp < pixelSize; jp++) {
+                  const pixelIndex = (jp + j + (ip + i) * width) * 4;
+                  image.data[pixelIndex] =
+                    image.data[pixelIndex + 1] =
+                    image.data[pixelIndex + 2] =
+                      a;
+                }
+              }
+            }
+
+            if (ascii) {
+              const charIndex = Math.floor(
+                map(a, 0, 255, 0, density.length - 1)
+              );
+              const c = density.charAt(charIndex);
+              asciiImage += c === " " ? "&nbsp;" : c;
+            }
+
+            if (ascii2) {
+              const matrixIndex = Math.floor(
+                map(a, 0, 255, 0, densityMatrixes.length - 1)
+              );
+              context2.fillStyle = `rgb(${mr} ${mg} ${mb})`;
+              console.log(r, g, b, mr, mg, mb, context2.fillStyle);
+              if (densityMatrixes[matrixIndex])
+                drawMatrix(densityMatrixes[matrixIndex], i, j);
+            }
+          }
+          if (ascii) asciiImage += "<br/>";
+        }
+
+        if (ascii) asciiDiv.innerHTML = asciiImage;
+      };
+
+      const addBlurs = (positions) => {
+        const svgEl = document.getElementById("svg");
+
+        let filterUrls = "";
+
+        for (let index = 0; index < positions.length; index++) {
+          const svgFilter = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "filter"
+          );
+          const filterId = `blur-${index}`;
+          svgFilter.setAttribute("id", filterId);
+
+          const { x, y, w, h } = positions[index];
+          const blurFilter = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "feGaussianBlur"
+          );
+          blurFilter.setAttribute("x", x);
+          blurFilter.setAttribute("y", y);
+          blurFilter.setAttribute("width", w);
+          blurFilter.setAttribute("height", h);
+          blurFilter.setStdDeviation(5, 5);
+          svgFilter.appendChild(blurFilter);
+
+          const composite = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "feComposite"
+          );
+          composite.setAttribute("operator", "over");
+          composite.setAttribute("in2", "SourceGraphic");
+          composite.setAttribute("in", `C`);
+          svgFilter.appendChild(composite);
+
+          svgEl.appendChild(svgFilter);
+          filterUrls += `url(#${filterId}) `;
+        }
+
+        canvas.style.filter = filterUrls;
+      };
+
+      if (blurs)
+        addBlurs([
+          { x: 0, y: 0, h: height, w: 150 },
+          { x: 0, y: 0, h: 50, w: width },
+          { x: 270, y: 0, h: height, w: 130 },
+        ]);
+
+      const drawMatrix = (matrix, y, x) => {
+        for (let y1 = 0; y1 < matrix.length; y1++) {
+          for (let x1 = 0; x1 < matrix.length; x1++) {
+            if (matrix[y1][x1]) {
+              context2.fillRect((x1 + x) * 1, (y1 + y) * 1, 1, 1);
+            }
+          }
+        }
+      };
+
+      const createMatrix = (() => {
+        const getSize = (n) => {
+          const size = n * 2;
+          return [...new Array(size)].map((_, i) => {
+            if (n - i >= 2) return n * (n - i);
+            const newI = size - i;
+            if (newI <= 2) return newI - 1;
+            return (newI - 2) * 2;
+          });
+        };
+
+        const createArrayLinear = (part, n, reverse) => {
+          const array = [];
+          let rest = 0;
+          let j = reverse ? n - 1 : 0;
+
+          while (reverse ? j >= 0 : j < n) {
+            const r = part + rest;
+            array[j] = Math.floor(fixFP(r));
+            rest = r - array[j];
+            j = j + (reverse ? -1 : 1);
+          }
+
+          return array;
+        };
+
+        const createArrayInwards = (
+          part,
+          n,
+          rest1 = 0,
+          rest2 = 0,
+          decreaseHalf
+        ) => {
+          let half = Math.floor(n / 2);
+          const array = [];
+
+          if (decreaseHalf) half--;
+
+          for (let j = 0; j < half; j++) {
+            const r = part + rest1;
+            array[j] = Math.floor(fixFP(r));
+            rest1 = r - array[j];
+          }
+
+          for (let j = n - 1; j > half; j--) {
+            const r = part + rest2;
+            array[j] = Math.floor(fixFP(r));
+            rest2 = r - array[j];
+          }
+
+          array[half] = Math.round(part + rest1 + rest2);
+
+          return array;
+        };
+
+        const createArrayOutAndInwards = (part, n) => {
+          const half = Math.floor(n / 2);
+          const isEven = n % 2 === 0;
+          let rest1 = 0;
+          let rest2 = 0;
+          const halfValue = Math.floor(part);
+
+          if (!isEven) rest1 = rest2 = fixFP((part - halfValue) / 2);
+
+          const firstHalf = createArrayInwards(part, half, 0, rest1);
+          const secondHalf = createArrayInwards(
+            part,
+            half,
+            rest2,
+            0,
+            !(half % 2)
+          );
+
+          return isEven
+            ? [...firstHalf, ...secondHalf]
+            : [...firstHalf, halfValue, ...secondHalf];
+        };
+
+        const createArray = (n) => {
+          const sizes = getSize(n);
+          return sizes.map((a, i) => {
+            const part = a / n;
+            if (!(a % n)) return [...new Array(n)].map(() => part);
+
+            return i === sizes.length - 3
+              ? createArrayOutAndInwards(part, n)
+              : createArrayInwards(part, n);
+          });
+        };
+
+        return (n) => {
+          const array = createArray(n);
+          const isEven = n % 2 === 0;
+
+          return array.map((ar, i) =>
+            ar.map((a, j) => {
+              const part = a / n;
+              const reverse = isEven ? j % 2 : !(j % 2);
+              return i >= n - 1
+                ? a === 1
+                  ? createArrayInwards(part, n, 0, 0, isEven && reverse)
+                  : createArrayOutAndInwards(part, n)
+                : createArrayLinear(part, n, reverse);
+            })
+          );
+        };
+      })();
+
+      const fixFP = (n, size = 10) => +n.toFixed(size);
+
+      const map = (n, start1, stop1, start2, stop2) =>
+        ((n - start1) / (stop1 - start1)) * (stop2 - start2) + start2;
+
+      let densityMatrixes = createMatrix(pixelSize);
+      for (let i = 0; i < nEmptySpaces - 1; i++) {
+        densityMatrixes.push(densityMatrixes[densityMatrixes.length - 1]);
+      }
+    </script>
+  </body>
+</html>

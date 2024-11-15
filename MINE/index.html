@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style type="text/css">
+      .row {
+        display: flex;
+      }
+
+      .cell {
+        width: 25px;
+        aspect-ratio: 1;
+        font-size: 19px;
+        border: 1px solid black;
+        background: lightgray;
+        box-shadow: inset 2px 2px 0px 2px white, inset -2px -2px 0px 2px grey;
+        text-align: center;
+        padding-top: 2px;
+        font-weight: bold;
+        cursor: pointer;
+        color: black;
+        user-select: none;
+      }
+
+      .cell.open {
+        box-shadow: none;
+        cursor: default;
+      }
+
+      .cell.disabled {
+        cursor: default;
+      }
+
+      .cell.bomb {
+        box-shadow: none;
+      }
+      .cell.bomb::before {
+        content: "💣";
+      }
+
+      .cell.flagged {
+        cursor: default;
+        color: black !important;
+      }
+      .cell.flagged::before {
+        content: "⚑";
+      }
+
+      .cell.highlighted {
+        box-shadow: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="init"></div>
+
+    <script type="text/javascript">
+      const colors = [
+        "blue",
+        "green",
+        "red",
+        "darkblue",
+        "brown",
+        "darkred",
+        "black",
+        "grey",
+      ];
+
+      const container = document.getElementById("init");
+      const field = [];
+
+      const rows = 30;
+      const columns = 60;
+      const bombs = Math.round((rows * columns) / 4);
+      const useV2 = true;
+      const showField = false;
+
+      while (container.firstChild) container.removeChild(container.firstChild);
+
+      window.oncontextmenu = () => false;
+
+      const getAdjacentIndex = (i, j) => {
+        return [
+          [i - 1, j - 1],
+          [i - 1, j],
+          [i - 1, j + 1],
+          [i, j - 1],
+          [i, j + 1],
+          [i + 1, j - 1],
+          [i + 1, j],
+          [i + 1, j + 1],
+        ];
+      };
+
+      const loseGame = () => {
+        field.forEach((row) =>
+          row.forEach((cell) => {
+            cell.onclick =
+              cell.onmousedown =
+              cell.onmouseup =
+              cell.onmouseleave =
+              cell.oncontextmenu =
+                () => {};
+            cell.classList.add("disabled");
+
+            if (cell.isBomb && !cell.isFlagged) {
+              cell.classList.add("bomb");
+            }
+          })
+        );
+      };
+
+      const openClosedCell = (i, j) => {
+        const cell = field[i]?.[j];
+        cell.isOpen = true;
+        cell.classList.add("open");
+
+        if (cell.value > 0) {
+          if (useV2) openAdjacentCells(i, j);
+          cell.innerHTML = cell.value;
+        } else {
+          getAdjacentIndex(i, j).forEach(([ai, aj]) => openCell(ai, aj));
+        }
+      };
+
+      const openAdjacentCells = (i, j, mouseDown) => {
+        const cell = field[i]?.[j];
+        const aCells = getAdjacentIndex(i, j).map(
+          ([ai, aj]) => field[ai]?.[aj]
+        );
+        const numFlagCells = aCells.filter((c) => c?.isFlagged).length;
+        const hasFlaggedValue = numFlagCells === cell.value;
+
+        getAdjacentIndex(i, j).forEach(([ai, aj]) => {
+          if (hasFlaggedValue && mouseDown !== false) openCell(ai, aj);
+          else if (mouseDown !== undefined) {
+            const aCell = field[ai]?.[aj];
+            if (aCell && !aCell.isOpen && !aCell.isFlagged) {
+              aCell.classList[mouseDown ? "add" : "remove"]("highlighted");
+            }
+          }
+        });
+      };
+
+      const openFlaggedCell = (i, j, mouseDown) => {
+        const cell = field[i]?.[j];
+        if (!cell) return;
+
+        if (cell.value > 0 && cell.isOpen) {
+          openAdjacentCells(i, j, mouseDown);
+        }
+      };
+
+      const openCell = (i, j) => {
+        const cell = field[i]?.[j];
+        if (!cell) return;
+        if (cell.isFlagged) return;
+        if (cell.isOpen) return;
+        if (cell.isBomb) {
+          cell.classList.add("bomb");
+          loseGame();
+          return;
+        }
+
+        openClosedCell(i, j);
+      };
+
+      const flagCell = (i, j) => {
+        const cell = field[i]?.[j];
+        if (!cell) return;
+        if (cell.isOpen) return false;
+        if (cell.isFlagged) {
+          cell.classList.remove("flagged");
+          cell.isFlagged = false;
+        } else {
+          cell.classList.add("flagged");
+          cell.isFlagged = true;
+          if (useV2) {
+            getAdjacentIndex(i, j).forEach(([ai, aj]) => {
+              const aCell = field[ai]?.[aj];
+              if (aCell?.value > 0 && aCell?.isOpen) openAdjacentCells(ai, aj);
+            });
+          }
+        }
+      };
+
+      const createField = () => {
+        for (let i = 0; i < rows; i++) {
+          const row = document.createElement("DIV");
+          row.classList.add("row");
+          field[i] = [];
+          for (let j = 0; j < columns; j++) {
+            const cell = document.createElement("DIV");
+            cell.classList.add("cell");
+            cell.isOpen = false;
+            cell.value = 0;
+
+            cell.onclick = () => {
+              openCell(i, j);
+            };
+            cell.onmousedown = () => {
+              openFlaggedCell(i, j, true);
+            };
+            cell.onmouseup = () => {
+              openFlaggedCell(i, j, false);
+            };
+            cell.onmouseleave = () => {
+              openFlaggedCell(i, j, false);
+            };
+            cell.oncontextmenu = () => {
+              flagCell(i, j);
+            };
+
+            row.appendChild(cell);
+            field[i][j] = cell;
+          }
+          container.appendChild(row);
+        }
+      };
+
+      const getIndexForBomb = (limit) => {
+        if (useV2) limit = limit - 2;
+        return Math.floor(Math.random() * limit) + +!!useV2;
+      };
+
+      const addBomb = () => {
+        const row = getIndexForBomb(rows);
+        const column = getIndexForBomb(columns);
+        const cell = field[row][column];
+
+        if (cell.isBomb) return false;
+
+        cell.isBomb = true;
+        if (showField) {
+          cell.classList.add("bomb");
+          cell.innerHTML = "";
+        }
+        getAdjacentIndex(row, column).forEach(([i, j]) => {
+          const aCell = field[i]?.[j];
+          if (aCell) {
+            aCell.value = aCell.value + 1;
+            aCell.style.color = colors[aCell.value - 1];
+
+            if (showField) {
+              aCell.innerHTML = aCell.isBomb ? "" : aCell.value;
+              aCell.classList.add("open");
+            }
+          }
+        });
+        return true;
+      };
+
+      const addBombs = () => {
+        for (let i = 0; i < bombs; i++) {
+          if (!addBomb()) i--;
+        }
+      };
+
+      createField();
+      addBombs();
+    </script>
+  </body>
+</html>

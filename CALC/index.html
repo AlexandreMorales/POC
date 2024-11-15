@@ -1,0 +1,113 @@
+<html>
+<head>
+    <title>Calculadora</title>
+    <style type="text/css">
+        
+        button{
+            height: 50px;
+            width: 50px;
+            margin: 10px;
+            font-size: 30px;
+        }
+        input{
+            width: 300px;
+            height: 50px;
+            font-size: 30px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <input id="input" type="number" disabled placeholder="0" />
+    <br>
+    <button id="plus">+</button>
+    <button id="minus">-</button>
+    <button id="times">x</button>
+    <button id="divide">/</button>
+    <br>
+    <button onclick="digitar(1)" type="button" >1</button>
+    <button onclick="digitar(2)" type="button" >2</button>
+    <button onclick="digitar(3)" type="button" >3</button>
+    <button id="equals">=</button>
+    <br>
+    <button onclick="digitar(4)" type="button" >4</button>
+    <button onclick="digitar(5)" type="button" >5</button>
+    <button onclick="digitar(6)" type="button" >6</button>
+    <button onclick="document.getElementById('input').value = ''">C</button>
+    <br>
+    <button onclick="digitar(7)" type="button" >7</button>
+    <button onclick="digitar(8)" type="button" >8</button>
+    <button onclick="digitar(9)" type="button" >9</button>
+    <button onclick="digitar(0)" type="button" >0</button>
+
+</body>
+<script type="text/javascript">
+    const input = document.getElementById('input')
+    const plusButton = document.getElementById('plus')
+    const minusButton = document.getElementById('minus')
+    const timesButton = document.getElementById('times')
+    const divideButton = document.getElementById('divide')
+    const equalsButton = document.getElementById('equals')
+
+    function digitar (x){
+        document.getElementById('input').value += x
+    }
+
+    let currentOperation = a => a
+
+    plusButton.onclick = () => {
+        const value = parseFloat(input.value)
+        input.value = ''
+
+        const oldValue = currentOperation(value)
+
+        currentOperation = value2 => {
+            return oldValue + value2
+        }
+    }
+    
+    minusButton.onclick = () => {
+        const value = parseFloat(input.value)
+        input.value = ''
+
+        const oldValue = currentOperation(value)
+
+        currentOperation = value2 => {
+            return oldValue - value2
+        }
+    }
+
+    timesButton.onclick = () => {
+        const value = parseFloat(input.value)
+        input.value = ''
+
+        const oldValue = currentOperation(value)
+
+        currentOperation = value2 => {
+            return oldValue * value2
+        }
+    }
+
+    divideButton.onclick = () => {
+        const value = parseFloat(input.value)
+        input.value = ''
+
+        const oldValue = currentOperation(value)
+
+        currentOperation = value2 => {
+            return oldValue / value2
+        }
+    }
+    
+
+    equalsButton.onclick = () => {
+        const value = parseFloat(input.value)
+        input.value = currentOperation(value)
+    }
+
+    
+</script>
+
+</html>

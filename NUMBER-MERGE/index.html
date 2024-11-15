@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style type="text/css">
+      .row {
+        display: flex;
+        position: relative;
+        pointer-events: none;
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .cell {
+        aspect-ratio: 1;
+        border: 0px solid gray;
+        background: lightgray;
+        user-select: none;
+      }
+
+      .card {
+        position: absolute;
+        border-radius: 20%;
+        z-index: 2;
+
+        text-align: center;
+        font-weight: bold;
+        font-family: Rubik, Arial, system-ui, sans-serif;
+        -webkit-text-stroke: 1px black;
+      }
+
+      #init {
+        display: inline-block;
+        border: 0px solid gray;
+        position: relative;
+        border-radius: 2%;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="init"></div>
+    <div id="score"></div>
+
+    <script type="text/javascript">
+      const rows = 4;
+      const columns = 4;
+
+      const adds = 2;
+      const minRandom = 1;
+
+      const cellSize = 100;
+      const animationDelay = 0.2;
+      const borderSize = 3;
+
+      const colors = new Proxy(
+        [
+          "white", //2
+          "beige", //4
+          "orange", //8
+          "darkorange", //16
+          "orangered", //32
+          "red", //64
+          "yellow", //128
+          "gold", //256
+          "goldenrod", //512
+          "darkgoldenrod", //1024
+        ],
+        {
+          get: (obj, prop) => obj[prop] || "black",
+        }
+      );
+
+      const transitionFields = [
+        "top",
+        "left",
+        "background",
+        "color",
+        "font-size",
+      ];
+
+      const container = document.getElementById("init");
+      const scoreDiv = document.getElementById("score");
+      const cards = [];
+      let score = 0;
+
+      while (container.firstChild) container.removeChild(container.firstChild);
+
+      document.onkeyup = (e) => {
+        e = e || window.event;
+        const useDiagonal = e.altKey;
+
+        if (e.keyCode == "38") {
+          // up
+          moveCards({
+            getNextSpace: useDiagonal
+              ? (card) => cards[card.pos.i - 1]?.[card.pos.j - 1]
+              : (card) => cards[card.pos.i - 1]?.[card.pos.j],
+            reverseI: false,
+            reverseJ: false,
+          });
+        } else if (e.keyCode == "40") {
+          // down
+          moveCards({
+            getNextSpace: useDiagonal
+              ? (card) => cards[card.pos.i + 1]?.[card.pos.j + 1]
+              : (card) => cards[card.pos.i + 1]?.[card.pos.j],
+            reverseI: true,
+            reverseJ: true,
+          });
+        } else if (e.keyCode == "37") {
+          // left
+          moveCards({
+            getNextSpace: useDiagonal
+              ? (card) => cards[card.pos.i + 1]?.[card.pos.j - 1]
+              : (card) => cards[card.pos.i]?.[card.pos.j - 1],
+            reverseI: useDiagonal,
+            reverseJ: false,
+          });
+        } else if (e.keyCode == "39") {
+          // right
+          moveCards({
+            getNextSpace: useDiagonal
+              ? (card) => cards[card.pos.i - 1]?.[card.pos.j + 1]
+              : (card) => cards[card.pos.i]?.[card.pos.j + 1],
+            reverseI: !useDiagonal,
+            reverseJ: true,
+          });
+        }
+      };
+
+      const moveCards = ({ getNextSpace, reverseI, reverseJ }) => {
+        const changes = [];
+
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < columns; j++) {
+            const realI = reverseI ? rows - 1 - i : i;
+            const realJ = reverseJ ? columns - 1 - j : j;
+
+            const oldCell = cards[realI]?.[realJ];
+            if (oldCell?.exists) {
+              let currSpace = oldCell;
+              let nextSpace = getNextSpace(currSpace);
+
+              let movedCell = false;
+
+              while (
+                !!nextSpace &&
+                (!nextSpace.exists ||
+                  (nextSpace.value === oldCell.value && !nextSpace.merged))
+              ) {
+                movedCell = true;
+                currSpace = nextSpace;
+                nextSpace = getNextSpace(currSpace);
+              }
+
+              if (movedCell) {
+                moved = true;
+                oldCell.style.zIndex = `${i + j}`;
+
+                cards[oldCell.pos.i][oldCell.pos.j] = {
+                  pos: { ...oldCell.pos },
+                };
+                cards[currSpace.pos.i][currSpace.pos.j] = oldCell;
+
+                oldCell.pos = { ...currSpace.pos };
+
+                if (currSpace.value === oldCell.value) {
+                  currSpace.value = oldCell.value = oldCell.value + 1;
+                  oldCell.merged = true;
+                  updateCard(currSpace);
+
+                  score += adds * 2 ** currSpace.value;
+                }
+
+                updateCard(oldCell);
+                changes.push({ oldCell, currSpace });
+              }
+            }
+          }
+        }
+
+        if (changes.length) {
+          setTimeout(() => {
+            for (const { oldCell, currSpace } of changes) {
+              oldCell.merged = false;
+              currSpace.parentNode?.removeChild(currSpace);
+            }
+            spawnCard(1);
+            verifyGameOver();
+          }, animationDelay * 1000);
+        }
+      };
+
+      const verifyGameOver = () => {
+        const possibleMove = cards
+          .flatMap((c) => c)
+          .find(
+            (c) =>
+              !c.exists ||
+              getAdjacentIndex(c.pos).find(
+                ([i, j]) => cards[i]?.[j]?.value === c.value
+              )
+          );
+
+        if (!possibleMove) {
+          scoreDiv.innerHTML = `GAME OVER<br />SCORE: ${score}`;
+        }
+      };
+
+      const getRandomInt = (max) => Math.floor(Math.random() * max);
+
+      const getAdjacentIndex = ({ i, j }) => {
+        return [
+          [i - 1, j - 1],
+          [i - 1, j],
+          [i - 1, j + 1],
+          [i, j - 1],
+          [i, j + 1],
+          [i + 1, j - 1],
+          [i + 1, j],
+          [i + 1, j + 1],
+        ];
+      };
+
+      const createCell = (i, j) => {
+        const cell = document.createElement("DIV");
+        cell.classList.add("cell");
+        cell.style.width = `${cellSize}px`;
+        cell.style.borderWidth = `${borderSize}px`;
+        return cell;
+      };
+
+      const createCard = (i, j, value) => {
+        const card = createCell(i, j);
+
+        card.classList.add("card");
+        card.value = value;
+        card.exists = true;
+        card.style.transition = transitionFields
+          .map((t) => `${animationDelay}s ${t}`)
+          .join(",");
+        card.style.lineHeight = `${cellSize}px`;
+        card.pos = { i, j };
+
+        cards[i][j] = card;
+
+        container.appendChild(card);
+
+        return card;
+      };
+
+      const updateCard = (card) => {
+        const value = adds * 2 ** card.value;
+        const size = `${value}`.length;
+
+        card.innerHTML = value;
+        card.style.background = colors[card.value];
+        card.style.fontSize = `${cellSize * 0.7 * (1 - size * 0.1)}px`;
+        card.style.top = `${(cellSize + borderSize * 2) * card.pos.i}px`;
+        card.style.left = `${(cellSize + borderSize * 2) * card.pos.j}px`;
+        card.style.color = card.value > minRandom ? "white" : "black";
+
+        scoreDiv.innerHTML = score;
+
+        return card;
+      };
+
+      const createGrid = () => {
+        container.style.borderWidth = `${borderSize}px`;
+
+        for (let i = 0; i < rows; i++) {
+          const row = document.createElement("DIV");
+          row.classList.add("row");
+          cards[i] = [];
+
+          for (let j = 0; j < columns; j++) {
+            const cell = createCell(i, j);
+            cards[i][j] = { pos: { i, j } };
+            row.appendChild(cell);
+          }
+
+          container.appendChild(row);
+        }
+      };
+
+      const spawnCard = (n) => {
+        let i = 0;
+        while (i < n) {
+          const value = getRandomInt(minRandom + 1);
+          const ri = getRandomInt(rows);
+          const rj = getRandomInt(columns);
+          if (!cards[ri]?.[rj]?.exists) {
+            updateCard(createCard(ri, rj, value));
+            i++;
+          } else if (!cards.flatMap((c) => c).find((c) => !c.exists)) {
+            return;
+          }
+        }
+      };
+
+      createGrid();
+      spawnCard(2);
+    </script>
+  </body>
+</html>
