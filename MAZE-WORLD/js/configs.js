@@ -4,7 +4,7 @@ export const CONFIG = {
   initialRows: 10,
   initialColumns: 10,
   cellSize: 15,
-  poliSizes: KNOWN_POLYGONS.SQUARE,
+  poliSizes: KNOWN_POLYGONS.HEXAGON,
 
   isCircle: false,
   isMaze: false,
@@ -15,6 +15,7 @@ export const CONFIG = {
 export const MAP_CONFIG = {
   passHour: 0.5,
   midNightHour: 70,
+  velocity: 10,
 };
 
 export const CANVAS_CONFIG = {

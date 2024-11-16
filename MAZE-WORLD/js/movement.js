@@ -1,4 +1,4 @@
-import { CONFIG, MAP_CONFIG, MAZE_CONFIG } from "./configs.js";
+import { CONFIG, MAP_CONFIG } from "./configs.js";
 import {
   KNOWN_POLYGONS,
   knownPolys,
@@ -8,8 +8,8 @@ import {
   STATES,
 } from "./infos.js";
 import { GRID } from "./grid.js";
-import { resetCanvasSize, drawEveryCell, applyDark } from "./draw.js";
-import { move } from "./maze.js";
+import { resetCanvasSize, drawEveryCell } from "./draw.js";
+import { mazeMove } from "./maze.js";
 import { correctRoundError, debounce } from "./utils.js";
 
 if (CONFIG.moveManually) {
@@ -28,12 +28,11 @@ if (CONFIG.moveManually) {
       resetCanvasSize();
       updateOffsets(getCenterCell(), MAP_INFO.currentCell);
       drawEveryCell();
-      applyDark();
       return;
     }
 
     if (e.code === "Space") {
-      moveTime();
+      move();
       return;
     }
 
@@ -52,14 +51,12 @@ if (CONFIG.moveManually) {
 
     if (!nextCell) return;
 
-    const oldCell = MAP_INFO.currentCell;
-    MAP_INFO.currentCell = nextCell;
-
     if (CONFIG.isMaze) {
-      move(oldCell, nextCell);
+      const oldCell = MAP_INFO.currentCell;
+      MAP_INFO.currentCell = nextCell;
+      mazeMove(oldCell, nextCell);
     } else {
-      updateOffsets(oldCell, nextCell);
-      moveTime();
+      move(nextCell);
     }
   };
 }
@@ -125,9 +122,28 @@ export const updateOffsets = (oldCell, nextCell) => {
   MAP_INFO.jOffset += nextCell.pos.j - oldCell.pos.j;
 };
 
+let canMove = true;
+
+/**
+ * @param {import("./infos.js").Cell} [nextCell]
+ */
+const move = (nextCell) => {
+  if (canMove) {
+    if (nextCell) {
+      const oldCell = MAP_INFO.currentCell;
+      MAP_INFO.currentCell = nextCell;
+
+      updateOffsets(oldCell, nextCell);
+    }
+    moveTime();
+    canMove = false;
+  }
+};
+
 const moveTime = debounce(() => {
+  canMove = true;
+
   drawEveryCell();
-  applyDark();
   MAP_INFO.timeOfDay += MAP_CONFIG.passHour;
 
   if (
@@ -136,7 +152,7 @@ const moveTime = debounce(() => {
   ) {
     MAP_CONFIG.passHour = -MAP_CONFIG.passHour;
   }
-});
+}, 1000 / MAP_CONFIG.velocity);
 
 /**
  * @returns {import("./infos.js").Cell}

@@ -5,9 +5,9 @@
 export const getRandomInt = (max) => Math.floor(Math.random() * max);
 
 /**
- * @param {() => void} fn
+ * @param {function} fn
  * @param {number} timeout
- * @returns {() => void}
+ * @returns {function}
  */
 export const debounce = (fn, timeout = 10) => {
   let timer;

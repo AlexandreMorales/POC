@@ -78,11 +78,6 @@ export const drawCell = (cell) => {
   else drawPoligon(cell, x, y);
 };
 
-export const applyDark = () => {
-  context.fillStyle = `rgba(0, 0, 0, ${MAP_INFO.timeOfDay / 100})`;
-  context.fillRect(0, 0, canvas.width, canvas.height);
-};
-
 /**
  * @param {import("./infos.js").Cell} cell
  * @param {number} x
@@ -103,15 +98,7 @@ const drawPoligon = (cell, x, y) => {
         ? -poliInfo.ySide
         : poliInfo.ySide;
 
-  // FILL
-  context.beginPath();
-
-  for (let i = 0; i < CONFIG.poliSizes; i++) {
-    context.lineTo(x + points[i].x, y + points[i].y);
-  }
-
-  context.closePath();
-  context.fill();
+  fillPoligon(x, y, points);
 
   if (CANVAS_CONFIG.showPos) {
     context.fillStyle = "black";
@@ -125,7 +112,19 @@ const drawPoligon = (cell, x, y) => {
     );
   }
 
-  if (!CONFIG.isMaze) return;
+  if (!CONFIG.isMaze) {
+    const shouldApplyDark =
+      cell !== MAP_INFO.currentCell &&
+      cell.adjacentIndexes[CONFIG.poliSizes]
+        .map(([ai, aj]) => GRID[ai]?.[aj])
+        .every((c) => c !== MAP_INFO.currentCell);
+
+    if (shouldApplyDark) {
+      context.fillStyle = `rgba(0, 0, 0, ${MAP_INFO.timeOfDay / 100})`;
+      fillPoligon(x, y, points);
+    }
+    return;
+  }
 
   // BORDERS
   context.strokeStyle = CANVAS_CONFIG.strokeColor;
@@ -142,6 +141,22 @@ const drawPoligon = (cell, x, y) => {
       context.stroke();
     }
   }
+};
+
+/**
+ * @param {number} x
+ * @param {number} y
+ * @param {{ x: number, y: number }[]} points
+ */
+const fillPoligon = (x, y, points) => {
+  context.beginPath();
+
+  for (let i = 0; i < CONFIG.poliSizes; i++) {
+    context.lineTo(x + points[i].x, y + points[i].y);
+  }
+
+  context.closePath();
+  context.fill();
 };
 
 /**

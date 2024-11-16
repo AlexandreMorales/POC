@@ -25,23 +25,15 @@ const start = () => {
   }
 
   loadChunk(0, 0);
+  MAP_INFO.currentCell = GRID[0][0];
 
   if (CONFIG.isMaze) {
-    MAP_INFO.currentCell = MAP_INFO.currentCell || GRID[0][0];
     startBuild();
   } else {
-    updateCurrentCell();
+    const centerCell = getCenterCell();
+    updateOffsets(centerCell, MAP_INFO.currentCell);
     drawEveryCell();
   }
-};
-
-const updateCurrentCell = () => {
-  const centerCell = getCenterCell();
-  MAP_INFO.currentCell = MAP_INFO.currentCell || centerCell;
-
-  if (MAP_INFO.currentCell !== centerCell)
-    updateOffsets(centerCell, MAP_INFO.currentCell);
-  drawEveryCell();
 };
 
 /**
@@ -109,7 +101,7 @@ const configPoli = (poliSizes) => {
   let canvasWidth = 0;
 
   if (CONFIG.automaticRowsAndColumns) {
-    canvasHeight = window.innerHeight - 50;
+    canvasHeight = window.innerHeight - 100;
     canvasWidth = window.innerWidth;
 
     rows = canvasHeight;

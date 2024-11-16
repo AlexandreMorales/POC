@@ -232,7 +232,7 @@ const getNextCellAdjacentIndex = (cell, nextCell) => {
  * @param {import("./infos.js").Cell} oldCell
  * @param {import("./infos.js").Cell} nextCell
  */
-export const move = (oldCell, nextCell) => {
+export const mazeMove = (oldCell, nextCell) => {
   const prevCell = MAZE_INFO.queue[MAZE_INFO.queue.length - 1];
 
   if (nextCell.pos === prevCell) {
