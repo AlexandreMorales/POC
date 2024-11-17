@@ -32,7 +32,7 @@ export const MAP_CONFIG = {
   velocity: 10,
   canMove: true,
   touchThreshold: 25,
-  initialTouchPos: { x: 0, y: 0 },
+  touchPos: { x: 0, y: 0, interval: null },
 };
 
 export const CANVAS_CONFIG = {

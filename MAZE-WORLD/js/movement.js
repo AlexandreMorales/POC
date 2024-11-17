@@ -26,24 +26,37 @@ if (CONFIG.moveManually) {
   };
 
   document.ontouchstart = (e) => {
-    MAP_CONFIG.initialTouchPos.x = e.changedTouches[0].screenX;
-    MAP_CONFIG.initialTouchPos.y = e.changedTouches[0].screenY;
+    e = e || /** @type {TouchEvent} */ (window.event);
+    const { screenX, screenY } = e.changedTouches[0];
+    MAP_CONFIG.touchPos.x = screenX;
+    MAP_CONFIG.touchPos.y = screenY;
+
+    MAP_CONFIG.touchPos.interval = setInterval(() => {
+      const finalX = screenX - MAP_CONFIG.touchPos.x;
+      const finalY = screenY - MAP_CONFIG.touchPos.y;
+
+      let code = null;
+      let useDiagonal = false;
+      if (Math.abs(finalY) > MAP_CONFIG.touchThreshold) {
+        useDiagonal = finalY < 0;
+        code = useDiagonal ? "ArrowUp" : "ArrowDown";
+      }
+      if (Math.abs(finalX) > MAP_CONFIG.touchThreshold) {
+        code = finalX < 0 ? "ArrowLeft" : "ArrowRight";
+      }
+
+      if (code) moveBaseOnCode(code, useDiagonal);
+    }, 100);
   };
-  document.ontouchend = (e) => {
-    const finalX = MAP_CONFIG.initialTouchPos.x - e.changedTouches[0].screenX;
-    const finalY = MAP_CONFIG.initialTouchPos.y - e.changedTouches[0].screenY;
-
-    let code = null;
-    let useDiagonal = false;
-    if (Math.abs(finalY) > MAP_CONFIG.touchThreshold) {
-      useDiagonal = finalY < 0;
-      code = useDiagonal ? "ArrowUp" : "ArrowDown";
-    }
-    if (Math.abs(finalX) > MAP_CONFIG.touchThreshold) {
-      code = finalX < 0 ? "ArrowLeft" : "ArrowRight";
-    }
-
-    if (code) moveBaseOnCode(code, useDiagonal);
+  document.ontouchmove = (e) => {
+    e = e || /** @type {TouchEvent} */ (window.event);
+    const { screenX, screenY } = e.changedTouches[0];
+    MAP_CONFIG.touchPos.x = screenX;
+    MAP_CONFIG.touchPos.y = screenY;
+  };
+  document.ontouchend = () => {
+    clearInterval(MAP_CONFIG.touchPos.interval);
+    MAP_CONFIG.touchPos = { x: 0, y: 0, interval: null };
   };
 }
 
