@@ -17,11 +17,39 @@
         margin: 0 auto;
         display: block;
       }
+
+      button {
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        border-radius: 5px;
+        background-image: -webkit-gradient(
+          linear,
+          left bottom,
+          left top,
+          color-stop(0.16, rgb(207, 207, 207)),
+          color-stop(0.79, rgb(252, 252, 252))
+        );
+        background-image: -moz-linear-gradient(
+          center bottom,
+          rgb(207, 207, 207) 16%,
+          rgb(252, 252, 252) 79%
+        );
+        background-image: linear-gradient(
+          to top,
+          rgb(207, 207, 207) 16%,
+          rgb(252, 252, 252) 79%
+        );
+        padding: 3px;
+        border: 1px solid #000;
+        color: black;
+        text-decoration: none;
+      }
     </style>
   </head>
   <body>
     <canvas id="init"></canvas>
     <input type="range" id="cell-height" name="volume" min="10" max="300" />
+    <button type="button" id="change-poly">Change Polygon</button>
   </body>
   <script type="module" src="js/start.js"></script>
 </html>

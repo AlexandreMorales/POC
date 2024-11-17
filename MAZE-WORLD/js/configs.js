@@ -30,6 +30,9 @@ export const MAP_CONFIG = {
   passHour: 0.5,
   midNightHour: 70,
   velocity: 10,
+  canMove: true,
+  touchThreshold: 25,
+  initialTouchPos: { x: 0, y: 0 },
 };
 
 export const CANVAS_CONFIG = {

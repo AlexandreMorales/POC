@@ -22,37 +22,35 @@ if (CONFIG.moveManually) {
       return;
     }
 
-    const aIndex = getMovedAdjacentIndex(e);
+    moveBaseOnCode(e.code, e.altKey);
+  };
 
-    if (aIndex === undefined) return;
+  document.ontouchstart = (e) => {
+    MAP_CONFIG.initialTouchPos.x = e.changedTouches[0].screenX;
+    MAP_CONFIG.initialTouchPos.y = e.changedTouches[0].screenY;
+  };
+  document.ontouchend = (e) => {
+    const finalX = MAP_CONFIG.initialTouchPos.x - e.changedTouches[0].screenX;
+    const finalY = MAP_CONFIG.initialTouchPos.y - e.changedTouches[0].screenY;
 
-    if (CONFIG.isMaze) if (MAP_INFO.currentCell.borders[aIndex]) return;
-
-    const nextPos =
-      MAP_INFO.currentCell.adjacentIndexes[CONFIG.polySides][aIndex];
-
-    if (!nextPos) return;
-
-    const nextCell = GRID[nextPos[0]]?.[nextPos[1]];
-
-    if (!nextCell) return;
-
-    if (CONFIG.isMaze) {
-      const oldCell = MAP_INFO.currentCell;
-      MAP_INFO.currentCell = nextCell;
-      mazeMove(oldCell, nextCell);
-    } else {
-      move(nextCell);
+    let code = null;
+    let useDiagonal = false;
+    if (Math.abs(finalY) > MAP_CONFIG.touchThreshold) {
+      useDiagonal = finalY < 0;
+      code = useDiagonal ? "ArrowUp" : "ArrowDown";
     }
+    if (Math.abs(finalX) > MAP_CONFIG.touchThreshold) {
+      code = finalX < 0 ? "ArrowLeft" : "ArrowRight";
+    }
+
+    if (code) moveBaseOnCode(code, useDiagonal);
   };
 }
 
 /**
- * @param {KeyboardEvent} e
+ * @param {boolean} [useDiagonal]
  */
-const getMovedAdjacentIndex = (e) => {
-  const useDiagonal = e.altKey;
-
+const getMovementMap = (useDiagonal) => {
   let topI = 0;
   let bottomI = POLY_INFO[CONFIG.polySides].bottomIndex;
 
@@ -70,14 +68,42 @@ const getMovedAdjacentIndex = (e) => {
     topRightI = bottomRightI = isInverted ? 2 : 1;
   }
 
-  const codeMap = {
+  return {
     ArrowUp: topI,
     ArrowDown: bottomI,
     ArrowLeft: useDiagonal ? topLeftI : bottomLeftI,
     ArrowRight: useDiagonal ? topRightI : bottomRightI,
   };
+};
 
-  return codeMap[e.code];
+/**
+ * @param {string} code
+ * @param {boolean} [useDiagonal]
+ */
+const moveBaseOnCode = (code, useDiagonal) => {
+  const moveMap = getMovementMap(useDiagonal);
+  const aIndex = moveMap[code];
+
+  if (aIndex === undefined) return;
+
+  if (CONFIG.isMaze) if (MAP_INFO.currentCell.borders[aIndex]) return;
+
+  const nextPos =
+    MAP_INFO.currentCell.adjacentIndexes[CONFIG.polySides][aIndex];
+
+  if (!nextPos) return;
+
+  const nextCell = GRID[nextPos[0]]?.[nextPos[1]];
+
+  if (!nextCell) return;
+
+  if (CONFIG.isMaze) {
+    const oldCell = MAP_INFO.currentCell;
+    MAP_INFO.currentCell = nextCell;
+    mazeMove(oldCell, nextCell);
+  } else {
+    move(nextCell);
+  }
 };
 
 export const changePolySides = () => {
@@ -117,13 +143,11 @@ export const updateOffsets = (oldCell, nextCell) => {
   MAP_INFO.jOffset += nextCell.pos.j - oldCell.pos.j;
 };
 
-let canMove = true;
-
 /**
  * @param {import("./infos.js").Cell} [nextCell]
  */
 const move = (nextCell) => {
-  if (canMove) {
+  if (MAP_CONFIG.canMove) {
     if (nextCell) {
       const oldCell = MAP_INFO.currentCell;
       MAP_INFO.currentCell = nextCell;
@@ -131,12 +155,12 @@ const move = (nextCell) => {
       updateOffsets(oldCell, nextCell);
     }
     moveTime();
-    canMove = false;
+    MAP_CONFIG.canMove = false;
   }
 };
 
 const moveTime = debounce(() => {
-  canMove = true;
+  MAP_CONFIG.canMove = true;
 
   drawEveryCell();
   MAP_INFO.timeOfDay += MAP_CONFIG.passHour;

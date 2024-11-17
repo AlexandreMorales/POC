@@ -10,7 +10,7 @@ import { resetCanvasSize, drawEveryCell, setCanvasSize } from "./draw.js";
 import { createPolyCell, GRID, loadChunk } from "./grid.js";
 import "./movement.js";
 import { startBuild } from "./maze.js";
-import { getCenterCell, updateOffsets } from "./movement.js";
+import { changePolySides, getCenterCell, updateOffsets } from "./movement.js";
 
 const start = () => {
   if (CONFIG.isCircle) {
@@ -112,7 +112,7 @@ const configPoly = (polySides) => {
   let canvasWidth = 0;
 
   if (CONFIG.automaticRowsAndColumns) {
-    canvasHeight = window.innerHeight * 0.91;
+    canvasHeight = window.innerHeight * 0.9;
     canvasWidth = window.innerWidth;
 
     rows = canvasHeight;
@@ -204,3 +204,8 @@ if (CONFIG.showZoom) {
 } else {
   cellHeightInput.style.display = "none";
 }
+
+const changePolyBtn = /** @type {HTMLButtonElement} */ (
+  document.getElementById("change-poly")
+);
+changePolyBtn.onclick = changePolySides;
