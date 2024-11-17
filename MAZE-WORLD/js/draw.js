@@ -1,4 +1,4 @@
-import { POLI_INFO, KNOWN_POLYGONS, MAP_INFO, CIRCLE_INFO } from "./infos.js";
+import { POLY_INFO, KNOWN_POLYGONS, MAP_INFO, CIRCLE_INFO } from "./infos.js";
 import { CONFIG, CANVAS_CONFIG } from "./configs.js";
 import { GRID, getRows, getNumCellsPerRow, loadChunk } from "./grid.js";
 import { tweakColor } from "./utils.js";
@@ -19,15 +19,15 @@ export const setCanvasSize = (height, width) => {
 
 export const resetCanvasSize = () => {
   setCanvasSize(
-    POLI_INFO[CONFIG.poliSizes].canvasHeight,
-    POLI_INFO[CONFIG.poliSizes].canvasWidth
+    POLY_INFO[CONFIG.polySides].canvasHeight,
+    POLY_INFO[CONFIG.polySides].canvasWidth
   );
 };
 
 export const drawEveryCell = () => {
-  const offsetHexagone =
+  const offsetPolygon =
     !CONFIG.isMaze &&
-    CONFIG.poliSizes === KNOWN_POLYGONS.HEXAGON &&
+    CONFIG.polySides > KNOWN_POLYGONS.SQUARE &&
     MAP_INFO.currentCell.pos.j % 2;
   const rows = getRows();
   for (let i = 0; i < rows; i++) {
@@ -37,7 +37,7 @@ export const drawEveryCell = () => {
       let nI = baseI;
       const nJ = j + MAP_INFO.jOffset;
 
-      if (offsetHexagone && nJ % 2 === 0) nI = nI + 1;
+      if (offsetPolygon && nJ % 2 === 0) nI = nI + 1;
 
       if (!GRID[nI]?.[nJ]) {
         const [cI, cJ] = getChunkStart(nI, nJ);
@@ -53,11 +53,11 @@ export const drawEveryCell = () => {
  * @param {import("./infos.js").Cell} cell
  */
 export const drawCell = (cell) => {
-  let { x, y } = cell.dPos[CONFIG.poliSizes];
+  let { x, y } = cell.dPos[CONFIG.polySides];
 
   if (!CONFIG.isMaze) {
-    x += MAP_INFO.xOffset[CONFIG.poliSizes] || 0;
-    y += MAP_INFO.yOffset[CONFIG.poliSizes] || 0;
+    x += MAP_INFO.xOffset[CONFIG.polySides] || 0;
+    y += MAP_INFO.yOffset[CONFIG.polySides] || 0;
   }
 
   if (x <= 0 || y <= 0 || x >= canvas.width || y > canvas.height) return;
@@ -75,7 +75,7 @@ export const drawCell = (cell) => {
     context.fillStyle = CANVAS_CONFIG.currentColor;
 
   if (CONFIG.isCircle) drawCellCircle(cell);
-  else drawPoligon(cell, x, y);
+  else drawPolygon(cell, x, y);
 };
 
 /**
@@ -83,45 +83,44 @@ export const drawCell = (cell) => {
  * @param {number} x
  * @param {number} y
  */
-const drawPoligon = (cell, x, y) => {
-  const isInverted =
-    CONFIG.poliSizes === KNOWN_POLYGONS.TRIANGLE && cell.isInverted;
-  const poliInfo = POLI_INFO[CONFIG.poliSizes];
-  const points = isInverted ? poliInfo.invertedPoints : poliInfo.points;
+const drawPolygon = (cell, x, y) => {
+  const isInverted = CONFIG.polySides % 2 && cell.isInverted;
+  const polyInfo = POLY_INFO[CONFIG.polySides];
+  const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;
 
   if (
-    CONFIG.poliSizes === KNOWN_POLYGONS.HEXAGON &&
+    CONFIG.polySides > KNOWN_POLYGONS.SQUARE &&
     (cell.pos.j + MAP_INFO.jOffset) % 2
   )
     y +=
       !CONFIG.isMaze && MAP_INFO.currentCell.pos.j % 2
-        ? -poliInfo.ySide
-        : poliInfo.ySide;
+        ? -polyInfo.ySide
+        : polyInfo.ySide;
 
-  fillPoligon(x, y, points);
+  fillPolygon(x, y, points);
 
   if (CANVAS_CONFIG.showPos) {
     context.fillStyle = "black";
-    context.font = `bold ${CONFIG.cellSize / 5}px Arial`;
+    context.font = `bold ${CONFIG.cellHeight / 5}px Arial`;
     context.textAlign = "center";
     context.textBaseline = "middle";
     context.fillText(
       `${cell.pos.i},${cell.pos.j}`,
       x,
-      isInverted ? y + poliInfo.ySide / 2 : y
+      isInverted ? y + polyInfo.ySide / 2 : y
     );
   }
 
   if (!CONFIG.isMaze) {
     const shouldApplyDark =
       cell !== MAP_INFO.currentCell &&
-      cell.adjacentIndexes[CONFIG.poliSizes]
+      cell.adjacentIndexes[CONFIG.polySides]
         .map(([ai, aj]) => GRID[ai]?.[aj])
         .every((c) => c !== MAP_INFO.currentCell);
 
     if (shouldApplyDark) {
       context.fillStyle = `rgba(0, 0, 0, ${MAP_INFO.timeOfDay / 100})`;
-      fillPoligon(x, y, points);
+      fillPolygon(x, y, points);
     }
     return;
   }
@@ -130,7 +129,7 @@ const drawPoligon = (cell, x, y) => {
   context.strokeStyle = CANVAS_CONFIG.strokeColor;
   context.lineWidth = CANVAS_CONFIG.border;
 
-  for (let i = 0; i < CONFIG.poliSizes; i++) {
+  for (let i = 0; i < CONFIG.polySides; i++) {
     if (cell.borders[i]) {
       let point = points[i];
       let nextPoint = points[i + 1];
@@ -148,10 +147,10 @@ const drawPoligon = (cell, x, y) => {
  * @param {number} y
  * @param {{ x: number, y: number }[]} points
  */
-const fillPoligon = (x, y, points) => {
+const fillPolygon = (x, y, points) => {
   context.beginPath();
 
-  for (let i = 0; i < CONFIG.poliSizes; i++) {
+  for (let i = 0; i < CONFIG.polySides; i++) {
     context.lineTo(x + points[i].x, y + points[i].y);
   }
 
@@ -178,7 +177,7 @@ const getChunkStart = (i, j) => [
  * @param {import("./infos.js").Cell} cell
  */
 const drawCellCircle = (cell) => {
-  const { x, y } = cell.dPos[CONFIG.poliSizes];
+  const { x, y } = cell.dPos[CONFIG.polySides];
   const {
     radius,
     downCellRadius,

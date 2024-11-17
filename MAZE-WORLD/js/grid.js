@@ -1,5 +1,5 @@
 import { CONFIG } from "./configs.js";
-import { POLI_INFO, KNOWN_POLYGONS, CIRCLE_INFO } from "./infos.js";
+import { POLY_INFO, KNOWN_POLYGONS, CIRCLE_INFO } from "./infos.js";
 import { BIOMES } from "./biomes.js";
 import { tweakColor, isCellInverted } from "./utils.js";
 
@@ -32,11 +32,11 @@ export const createCell = (i, j, value) => {
   }
 
   if (CONFIG.isMaze)
-    cell.borders = [...new Array(CONFIG.poliSizes)].map(() => CONFIG.isMaze);
+    cell.borders = [...new Array(CONFIG.polySides)].map(() => CONFIG.isMaze);
   cell.adjacentIndexes = getAdjacentIndexes(i, j);
 
   if (CONFIG.isCircle) createCircleCell(cell);
-  else createPoliCell(cell);
+  else createPolyCell(cell);
 
   return cell;
 };
@@ -44,27 +44,40 @@ export const createCell = (i, j, value) => {
 /**
  * @param {import("./infos.js").Cell} cell
  */
-const createPoliCell = (cell) => {
+const createPolyCell = (cell) => {
   const { i, j } = cell.pos;
-  const triangleInfo = POLI_INFO[KNOWN_POLYGONS.TRIANGLE];
-  const squareInfo = POLI_INFO[KNOWN_POLYGONS.SQUARE];
-  const hexaInfo = POLI_INFO[KNOWN_POLYGONS.HEXAGON];
+  const triangleInfo = POLY_INFO[KNOWN_POLYGONS.TRIANGLE];
+  const squareInfo = POLY_INFO[KNOWN_POLYGONS.SQUARE];
+  const hexaInfo = POLY_INFO[KNOWN_POLYGONS.HEXAGON];
 
   cell.isInverted = isCellInverted(cell.pos);
-  cell.dPos = {
-    [KNOWN_POLYGONS.TRIANGLE]: {
-      x: j * (triangleInfo.polySide / 2) + triangleInfo.xSide,
-      y: i * triangleInfo.ySide * 2 + triangleInfo.ySide,
+  cell.dPos = new Proxy(
+    {
+      [KNOWN_POLYGONS.TRIANGLE]: {
+        x: j * (triangleInfo.polySide / 2) + triangleInfo.xSide,
+        y: i * triangleInfo.ySide * 2 + triangleInfo.ySide,
+      },
+      [KNOWN_POLYGONS.SQUARE]: {
+        x: j * squareInfo.xSide * 2 + squareInfo.xSide,
+        y: i * squareInfo.ySide * 2 + squareInfo.ySide,
+      },
+      [KNOWN_POLYGONS.HEXAGON]: {
+        x: j * (hexaInfo.xSide + hexaInfo.polySide / 2) + hexaInfo.xSide,
+        y: i * hexaInfo.ySide * 2 + hexaInfo.ySide,
+      },
     },
-    [KNOWN_POLYGONS.SQUARE]: {
-      x: j * squareInfo.xSide * 2 + squareInfo.xSide,
-      y: i * squareInfo.ySide * 2 + squareInfo.ySide,
-    },
-    [KNOWN_POLYGONS.HEXAGON]: {
-      x: j * (hexaInfo.xSide + hexaInfo.polySide / 2) + hexaInfo.xSide,
-      y: i * hexaInfo.ySide * 2 + hexaInfo.ySide,
-    },
-  };
+    {
+      get: (obj, prop) => {
+        const polyInfo = POLY_INFO[prop];
+        return (
+          obj[prop] || {
+            x: j * (polyInfo.xSide + polyInfo.polySide / 2) + polyInfo.xSide,
+            y: i * polyInfo.ySide * 2 + polyInfo.ySide,
+          }
+        );
+      },
+    }
+  );
 };
 
 /**
@@ -94,7 +107,7 @@ export const loadChunk = (offsetI, offsetJ) => {
  * @returns {number}
  */
 export const getRows = () =>
-  CONFIG.isCircle ? CIRCLE_INFO.rows : POLI_INFO[CONFIG.poliSizes].rows;
+  CONFIG.isCircle ? CIRCLE_INFO.rows : POLY_INFO[CONFIG.polySides].rows;
 
 /**
  * @param {number} rowIndex
@@ -103,7 +116,7 @@ export const getRows = () =>
 export const getNumCellsPerRow = (rowIndex) =>
   CONFIG.isCircle
     ? CIRCLE_INFO.columns - Math.floor((rowIndex + 1) / 2)
-    : POLI_INFO[CONFIG.poliSizes].columns;
+    : POLY_INFO[CONFIG.polySides].columns;
 
 /**
  * @param {number} width
@@ -242,8 +255,8 @@ const getAdjacentIndexes = (i, j) => {
  */
 const createCircleCell = (cell) => {
   const { i, j } = cell.pos;
-  const radius = (CIRCLE_INFO.rows - i) * CONFIG.cellSize;
-  const downCellRadius = radius - CONFIG.cellSize;
+  const radius = (CIRCLE_INFO.rows - i) * CONFIG.cellHeight;
+  const downCellRadius = radius - CONFIG.cellHeight;
 
   const angle = Math.atan2(-radius, 0);
   const downCellAngle = Math.atan2(-downCellRadius, 0);
@@ -262,7 +275,7 @@ const createCircleCell = (cell) => {
   const [x1, y1] = getPoint(radius, endTopAngle);
   const [x2, y2] = getPoint(downCellRadius, endBottomAngle);
 
-  cell.dPos = { [CONFIG.poliSizes]: { x, y } };
+  cell.dPos = { [CONFIG.polySides]: { x, y } };
   cell.pos = {
     i,
     j,
@@ -280,7 +293,7 @@ const createCircleCell = (cell) => {
     endBottomAngle,
   };
   cell.adjacentIndexes = {
-    [CONFIG.poliSizes]: cell.adjacentIndexes[CONFIG.poliSizes].map(
+    [CONFIG.polySides]: cell.adjacentIndexes[CONFIG.polySides].map(
       ([ai, aj]) => [ai, aj < 0 ? numCells - 1 : aj >= numCells ? 0 : aj]
     ),
   };

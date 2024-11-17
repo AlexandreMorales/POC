@@ -24,12 +24,12 @@
  * @property {number} value
  * @property {import("./biomes").Block} type
  * @property {string} color
- * @property {boolean[]} borders
  * @property {{ [k: number]: number[][] }} adjacentIndexes
  * @property {boolean} isInverted Only used for triangles
  * @property {{ [k: string]: { x: number, y: number } }} dPos
  *
  * MAZE PROPERTIES
+ * @property {boolean[]} [borders]
  * @property {boolean} [visited] Only used for maze on the build state
  * @property {boolean} [solved] Only used for maze on the build solve
  * @property {boolean} [path] Only used for maze on the build solve
@@ -64,8 +64,8 @@ export const MAP_INFO = /** @type {MapInfo} */ ({
 /**
  * @typedef {Object} PolyInfoProp
  * @property {number} polySide The length of the side of the polygon
- * @property {number} xSide The horizontal length of the polygon
- * @property {number} ySide The vertical length of the polygon
+ * @property {number} xSide The half of the horizontal length of the polygon
+ * @property {number} ySide The half of the vertical length of the polygon
  * @property {{ x: number, y: number }[]} points List of point of the polygon
  * @property {{ x: number, y: number }[]} invertedPoints List of point of the polygon for inverted triangles
  * @property {number} bottomIndex
@@ -74,7 +74,7 @@ export const MAP_INFO = /** @type {MapInfo} */ ({
  * @property {number} canvasHeight
  * @property {number} canvasWidth
  */
-export const POLI_INFO = /** @type {{ [k: number]: PolyInfoProp }} */ ({});
+export const POLY_INFO = /** @type {{ [k: number]: PolyInfoProp }} */ ({});
 
 ///// MAZE /////
 

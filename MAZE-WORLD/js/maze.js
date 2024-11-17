@@ -5,7 +5,7 @@ import {
   MAP_INFO,
   TIME,
   CIRCLE_INFO,
-  POLI_INFO,
+  POLY_INFO,
   STATES,
   MAZE_INFO,
 } from "./infos.js";
@@ -72,7 +72,7 @@ const clearRandomCells = () => {
     const randomJ = getRandomInt(getNumCellsPerRow(randomI) - 2) + 1;
     const cell = GRID[randomI][randomJ];
 
-    const indexes = cell.adjacentIndexes[CONFIG.poliSizes];
+    const indexes = cell.adjacentIndexes[CONFIG.polySides];
     for (let index = 0; index < indexes.length; index++) {
       const [aI, aJ] = indexes[index];
       const nextCell = GRID[aI]?.[aJ];
@@ -90,8 +90,8 @@ const clearRandomCells = () => {
 };
 
 const getLastCell = () =>
-  GRID[POLI_INFO[CONFIG.poliSizes].rows - 1][
-    POLI_INFO[CONFIG.poliSizes].columns - 1
+  GRID[POLY_INFO[CONFIG.polySides].rows - 1][
+    POLY_INFO[CONFIG.polySides].columns - 1
   ];
 
 const isSolved = () =>
@@ -191,7 +191,7 @@ const finish = () => {
  * @param {(c: import("./infos.js").Cell) => boolean} cellFilter
  */
 const getNextCell = (cell, cellFilter) => {
-  const aCells = cell.adjacentIndexes[CONFIG.poliSizes]
+  const aCells = cell.adjacentIndexes[CONFIG.polySides]
     .map(([ai, aj]) => GRID[ai]?.[aj])
     .filter(cellFilter);
 
@@ -216,7 +216,7 @@ const getNextCell = (cell, cellFilter) => {
  */
 const getNextCellAdjacentIndex = (cell, nextCell) => {
   let nextIndex = 0;
-  const indexes = cell.adjacentIndexes[CONFIG.poliSizes];
+  const indexes = cell.adjacentIndexes[CONFIG.polySides];
   while (nextIndex < indexes.length) {
     const [i, j] = indexes[nextIndex];
     if (nextCell.pos.i === i && nextCell.pos.j === j) {

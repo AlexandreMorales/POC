@@ -4,7 +4,7 @@ import {
   KNOWN_POLYGONS,
   knownPolys,
   MAP_INFO,
-  POLI_INFO,
+  POLY_INFO,
 } from "./infos.js";
 import { resetCanvasSize, drawEveryCell, setCanvasSize } from "./draw.js";
 import { GRID, loadChunk } from "./grid.js";
@@ -17,11 +17,11 @@ const start = () => {
     configCircle();
   } else {
     for (const p of knownPolys) {
-      POLI_INFO[p] = configPoli(p);
+      POLY_INFO[p] = configPoly(p);
     }
     resetCanvasSize();
-    CONFIG.initialRows = POLI_INFO[CONFIG.poliSizes].rows;
-    CONFIG.initialColumns = POLI_INFO[CONFIG.poliSizes].columns;
+    CONFIG.initialRows = POLY_INFO[CONFIG.polySides].rows;
+    CONFIG.initialColumns = POLY_INFO[CONFIG.polySides].columns;
   }
 
   loadChunk(0, 0);
@@ -37,20 +37,20 @@ const start = () => {
 };
 
 /**
- * @param {number} poliSizes
- * @param {number} polyRadius
+ * @param {number} polySides
+ * @param {number} radiusFromCorner
  * @param {number} coeficient
  * @param {number} yCoeficient
  * @returns {{ x: number, y: number }[]}
  */
-const createPoints = (poliSizes, polyRadius, coeficient, yCoeficient) => {
+const createPoints = (polySides, radiusFromCorner, coeficient, yCoeficient) => {
   const points = [];
-  const sideRad = (2 * Math.PI) / poliSizes;
+  const sideRad = (2 * Math.PI) / polySides;
 
-  for (let i = 0; i < poliSizes; i++) {
+  for (let i = 0; i < polySides; i++) {
     const nI = i - coeficient;
-    const x = polyRadius * Math.cos(sideRad * nI);
-    const y = polyRadius * Math.sin(sideRad * nI) + yCoeficient;
+    const x = radiusFromCorner * Math.cos(sideRad * nI);
+    const y = radiusFromCorner * Math.sin(sideRad * nI) + yCoeficient;
 
     points.push({ x, y });
   }
@@ -59,41 +59,49 @@ const createPoints = (poliSizes, polyRadius, coeficient, yCoeficient) => {
 };
 
 /**
- * @param {number} poliSizes
+ * @param {number} polySides
  * @returns {import("./infos.js").PolyInfoProp}
  */
-const configPoli = (poliSizes) => {
-  const polyHeight = CONFIG.cellSize / 2;
-  const polyRadius = polyHeight * (1 / Math.cos(Math.PI / poliSizes));
+const configPoly = (polySides) => {
+  let radiusFromSide = 0;
+  let radiusFromCorner = 0;
+  // The length of the side of the polygon
+  let polySide = 0;
+  const isOddPoly = polySides % 2;
 
-  const polySide = 2 * polyRadius * Math.sin(Math.PI / poliSizes);
+  if (isOddPoly) {
+    // Pythagoras of (height² + (side/2)² = side²)
+    polySide = Math.sqrt(CONFIG.cellHeight ** 2 / (1 - 1 / 4));
+    // (1/2)a cot(π/n);
+    radiusFromSide = (polySide / 2) * (1 / Math.tan(Math.PI / polySides));
+  } else {
+    radiusFromSide = CONFIG.cellHeight / 2;
+    // 2r tan(π/n)
+    polySide = 2 * radiusFromSide * Math.tan(Math.PI / polySides);
+  }
+  // (r sec(π/n))
+  radiusFromCorner = radiusFromSide * (1 / Math.cos(Math.PI / polySides));
 
-  const shouldIntercalate = poliSizes > 4;
+  const shouldIntercalate = polySides > KNOWN_POLYGONS.SQUARE;
 
-  const yCoeficient = {
-    3: CONFIG.cellSize / 4,
-    5: CONFIG.cellSize / 10,
-    7: CONFIG.cellSize / 20,
-    9: CONFIG.cellSize / 35,
-    11: CONFIG.cellSize / 50,
-  };
+  const yCoeficient = isOddPoly ? CONFIG.cellHeight / 6 : 0;
   const points = createPoints(
-    poliSizes,
-    polyRadius,
-    (poliSizes / 2 + 1) / 2,
-    -(yCoeficient[poliSizes] || 0)
+    polySides,
+    radiusFromCorner,
+    (polySides / 2 + 1) / 2,
+    -yCoeficient
   );
   const xSide = points.reduce((acc, { x }) => (x > acc ? x : acc), 0);
   const invertedPoints = createPoints(
-    poliSizes,
-    polyRadius,
-    (poliSizes / 2 + (poliSizes + 1)) / 2,
-    yCoeficient[poliSizes] || 0
+    polySides,
+    radiusFromCorner,
+    (polySides / 2 + (polySides + 1)) / 2,
+    yCoeficient
   );
 
-  const ySide = poliSizes % 2 ? (polyHeight + polyRadius) / 2 : polyHeight;
+  const ySide = CONFIG.cellHeight / 2;
 
-  const slopSide = Math.sqrt(Math.abs(polySide ** 2 - polyHeight ** 2));
+  const slopSide = Math.sqrt(Math.abs(polySide ** 2 - radiusFromSide ** 2));
 
   let rows = CONFIG.initialRows;
   let columns = CONFIG.initialColumns;
@@ -106,17 +114,15 @@ const configPoli = (poliSizes) => {
 
     rows = canvasHeight;
     if (shouldIntercalate) rows -= ySide;
-    rows = rows / CONFIG.cellSize;
+    rows = rows / CONFIG.cellHeight;
 
     columns = canvasWidth / (xSide * 2);
 
-    if (shouldIntercalate) {
-      columns = ((canvasWidth - slopSide) * 2) / (polyRadius * 2 + polySide);
-    }
+    if (isOddPoly) columns = ((canvasWidth - 2) * 2 - polySide) / polySide;
 
-    if (poliSizes === KNOWN_POLYGONS.TRIANGLE) {
-      rows = canvasHeight / (polyHeight + polyRadius);
-      columns = ((canvasWidth - 2) * 2 - polySide) / polySide;
+    if (shouldIntercalate) {
+      columns =
+        ((canvasWidth - slopSide) * 2) / (radiusFromCorner * 2 + polySide);
     }
 
     rows = Math.floor(rows);
@@ -126,20 +132,17 @@ const configPoli = (poliSizes) => {
   if (rows % 2 === 0) rows -= 1;
   if (columns % 2 === 0) columns -= 1;
 
-  canvasHeight = rows * CONFIG.cellSize;
+  canvasHeight = rows * CONFIG.cellHeight;
   if (shouldIntercalate) canvasHeight += ySide;
 
   canvasWidth = columns * (xSide * 2);
 
+  if (isOddPoly) canvasWidth = (columns * polySide) / 2 + polySide / 2 + 2;
+
   if (shouldIntercalate)
-    canvasWidth = (columns * (polyRadius * 2 + polySide)) / 2 + slopSide;
+    canvasWidth = (columns * (radiusFromCorner * 2 + polySide)) / 2 + slopSide;
 
-  if (poliSizes === KNOWN_POLYGONS.TRIANGLE) {
-    canvasHeight = rows * (polyHeight + polyRadius);
-    canvasWidth = (columns * polySide) / 2 + polySide / 2 + 2;
-  }
-
-  const bottomIndex = Math.floor(poliSizes / 2) % poliSizes;
+  const bottomIndex = Math.floor(polySides / 2) % polySides;
 
   return {
     polySide,
@@ -156,11 +159,11 @@ const configPoli = (poliSizes) => {
 };
 
 const configCircle = () => {
-  CONFIG.poliSizes = 4;
+  CONFIG.polySides = KNOWN_POLYGONS.SQUARE;
   CIRCLE_INFO.rows = CONFIG.initialRows * 2;
   CIRCLE_INFO.columns = CONFIG.initialColumns * 2;
 
-  const canvasWidth = CIRCLE_INFO.rows * 2 * CONFIG.cellSize + 2;
+  const canvasWidth = CIRCLE_INFO.rows * 2 * CONFIG.cellHeight + 2;
 
   setCanvasSize(canvasWidth, canvasWidth);
 

@@ -4,7 +4,7 @@ import {
   knownPolys,
   MAP_INFO,
   MAZE_INFO,
-  POLI_INFO,
+  POLY_INFO,
   STATES,
 } from "./infos.js";
 import { GRID } from "./grid.js";
@@ -20,9 +20,9 @@ if (CONFIG.moveManually) {
     e.preventDefault();
 
     if (e.code === "ShiftLeft") {
-      CONFIG.poliSizes =
+      CONFIG.polySides =
         knownPolys[
-          (knownPolys.indexOf(CONFIG.poliSizes) + 1) % knownPolys.length
+          (knownPolys.indexOf(CONFIG.polySides) + 1) % knownPolys.length
         ];
 
       resetCanvasSize();
@@ -43,7 +43,7 @@ if (CONFIG.moveManually) {
     if (CONFIG.isMaze) if (MAP_INFO.currentCell.borders[aIndex]) return;
 
     const nextPos =
-      MAP_INFO.currentCell.adjacentIndexes[CONFIG.poliSizes][aIndex];
+      MAP_INFO.currentCell.adjacentIndexes[CONFIG.polySides][aIndex];
 
     if (!nextPos) return;
 
@@ -68,15 +68,15 @@ const getMovedAdjacentIndex = (e) => {
   const useDiagonal = e.altKey;
 
   let topI = 0;
-  let bottomI = POLI_INFO[CONFIG.poliSizes].bottomIndex;
+  let bottomI = POLY_INFO[CONFIG.polySides].bottomIndex;
 
-  let topLeftI = CONFIG.poliSizes - 1;
+  let topLeftI = CONFIG.polySides - 1;
   let topRightI = topI + 1;
 
   let bottomLeftI = bottomI + 1;
   let bottomRightI = bottomI - 1;
 
-  if (CONFIG.poliSizes === KNOWN_POLYGONS.TRIANGLE) {
+  if (CONFIG.polySides % 2) {
     const isInverted = MAP_INFO.currentCell.isInverted;
     topI = isInverted ? undefined : 0;
     bottomI = isInverted ? 0 : undefined;
@@ -158,8 +158,8 @@ const moveTime = debounce(() => {
  * @returns {import("./infos.js").Cell}
  */
 export const getCenterCell = () => {
-  const middleRow = Math.floor(POLI_INFO[CONFIG.poliSizes].rows / 2);
-  const middleColumn = Math.floor(POLI_INFO[CONFIG.poliSizes].columns / 2);
+  const middleRow = Math.floor(POLY_INFO[CONFIG.polySides].rows / 2);
+  const middleColumn = Math.floor(POLY_INFO[CONFIG.polySides].columns / 2);
 
   return GRID[middleRow + MAP_INFO.iOffset][middleColumn + MAP_INFO.jOffset];
 };

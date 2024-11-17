@@ -27,9 +27,11 @@ export const isCellInverted = ({ i, j }) => (i + j) % 2 !== 0;
 
 /**
  * @param {number} number
+ * @param {number} estimation
  * @returns {number}
  */
-export const correctRoundError = (number) => +number.toFixed(6);
+export const correctRoundError = (number, estimation = 6) =>
+  +number.toFixed(estimation);
 
 /**
  * @param {string} hexColor

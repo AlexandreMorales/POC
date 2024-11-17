@@ -1,16 +1,28 @@
 import { KNOWN_POLYGONS } from "./infos.js";
 
-export const CONFIG = {
+/**
+ * @typedef {Object} Config
+ * @property {number} initialRows
+ * @property {number} initialColumns
+ * @property {number} cellHeight
+ * @property {number} polySides The number of sides of the current polygon
+ *
+ * @property {boolean} isCircle
+ * @property {boolean} isMaze
+ * @property {boolean} moveManually
+ * @property {boolean} automaticRowsAndColumns
+ */
+export const CONFIG = /** @type {Config} */ ({
   initialRows: 10,
   initialColumns: 10,
-  cellSize: 15,
-  poliSizes: KNOWN_POLYGONS.HEXAGON,
+  cellHeight: 20,
+  polySides: KNOWN_POLYGONS.HEXAGON,
 
   isCircle: false,
   isMaze: false,
   moveManually: true,
   automaticRowsAndColumns: true,
-};
+});
 
 export const MAP_CONFIG = {
   passHour: 0.5,
