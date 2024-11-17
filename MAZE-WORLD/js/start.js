@@ -7,7 +7,7 @@ import {
   POLY_INFO,
 } from "./infos.js";
 import { resetCanvasSize, drawEveryCell, setCanvasSize } from "./draw.js";
-import { GRID, loadChunk } from "./grid.js";
+import { createPolyCell, GRID, loadChunk } from "./grid.js";
 import "./movement.js";
 import { startBuild } from "./maze.js";
 import { getCenterCell, updateOffsets } from "./movement.js";
@@ -16,22 +16,19 @@ const start = () => {
   if (CONFIG.isCircle) {
     configCircle();
   } else {
-    for (const p of knownPolys) {
-      POLY_INFO[p] = configPoly(p);
-    }
+    configPolys();
     resetCanvasSize();
     CONFIG.initialRows = POLY_INFO[CONFIG.polySides].rows;
     CONFIG.initialColumns = POLY_INFO[CONFIG.polySides].columns;
   }
 
   loadChunk(0, 0);
-  MAP_INFO.currentCell = GRID[0][0];
 
   if (CONFIG.isMaze) {
+    MAP_INFO.currentCell = GRID[0][0];
     startBuild();
   } else {
-    const centerCell = getCenterCell();
-    updateOffsets(centerCell, MAP_INFO.currentCell);
+    MAP_INFO.currentCell = getCenterCell();
     drawEveryCell();
   }
 };
@@ -56,6 +53,12 @@ const createPoints = (polySides, radiusFromCorner, coeficient, yCoeficient) => {
   }
   points.push(points[0]);
   return points;
+};
+
+const configPolys = () => {
+  for (const p of knownPolys) {
+    POLY_INFO[p] = configPoly(p);
+  }
 };
 
 /**
@@ -109,7 +112,7 @@ const configPoly = (polySides) => {
   let canvasWidth = 0;
 
   if (CONFIG.automaticRowsAndColumns) {
-    canvasHeight = window.innerHeight - 100;
+    canvasHeight = window.innerHeight * 0.91;
     canvasWidth = window.innerWidth;
 
     rows = canvasHeight;
@@ -131,6 +134,7 @@ const configPoly = (polySides) => {
 
   if (rows % 2 === 0) rows -= 1;
   if (columns % 2 === 0) columns -= 1;
+  if (shouldIntercalate && ((columns + 1) / 2) % 2 === 0) columns -= 2;
 
   canvasHeight = rows * CONFIG.cellHeight;
   if (shouldIntercalate) canvasHeight += ySide;
@@ -170,4 +174,33 @@ const configCircle = () => {
   CIRCLE_INFO.centerX = CIRCLE_INFO.centerY = canvasWidth / 2;
 };
 
+/**
+ * @param {number} newSize
+ */
+export const resetSize = (newSize) => {
+  CONFIG.cellHeight = newSize;
+  configPolys();
+  GRID.flatMap((c) => c.flat()).map((c) => createPolyCell(c));
+  setCanvasSize(null, POLY_INFO[CONFIG.polySides].canvasWidth);
+  const oldOffsets = {
+    xOffset: MAP_INFO.xOffset,
+    yOffset: MAP_INFO.yOffset,
+    iOffset: MAP_INFO.iOffset,
+    jOffset: MAP_INFO.jOffset,
+  };
+  updateOffsets(getCenterCell(), MAP_INFO.currentCell);
+  drawEveryCell();
+  Object.assign(MAP_INFO, oldOffsets);
+};
+
 start();
+
+const cellHeightInput = /** @type {HTMLInputElement} */ (
+  document.getElementById("cell-height")
+);
+if (CONFIG.showZoom) {
+  cellHeightInput.value = cellHeightInput.min = `${CONFIG.cellHeight}`;
+  cellHeightInput.oninput = () => resetSize(+cellHeightInput.value);
+} else {
+  cellHeightInput.style.display = "none";
+}

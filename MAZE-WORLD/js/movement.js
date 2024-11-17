@@ -1,12 +1,5 @@
 import { CONFIG, MAP_CONFIG } from "./configs.js";
-import {
-  KNOWN_POLYGONS,
-  knownPolys,
-  MAP_INFO,
-  MAZE_INFO,
-  POLY_INFO,
-  STATES,
-} from "./infos.js";
+import { knownPolys, MAP_INFO, MAZE_INFO, POLY_INFO, STATES } from "./infos.js";
 import { GRID } from "./grid.js";
 import { resetCanvasSize, drawEveryCell } from "./draw.js";
 import { mazeMove } from "./maze.js";
@@ -20,14 +13,7 @@ if (CONFIG.moveManually) {
     e.preventDefault();
 
     if (e.code === "ShiftLeft") {
-      CONFIG.polySides =
-        knownPolys[
-          (knownPolys.indexOf(CONFIG.polySides) + 1) % knownPolys.length
-        ];
-
-      resetCanvasSize();
-      updateOffsets(getCenterCell(), MAP_INFO.currentCell);
-      drawEveryCell();
+      changePolySides();
       return;
     }
 
@@ -92,6 +78,15 @@ const getMovedAdjacentIndex = (e) => {
   };
 
   return codeMap[e.code];
+};
+
+export const changePolySides = () => {
+  CONFIG.polySides =
+    knownPolys[(knownPolys.indexOf(CONFIG.polySides) + 1) % knownPolys.length];
+
+  resetCanvasSize();
+  updateOffsets(getCenterCell(), MAP_INFO.currentCell);
+  drawEveryCell();
 };
 
 /**

@@ -11,17 +11,19 @@ import { KNOWN_POLYGONS } from "./infos.js";
  * @property {boolean} isMaze
  * @property {boolean} moveManually
  * @property {boolean} automaticRowsAndColumns
+ * @property {boolean} showZoom
  */
 export const CONFIG = /** @type {Config} */ ({
   initialRows: 10,
   initialColumns: 10,
-  cellHeight: 20,
+  cellHeight: 17,
   polySides: KNOWN_POLYGONS.HEXAGON,
 
   isCircle: false,
   isMaze: false,
   moveManually: true,
   automaticRowsAndColumns: true,
+  showZoom: false,
 });
 
 export const MAP_CONFIG = {

@@ -44,7 +44,7 @@ export const createCell = (i, j, value) => {
 /**
  * @param {import("./infos.js").Cell} cell
  */
-const createPolyCell = (cell) => {
+export const createPolyCell = (cell) => {
   const { i, j } = cell.pos;
   const triangleInfo = POLY_INFO[KNOWN_POLYGONS.TRIANGLE];
   const squareInfo = POLY_INFO[KNOWN_POLYGONS.SQUARE];
@@ -299,6 +299,10 @@ const createCircleCell = (cell) => {
   };
 };
 
+/**
+ * @param {number} radius
+ * @param {number} angle
+ */
 const getPoint = (radius, angle) => [
   CIRCLE_INFO.centerX + Math.cos(angle) * radius,
   CIRCLE_INFO.centerY + Math.sin(angle) * radius,

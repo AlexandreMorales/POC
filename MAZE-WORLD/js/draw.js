@@ -13,8 +13,8 @@ const context = canvas.getContext("2d");
  * @param {number} width
  */
 export const setCanvasSize = (height, width) => {
-  canvas.height = height;
-  canvas.width = width;
+  canvas.height = height || canvas.height;
+  canvas.width = width || canvas.width;
 };
 
 export const resetCanvasSize = () => {
