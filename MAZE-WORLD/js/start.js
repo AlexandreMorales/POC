@@ -1,37 +1,21 @@
 import { CONFIG } from "./configs.js";
-import {
-  CIRCLE_INFO,
-  KNOWN_POLYGONS,
-  knownPolys,
-  MAP_INFO,
-  POLY_INFO,
-} from "./infos.js";
+import { KNOWN_POLYGONS, knownPolys, MAP_INFO, POLY_INFO } from "./infos.js";
 import { resetCanvasSize, drawEveryCell, setCanvasSize } from "./draw.js";
 import { createPolyCell, GRID, loadChunk } from "./grid.js";
 import "./movement.js";
-import { startBuild } from "./maze.js";
 import { changePolySides, getCenterCell, updateOffsets } from "./movement.js";
 import { correctRoundError } from "./utils.js";
 
 const start = () => {
-  if (CONFIG.isCircle) {
-    configCircle();
-  } else {
-    configPolys();
-    resetCanvasSize();
-    CONFIG.initialRows = POLY_INFO[CONFIG.polySides].rows;
-    CONFIG.initialColumns = POLY_INFO[CONFIG.polySides].columns;
-  }
+  configPolys();
+  resetCanvasSize();
+  CONFIG.initialRows = POLY_INFO[CONFIG.polySides].rows;
+  CONFIG.initialColumns = POLY_INFO[CONFIG.polySides].columns;
 
   loadChunk(0, 0);
 
-  if (CONFIG.isMaze) {
-    MAP_INFO.currentCell = GRID[0][0];
-    startBuild();
-  } else {
-    MAP_INFO.currentCell = getCenterCell();
-    drawEveryCell();
-  }
+  MAP_INFO.currentCell = getCenterCell();
+  drawEveryCell();
 };
 
 const configPolys = () => {
@@ -155,18 +139,6 @@ const configPoly = (polySides) => {
     canvasHeight: Math.round(canvasHeight),
     canvasWidth: Math.round(canvasWidth),
   };
-};
-
-const configCircle = () => {
-  CONFIG.polySides = KNOWN_POLYGONS.SQUARE;
-  CIRCLE_INFO.rows = CONFIG.initialRows * 2;
-  CIRCLE_INFO.columns = CONFIG.initialColumns * 2;
-
-  const canvasWidth = CIRCLE_INFO.rows * 2 * CONFIG.cellHeight + 2;
-
-  setCanvasSize(canvasWidth, canvasWidth);
-
-  CIRCLE_INFO.centerX = CIRCLE_INFO.centerY = canvasWidth / 2;
 };
 
 /**

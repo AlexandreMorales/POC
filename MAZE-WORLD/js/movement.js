@@ -1,14 +1,11 @@
 import { CONFIG, MAP_CONFIG } from "./configs.js";
-import { knownPolys, MAP_INFO, MAZE_INFO, POLY_INFO, STATES } from "./infos.js";
+import { knownPolys, MAP_INFO, POLY_INFO } from "./infos.js";
 import { GRID } from "./grid.js";
 import { resetCanvasSize, drawEveryCell } from "./draw.js";
-import { mazeMove } from "./maze.js";
 import { correctRoundError, debounce } from "./utils.js";
 
 if (CONFIG.moveManually) {
   document.onkeydown = (e) => {
-    if (CONFIG.isMaze && MAZE_INFO.state !== STATES.solve) return;
-
     e = e || /** @type {KeyboardEvent} */ (window.event);
     e.preventDefault();
 
@@ -28,20 +25,20 @@ if (CONFIG.moveManually) {
   document.ontouchstart = (e) => {
     e = e || /** @type {TouchEvent} */ (window.event);
     const { screenX, screenY } = e.changedTouches[0];
-    MAP_CONFIG.touchPos.x = screenX;
-    MAP_CONFIG.touchPos.y = screenY;
+    MAP_INFO.touchPos.x = screenX;
+    MAP_INFO.touchPos.y = screenY;
 
-    MAP_CONFIG.touchPos.interval = setInterval(() => {
-      const finalX = screenX - MAP_CONFIG.touchPos.x;
-      const finalY = screenY - MAP_CONFIG.touchPos.y;
+    MAP_INFO.touchPos.interval = setInterval(() => {
+      const finalX = screenX - MAP_INFO.touchPos.x;
+      const finalY = screenY - MAP_INFO.touchPos.y;
 
       let code = null;
       let useDiagonal = false;
-      if (Math.abs(finalY) > MAP_CONFIG.touchThreshold) {
+      if (Math.abs(finalY) > MAP_INFO.touchThreshold) {
         useDiagonal = finalY < 0;
         code = useDiagonal ? "ArrowUp" : "ArrowDown";
       }
-      if (Math.abs(finalX) > MAP_CONFIG.touchThreshold) {
+      if (Math.abs(finalX) > MAP_INFO.touchThreshold) {
         code = finalX < 0 ? "ArrowLeft" : "ArrowRight";
       }
 
@@ -51,12 +48,12 @@ if (CONFIG.moveManually) {
   document.ontouchmove = (e) => {
     e = e || /** @type {TouchEvent} */ (window.event);
     const { screenX, screenY } = e.changedTouches[0];
-    MAP_CONFIG.touchPos.x = screenX;
-    MAP_CONFIG.touchPos.y = screenY;
+    MAP_INFO.touchPos.x = screenX;
+    MAP_INFO.touchPos.y = screenY;
   };
   document.ontouchend = () => {
-    clearInterval(MAP_CONFIG.touchPos.interval);
-    MAP_CONFIG.touchPos = { x: 0, y: 0, interval: null };
+    clearInterval(MAP_INFO.touchPos.interval);
+    MAP_INFO.touchPos = { x: 0, y: 0, interval: null };
   };
 }
 
@@ -99,8 +96,6 @@ const moveBaseOnCode = (code, useDiagonal) => {
 
   if (aIndex === undefined) return;
 
-  if (CONFIG.isMaze) if (MAP_INFO.currentCell.borders[aIndex]) return;
-
   const nextPos =
     MAP_INFO.currentCell.adjacentIndexes[CONFIG.polySides][aIndex];
 
@@ -110,13 +105,7 @@ const moveBaseOnCode = (code, useDiagonal) => {
 
   if (!nextCell) return;
 
-  if (CONFIG.isMaze) {
-    const oldCell = MAP_INFO.currentCell;
-    MAP_INFO.currentCell = nextCell;
-    mazeMove(oldCell, nextCell);
-  } else {
-    move(nextCell);
-  }
+  move(nextCell);
 };
 
 export const changePolySides = () => {

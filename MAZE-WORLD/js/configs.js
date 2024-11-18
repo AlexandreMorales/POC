@@ -7,8 +7,6 @@ import { KNOWN_POLYGONS } from "./infos.js";
  * @property {number} cellHeight
  * @property {number} polySides The number of sides of the current polygon
  *
- * @property {boolean} isCircle
- * @property {boolean} isMaze
  * @property {boolean} moveManually
  * @property {boolean} automaticRowsAndColumns
  * @property {boolean} showZoom
@@ -19,8 +17,6 @@ export const CONFIG = /** @type {Config} */ ({
   cellHeight: 20,
   polySides: KNOWN_POLYGONS.HEXAGON,
 
-  isCircle: false,
-  isMaze: false,
   moveManually: true,
   automaticRowsAndColumns: true,
   showZoom: false,
@@ -31,21 +27,10 @@ export const MAP_CONFIG = {
   midNightHour: 70,
   velocity: 10,
   canMove: true,
-  touchThreshold: 25,
-  touchPos: { x: 0, y: 0, interval: null },
 };
 
 export const CANVAS_CONFIG = {
   showPos: false,
   strokeColor: "black",
-  defaultColor: "white",
-  visitedColor: "grey",
-  pathColor: "green",
   currentColor: "cyan",
-};
-
-export const MAZE_CONFIG = {
-  buildTime: 0,
-  solveTime: 0,
-  clearRandomCells: false,
 };

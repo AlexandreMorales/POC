@@ -1,6 +1,6 @@
-import { POLY_INFO, KNOWN_POLYGONS, MAP_INFO, CIRCLE_INFO } from "./infos.js";
+import { POLY_INFO, KNOWN_POLYGONS, MAP_INFO } from "./infos.js";
 import { CONFIG, CANVAS_CONFIG } from "./configs.js";
-import { GRID, getRows, getNumCellsPerRow, loadChunk } from "./grid.js";
+import { GRID, loadChunk } from "./grid.js";
 import { tweakColor } from "./utils.js";
 
 const canvas = /** @type {HTMLCanvasElement} */ (
@@ -28,14 +28,11 @@ export const resetCanvasSize = () => {
 
 export const drawEveryCell = () => {
   const offsetPolygon =
-    !CONFIG.isMaze &&
-    CONFIG.polySides > KNOWN_POLYGONS.SQUARE &&
-    MAP_INFO.currentCell.pos.j % 2;
-  const rows = getRows();
+    CONFIG.polySides > KNOWN_POLYGONS.SQUARE && MAP_INFO.currentCell.pos.j % 2;
+  const { rows, columns } = POLY_INFO[CONFIG.polySides];
   for (let i = 0; i < rows; i++) {
-    const numCells = getNumCellsPerRow(i);
     const baseI = i + MAP_INFO.iOffset;
-    for (let j = 0; j < numCells; j++) {
+    for (let j = 0; j < columns; j++) {
       let nI = baseI;
       const nJ = j + MAP_INFO.jOffset;
 
@@ -57,27 +54,17 @@ export const drawEveryCell = () => {
 export const drawCell = (cell) => {
   let { x, y } = cell.dPos[CONFIG.polySides];
 
-  if (!CONFIG.isMaze) {
-    x += MAP_INFO.xOffset[CONFIG.polySides] || 0;
-    y += MAP_INFO.yOffset[CONFIG.polySides] || 0;
-  }
+  x += MAP_INFO.xOffset[CONFIG.polySides] || 0;
+  y += MAP_INFO.yOffset[CONFIG.polySides] || 0;
 
   if (x <= 0 || y <= 0 || x >= canvas.width || y > canvas.height) return;
 
-  if (CONFIG.isMaze) {
-    context.fillStyle = CANVAS_CONFIG.defaultColor;
-
-    if (cell.visited) context.fillStyle = CANVAS_CONFIG.visitedColor;
-    if (cell.path) context.fillStyle = CANVAS_CONFIG.pathColor;
-  } else {
-    context.fillStyle = cell.type.isFluid ? tweakColor(cell.color) : cell.color;
-  }
+  context.fillStyle = cell.type.isFluid ? tweakColor(cell.color) : cell.color;
 
   if (cell === MAP_INFO.currentCell)
     context.fillStyle = CANVAS_CONFIG.currentColor;
 
-  if (CONFIG.isCircle) drawCellCircle(cell);
-  else drawPolygon(cell, x, y);
+  drawPolygon(cell, x, y);
 };
 
 /**
@@ -92,10 +79,7 @@ const drawPolygon = (cell, x, y) => {
     CONFIG.polySides > KNOWN_POLYGONS.SQUARE &&
     (cell.pos.j + MAP_INFO.jOffset) % 2
   )
-    y +=
-      !CONFIG.isMaze && MAP_INFO.currentCell.pos.j % 2
-        ? -polyInfo.ySide
-        : polyInfo.ySide;
+    y += MAP_INFO.currentCell.pos.j % 2 ? -polyInfo.ySide : polyInfo.ySide;
 
   if (cell.aboveCell) {
   } else {
@@ -128,24 +112,21 @@ function drawPolyCell(x, y, cell, polyInfo, isAbove = false) {
     );
   }
 
-  let borders = cell.borders;
+  const shouldApplyDark =
+    cell !== MAP_INFO.currentCell &&
+    cell.adjacentIndexes[CONFIG.polySides]
+      .map(([ai, aj]) => GRID[ai]?.[aj])
+      .every((c) => c !== MAP_INFO.currentCell);
 
-  if (!CONFIG.isMaze) {
-    const shouldApplyDark =
-      cell !== MAP_INFO.currentCell &&
-      cell.adjacentIndexes[CONFIG.polySides]
-        .map(([ai, aj]) => GRID[ai]?.[aj])
-        .every((c) => c !== MAP_INFO.currentCell);
-
-    if (shouldApplyDark) {
-      context.fillStyle = `rgba(0, 0, 0, ${MAP_INFO.timeOfDay / 100})`;
-      fillPolygon(x, y, points);
-    }
-    if (!isAbove) return;
-    borders = points.map(() => true);
+  if (shouldApplyDark) {
+    context.fillStyle = `rgba(0, 0, 0, ${MAP_INFO.timeOfDay / 100})`;
+    fillPolygon(x, y, points);
   }
 
+  if (!isAbove) return;
+
   // BORDERS
+  const borders = points.map(() => true);
   for (let i = 0; i < points.length; i++) {
     if (borders[i]) {
       let point = points[i];
@@ -189,94 +170,3 @@ const getChunkStart = (i, j) => [
   getRange(i, CONFIG.initialRows),
   getRange(j, CONFIG.initialColumns),
 ];
-
-/**
- * @param {import("./infos.js").Cell} cell
- */
-const drawCellCircle = (cell) => {
-  const { x, y } = cell.dPos[CONFIG.polySides];
-  const {
-    radius,
-    downCellRadius,
-    x1,
-    y1,
-    x2,
-    y2,
-    beginTopAngle,
-    endTopAngle,
-    downCellX,
-    downCellY,
-    beginBottomAngle,
-    endBottomAngle,
-  } = cell.pos;
-
-  // FILL
-  context.beginPath();
-  context.moveTo(x, y);
-
-  context.arc(
-    CIRCLE_INFO.centerX,
-    CIRCLE_INFO.centerY,
-    radius,
-    beginTopAngle,
-    endTopAngle
-  );
-  context.lineTo(downCellX, downCellY);
-  context.arc(
-    CIRCLE_INFO.centerX,
-    CIRCLE_INFO.centerY,
-    downCellRadius,
-    beginBottomAngle,
-    endBottomAngle,
-    true
-  );
-  context.lineTo(x, y);
-
-  context.closePath();
-  context.fill();
-
-  // BORDERS
-  context.strokeStyle = CANVAS_CONFIG.strokeColor;
-  context.lineWidth = CANVAS_CONFIG.border;
-
-  if (cell.borders[0]) {
-    context.beginPath();
-    context.moveTo(x, y);
-    context.arc(
-      CIRCLE_INFO.centerX,
-      CIRCLE_INFO.centerY,
-      radius,
-      beginTopAngle,
-      endTopAngle
-    );
-    context.stroke();
-  }
-
-  if (cell.borders[1]) {
-    context.beginPath();
-    context.moveTo(x1, y1);
-    context.lineTo(downCellX, downCellY);
-    context.stroke();
-  }
-
-  if (cell.borders[2]) {
-    context.beginPath();
-    context.moveTo(downCellX, downCellY);
-    context.arc(
-      CIRCLE_INFO.centerX,
-      CIRCLE_INFO.centerY,
-      downCellRadius,
-      beginBottomAngle,
-      endBottomAngle,
-      true
-    );
-    context.stroke();
-  }
-
-  if (cell.borders[3]) {
-    context.beginPath();
-    context.moveTo(x2, y2);
-    context.lineTo(x, y);
-    context.stroke();
-  }
-};

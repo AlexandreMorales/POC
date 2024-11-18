@@ -2,20 +2,6 @@
  * @typedef {Object} CellPos
  * @property {number} i
  * @property {number} j
- *
- * CIRCLE PROPERTY
- * @property {number} [x1]
- * @property {number} [y1]
- * @property {number} [x2]
- * @property {number} [y2]
- * @property {number} [radius]
- * @property {number} [downCellRadius]
- * @property {number} [beginTopAngle]
- * @property {number} [endTopAngle]
- * @property {number} [downCellX]
- * @property {number} [downCellY]
- * @property {number} [beginBottomAngle]
- * @property {number} [endBottomAngle]
  */
 
 /**
@@ -28,12 +14,6 @@
  * @property {{ [k: number]: number[][] }} adjacentIndexes
  * @property {boolean} isInverted Only used for triangles
  * @property {{ [k: string]: Points }} dPos
- *
- * MAZE PROPERTIES
- * @property {boolean[]} [borders]
- * @property {boolean} [visited] Only used for maze on the build state
- * @property {boolean} [solved] Only used for maze on the build solve
- * @property {boolean} [path] Only used for maze on the build solve
  */
 
 export const KNOWN_POLYGONS = {
@@ -53,6 +33,8 @@ export const knownPolys = Object.values(KNOWN_POLYGONS);
  * @property {number} iOffset
  * @property {number} jOffset
  * @property {number} timeOfDay
+ * @property {number} touchThreshold
+ * @property {{ x: number, y: number, interval: Object }} touchPos
  */
 export const MAP_INFO = /** @type {MapInfo} */ ({
   currentCell: null,
@@ -62,6 +44,8 @@ export const MAP_INFO = /** @type {MapInfo} */ ({
   iOffset: 0,
   jOffset: 0,
   timeOfDay: 0,
+  touchThreshold: 25,
+  touchPos: { x: 0, y: 0, interval: null },
 });
 
 /**
@@ -84,29 +68,3 @@ export const MAP_INFO = /** @type {MapInfo} */ ({
  * @property {number} canvasWidth
  */
 export const POLY_INFO = /** @type {{ [k: number]: PolyInfoProp }} */ ({});
-
-///// MAZE /////
-
-export const STATES = {
-  build: Symbol("BUILD"),
-  solve: Symbol("SOLVE"),
-  show: Symbol("SHOW"),
-};
-
-export const MAZE_INFO = {
-  state: STATES.build,
-  queue: [],
-};
-
-export const CIRCLE_INFO = {
-  centerX: 0,
-  centerY: 0,
-  circEnd: Math.PI * 1.5,
-  rows: 0,
-  columns: 0,
-};
-
-export const TIME = {
-  startTime: new Date(),
-  lastTime: new Date(),
-};
