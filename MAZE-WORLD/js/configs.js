@@ -14,7 +14,7 @@ import { KNOWN_POLYGONS } from "./infos.js";
 export const CONFIG = /** @type {Config} */ ({
   initialRows: 10,
   initialColumns: 10,
-  cellHeight: 20,
+  cellHeight: 17,
   polySides: KNOWN_POLYGONS.HEXAGON,
 
   moveManually: true,

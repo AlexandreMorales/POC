@@ -9,8 +9,8 @@
  * @property {CellPos} pos
  * @property {number} value
  * @property {Cell} aboveCell
- * @property {import("./biomes").Block} type
- * @property {string} color
+ * @property {import("./biomes").Block} block
+ * @property {{ r: number, g: number, b: number }} color
  * @property {{ [k: number]: number[][] }} adjacentIndexes
  * @property {boolean} isInverted Only used for triangles
  * @property {{ [k: string]: Points }} dPos

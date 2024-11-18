@@ -1,7 +1,7 @@
 import { CONFIG } from "./configs.js";
 import { KNOWN_POLYGONS, knownPolys, MAP_INFO, POLY_INFO } from "./infos.js";
 import { resetCanvasSize, drawEveryCell, setCanvasSize } from "./draw.js";
-import { createPolyCell, GRID, loadChunk } from "./grid.js";
+import { configCellPos, GRID, loadChunk } from "./grid.js";
 import "./movement.js";
 import { changePolySides, getCenterCell, updateOffsets } from "./movement.js";
 import { correctRoundError } from "./utils.js";
@@ -116,7 +116,8 @@ const configPoly = (polySides) => {
   // When itercalating the first and last column should be an up column
   if (shouldIntercalate && ((columns + 1) / 2) % 2 === 0) columns -= 2;
 
-  canvasHeight = rows * CONFIG.cellHeight + ySide;
+  canvasHeight = rows * CONFIG.cellHeight;
+  if (shouldIntercalate) canvasHeight += ySide;
 
   canvasWidth = columns * (xSide * 2);
 
@@ -147,7 +148,7 @@ const configPoly = (polySides) => {
 export const resetSize = (newSize) => {
   CONFIG.cellHeight = newSize;
   configPolys();
-  GRID.flatMap((c) => c.flat()).map((c) => createPolyCell(c));
+  GRID.flatMap((c) => c.flat()).map((c) => configCellPos(c));
   setCanvasSize(null, POLY_INFO[CONFIG.polySides].canvasWidth);
   const oldOffsets = {
     xOffset: MAP_INFO.xOffset,

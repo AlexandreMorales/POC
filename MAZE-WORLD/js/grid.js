@@ -19,14 +19,15 @@ export const createCell = (i, j, value) => {
     cell.pos = { i, j };
 
     cell.value = value;
-    cell.type = Object.values(BIOMES.FOREST.ranges).find(
-      (range) => value <= range.max
+    const block = Object.values(BIOMES.FOREST.ranges).find(
+      (r) => value <= r.max
     );
-    cell.color = tweakColor(cell.type?.color);
+    cell.block = block;
+    cell.color = tweakColor(block.colorRGB);
   }
 
   cell.adjacentIndexes = getAdjacentIndexes(i, j);
-  createPolyCell(cell);
+  configCellPos(cell);
 
   return cell;
 };
@@ -34,26 +35,27 @@ export const createCell = (i, j, value) => {
 /**
  * @param {import("./infos.js").Cell} cell
  */
-export const createPolyCell = (cell) => {
+export const configCellPos = (cell) => {
   const { i, j } = cell.pos;
   const triangleInfo = POLY_INFO[KNOWN_POLYGONS.TRIANGLE];
   const squareInfo = POLY_INFO[KNOWN_POLYGONS.SQUARE];
   const hexaInfo = POLY_INFO[KNOWN_POLYGONS.HEXAGON];
+  const y = i * triangleInfo.ySide * 2 + triangleInfo.ySide;
 
   cell.isInverted = isCellInverted(cell.pos);
   cell.dPos = new Proxy(
     {
       [KNOWN_POLYGONS.TRIANGLE]: {
         x: j * (triangleInfo.polySide / 2) + triangleInfo.xSide,
-        y: i * triangleInfo.ySide * 2 + triangleInfo.ySide,
+        y,
       },
       [KNOWN_POLYGONS.SQUARE]: {
         x: j * squareInfo.xSide * 2 + squareInfo.xSide,
-        y: i * squareInfo.ySide * 2 + squareInfo.ySide,
+        y,
       },
       [KNOWN_POLYGONS.HEXAGON]: {
         x: j * (hexaInfo.xSide + hexaInfo.polySide / 2) + hexaInfo.xSide,
-        y: i * hexaInfo.ySide * 2 + hexaInfo.ySide,
+        y,
       },
     },
     {
@@ -62,7 +64,7 @@ export const createPolyCell = (cell) => {
         return (
           obj[prop] || {
             x: j * (polyInfo.xSide + polyInfo.polySide / 2) + polyInfo.xSide,
-            y: i * polyInfo.ySide * 2 + polyInfo.ySide,
+            y,
           }
         );
       },

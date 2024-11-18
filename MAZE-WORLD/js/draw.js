@@ -27,7 +27,7 @@ export const resetCanvasSize = () => {
 };
 
 export const drawEveryCell = () => {
-  const offsetPolygon =
+  const offsetCell =
     CONFIG.polySides > KNOWN_POLYGONS.SQUARE && MAP_INFO.currentCell.pos.j % 2;
   const { rows, columns } = POLY_INFO[CONFIG.polySides];
   for (let i = 0; i < rows; i++) {
@@ -36,7 +36,7 @@ export const drawEveryCell = () => {
       let nI = baseI;
       const nJ = j + MAP_INFO.jOffset;
 
-      if (offsetPolygon && nJ % 2 === 0) nI = nI + 1;
+      if (offsetCell && nJ % 2 === 0) nI = nI + 1;
 
       if (!GRID[nI]?.[nJ]) {
         const [cI, cJ] = getChunkStart(nI, nJ);
@@ -59,7 +59,8 @@ export const drawCell = (cell) => {
 
   if (x <= 0 || y <= 0 || x >= canvas.width || y > canvas.height) return;
 
-  context.fillStyle = cell.type.isFluid ? tweakColor(cell.color) : cell.color;
+  const color = cell.block.isFluid ? tweakColor(cell.color) : cell.color;
+  context.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
 
   if (cell === MAP_INFO.currentCell)
     context.fillStyle = CANVAS_CONFIG.currentColor;
@@ -74,29 +75,14 @@ export const drawCell = (cell) => {
  */
 const drawPolygon = (cell, x, y) => {
   const polyInfo = POLY_INFO[CONFIG.polySides];
+  const isInverted = CONFIG.polySides % 2 && cell.isInverted;
+  const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;
 
   if (
     CONFIG.polySides > KNOWN_POLYGONS.SQUARE &&
     (cell.pos.j + MAP_INFO.jOffset) % 2
   )
     y += MAP_INFO.currentCell.pos.j % 2 ? -polyInfo.ySide : polyInfo.ySide;
-
-  if (cell.aboveCell) {
-  } else {
-    drawPolyCell(x, y, cell, polyInfo);
-  }
-};
-
-/**
- * @param {number} x
- * @param {number} y
- * @param {import("./infos.js").Cell} cell
- * @param {import("./infos.js").PolyInfoProp} polyInfo
- * @param {boolean} [isAbove]
- */
-function drawPolyCell(x, y, cell, polyInfo, isAbove = false) {
-  const isInverted = CONFIG.polySides % 2 && cell.isInverted;
-  const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;
 
   fillPolygon(x, y, points);
 
@@ -123,7 +109,7 @@ function drawPolyCell(x, y, cell, polyInfo, isAbove = false) {
     fillPolygon(x, y, points);
   }
 
-  if (!isAbove) return;
+  return;
 
   // BORDERS
   const borders = points.map(() => true);
@@ -138,7 +124,7 @@ function drawPolyCell(x, y, cell, polyInfo, isAbove = false) {
       context.stroke();
     }
   }
-}
+};
 
 /**
  * @param {number} x
