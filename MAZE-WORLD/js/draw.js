@@ -15,6 +15,8 @@ const context = canvas.getContext("2d");
 export const setCanvasSize = (height, width) => {
   canvas.height = height || canvas.height;
   canvas.width = width || canvas.width;
+  context.strokeStyle = CANVAS_CONFIG.strokeColor;
+  context.lineWidth = Math.round(CONFIG.cellHeight / 20);
 };
 
 export const resetCanvasSize = () => {
@@ -84,9 +86,7 @@ export const drawCell = (cell) => {
  * @param {number} y
  */
 const drawPolygon = (cell, x, y) => {
-  const isInverted = CONFIG.polySides % 2 && cell.isInverted;
   const polyInfo = POLY_INFO[CONFIG.polySides];
-  const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;
 
   if (
     CONFIG.polySides > KNOWN_POLYGONS.SQUARE &&
@@ -96,6 +96,23 @@ const drawPolygon = (cell, x, y) => {
       !CONFIG.isMaze && MAP_INFO.currentCell.pos.j % 2
         ? -polyInfo.ySide
         : polyInfo.ySide;
+
+  if (cell.aboveCell) {
+  } else {
+    drawPolyCell(x, y, cell, polyInfo);
+  }
+};
+
+/**
+ * @param {number} x
+ * @param {number} y
+ * @param {import("./infos.js").Cell} cell
+ * @param {import("./infos.js").PolyInfoProp} polyInfo
+ * @param {boolean} [isAbove]
+ */
+function drawPolyCell(x, y, cell, polyInfo, isAbove = false) {
+  const isInverted = CONFIG.polySides % 2 && cell.isInverted;
+  const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;
 
   fillPolygon(x, y, points);
 
@@ -111,6 +128,8 @@ const drawPolygon = (cell, x, y) => {
     );
   }
 
+  let borders = cell.borders;
+
   if (!CONFIG.isMaze) {
     const shouldApplyDark =
       cell !== MAP_INFO.currentCell &&
@@ -122,17 +141,15 @@ const drawPolygon = (cell, x, y) => {
       context.fillStyle = `rgba(0, 0, 0, ${MAP_INFO.timeOfDay / 100})`;
       fillPolygon(x, y, points);
     }
-    return;
+    if (!isAbove) return;
+    borders = points.map(() => true);
   }
 
   // BORDERS
-  context.strokeStyle = CANVAS_CONFIG.strokeColor;
-  context.lineWidth = CANVAS_CONFIG.border;
-
-  for (let i = 0; i < CONFIG.polySides; i++) {
-    if (cell.borders[i]) {
+  for (let i = 0; i < points.length; i++) {
+    if (borders[i]) {
       let point = points[i];
-      let nextPoint = points[i + 1];
+      let nextPoint = points[i + 1] || points[0];
 
       context.beginPath();
       context.moveTo(x + point.x, y + point.y);
@@ -140,12 +157,12 @@ const drawPolygon = (cell, x, y) => {
       context.stroke();
     }
   }
-};
+}
 
 /**
  * @param {number} x
  * @param {number} y
- * @param {{ x: number, y: number }[]} points
+ * @param {import("./infos.js").Points[]} points
  */
 const fillPolygon = (x, y, points) => {
   context.beginPath();

@@ -16,7 +16,7 @@ import { KNOWN_POLYGONS } from "./infos.js";
 export const CONFIG = /** @type {Config} */ ({
   initialRows: 10,
   initialColumns: 10,
-  cellHeight: 17,
+  cellHeight: 20,
   polySides: KNOWN_POLYGONS.HEXAGON,
 
   isCircle: false,
@@ -36,7 +36,6 @@ export const MAP_CONFIG = {
 };
 
 export const CANVAS_CONFIG = {
-  border: 1,
   showPos: false,
   strokeColor: "black",
   defaultColor: "white",

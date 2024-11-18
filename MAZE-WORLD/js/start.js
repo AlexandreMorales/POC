@@ -11,6 +11,7 @@ import { createPolyCell, GRID, loadChunk } from "./grid.js";
 import "./movement.js";
 import { startBuild } from "./maze.js";
 import { changePolySides, getCenterCell, updateOffsets } from "./movement.js";
+import { correctRoundError } from "./utils.js";
 
 const start = () => {
   if (CONFIG.isCircle) {
@@ -33,28 +34,6 @@ const start = () => {
   }
 };
 
-/**
- * @param {number} polySides
- * @param {number} radiusFromCorner
- * @param {number} coeficient
- * @param {number} yCoeficient
- * @returns {{ x: number, y: number }[]}
- */
-const createPoints = (polySides, radiusFromCorner, coeficient, yCoeficient) => {
-  const points = [];
-  const sideRad = (2 * Math.PI) / polySides;
-
-  for (let i = 0; i < polySides; i++) {
-    const nI = i - coeficient;
-    const x = radiusFromCorner * Math.cos(sideRad * nI);
-    const y = radiusFromCorner * Math.sin(sideRad * nI) + yCoeficient;
-
-    points.push({ x, y });
-  }
-  points.push(points[0]);
-  return points;
-};
-
 const configPolys = () => {
   for (const p of knownPolys) {
     POLY_INFO[p] = configPoly(p);
@@ -72,39 +51,55 @@ const configPoly = (polySides) => {
   let polySide = 0;
   const isOddPoly = polySides % 2;
 
+  const ySide = correctRoundError(CONFIG.cellHeight / 2);
+
   if (isOddPoly) {
     // Pythagoras of (height² + (side/2)² = side²)
-    polySide = Math.sqrt(CONFIG.cellHeight ** 2 / (1 - 1 / 4));
+    polySide = correctRoundError(
+      Math.sqrt(CONFIG.cellHeight ** 2 / (1 - 1 / 4))
+    );
     // (1/2)a cot(π/n);
-    radiusFromSide = (polySide / 2) * (1 / Math.tan(Math.PI / polySides));
+    radiusFromSide = correctRoundError(
+      (polySide / 2) * (1 / Math.tan(Math.PI / polySides))
+    );
   } else {
-    radiusFromSide = CONFIG.cellHeight / 2;
+    radiusFromSide = ySide;
     // 2r tan(π/n)
-    polySide = 2 * radiusFromSide * Math.tan(Math.PI / polySides);
+    polySide = correctRoundError(
+      2 * radiusFromSide * Math.tan(Math.PI / polySides)
+    );
   }
+
   // (r sec(π/n))
-  radiusFromCorner = radiusFromSide * (1 / Math.cos(Math.PI / polySides));
+  radiusFromCorner = correctRoundError(
+    radiusFromSide * (1 / Math.cos(Math.PI / polySides))
+  );
 
   const shouldIntercalate = polySides > KNOWN_POLYGONS.SQUARE;
 
-  const yCoeficient = isOddPoly ? CONFIG.cellHeight / 6 : 0;
-  const points = createPoints(
-    polySides,
-    radiusFromCorner,
-    (polySides / 2 + 1) / 2,
-    -yCoeficient
-  );
+  const yCoeficient = isOddPoly ? correctRoundError(-CONFIG.cellHeight / 6) : 0;
+  const coeficient = (polySides / 2 + 1) / 2;
+  const points = [];
+
+  const sideRad = (2 * Math.PI) / polySides;
+
+  for (let i = 0; i < polySides; i++) {
+    const nI = i - coeficient;
+    const x = correctRoundError(radiusFromCorner * Math.cos(sideRad * nI));
+    const y = correctRoundError(
+      radiusFromCorner * Math.sin(sideRad * nI) + yCoeficient
+    );
+
+    points.push({ x, y });
+  }
+
   const xSide = points.reduce((acc, { x }) => (x > acc ? x : acc), 0);
-  const invertedPoints = createPoints(
-    polySides,
-    radiusFromCorner,
-    (polySides / 2 + (polySides + 1)) / 2,
-    yCoeficient
+  const invertedPoints = points.map((p) => ({ x: -p.x, y: -p.y }));
+
+  // Length the upper right point x to the rightmost point x
+  const slopSide = correctRoundError(
+    Math.sqrt(Math.abs(polySide ** 2 - radiusFromSide ** 2))
   );
-
-  const ySide = CONFIG.cellHeight / 2;
-
-  const slopSide = Math.sqrt(Math.abs(polySide ** 2 - radiusFromSide ** 2));
 
   let rows = CONFIG.initialRows;
   let columns = CONFIG.initialColumns;
@@ -134,10 +129,10 @@ const configPoly = (polySides) => {
 
   if (rows % 2 === 0) rows -= 1;
   if (columns % 2 === 0) columns -= 1;
+  // When itercalating the first and last column should be an up column
   if (shouldIntercalate && ((columns + 1) / 2) % 2 === 0) columns -= 2;
 
-  canvasHeight = rows * CONFIG.cellHeight;
-  if (shouldIntercalate) canvasHeight += ySide;
+  canvasHeight = rows * CONFIG.cellHeight + ySide;
 
   canvasWidth = columns * (xSide * 2);
 
@@ -155,10 +150,10 @@ const configPoly = (polySides) => {
     points,
     invertedPoints,
     bottomIndex,
-    rows,
-    columns,
-    canvasHeight,
-    canvasWidth,
+    rows: Math.round(rows),
+    columns: Math.round(columns),
+    canvasHeight: Math.round(canvasHeight),
+    canvasWidth: Math.round(canvasWidth),
   };
 };
 

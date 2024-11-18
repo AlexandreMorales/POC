@@ -126,6 +126,7 @@ export const changePolySides = () => {
   resetCanvasSize();
   updateOffsets(getCenterCell(), MAP_INFO.currentCell);
   drawEveryCell();
+  drawEveryCell();
 };
 
 /**
@@ -173,8 +174,6 @@ const move = (nextCell) => {
 };
 
 const moveTime = debounce(() => {
-  MAP_CONFIG.canMove = true;
-
   drawEveryCell();
   MAP_INFO.timeOfDay += MAP_CONFIG.passHour;
 
@@ -184,6 +183,8 @@ const moveTime = debounce(() => {
   ) {
     MAP_CONFIG.passHour = -MAP_CONFIG.passHour;
   }
+
+  MAP_CONFIG.canMove = true;
 }, 1000 / MAP_CONFIG.velocity);
 
 /**

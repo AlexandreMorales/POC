@@ -22,11 +22,12 @@
  * @typedef {Object} Cell
  * @property {CellPos} pos
  * @property {number} value
+ * @property {Cell} aboveCell
  * @property {import("./biomes").Block} type
  * @property {string} color
  * @property {{ [k: number]: number[][] }} adjacentIndexes
  * @property {boolean} isInverted Only used for triangles
- * @property {{ [k: string]: { x: number, y: number } }} dPos
+ * @property {{ [k: string]: Points }} dPos
  *
  * MAZE PROPERTIES
  * @property {boolean[]} [borders]
@@ -46,6 +47,7 @@ export const knownPolys = Object.values(KNOWN_POLYGONS);
 /**
  * @typedef {Object} MapInfo
  * @property {Cell} currentCell
+ * @property {Cell[]} pickedCells
  * @property {{ [k: number]: number }} xOffset
  * @property {{ [k: number]: number }} yOffset
  * @property {number} iOffset
@@ -54,6 +56,7 @@ export const knownPolys = Object.values(KNOWN_POLYGONS);
  */
 export const MAP_INFO = /** @type {MapInfo} */ ({
   currentCell: null,
+  pickedCells: [],
   xOffset: {},
   yOffset: {},
   iOffset: 0,
@@ -62,12 +65,18 @@ export const MAP_INFO = /** @type {MapInfo} */ ({
 });
 
 /**
+ * @typedef {Object} Points
+ * @property {number} x
+ * @property {number} y
+ */
+
+/**
  * @typedef {Object} PolyInfoProp
  * @property {number} polySide The length of the side of the polygon
  * @property {number} xSide The half of the horizontal length of the polygon
  * @property {number} ySide The half of the vertical length of the polygon
- * @property {{ x: number, y: number }[]} points List of point of the polygon
- * @property {{ x: number, y: number }[]} invertedPoints List of point of the polygon for inverted triangles
+ * @property {Points[]} points List of point of the polygon
+ * @property {Points[]} invertedPoints List of point of the polygon for inverted triangles
  * @property {number} bottomIndex
  * @property {number} rows
  * @property {number} columns
