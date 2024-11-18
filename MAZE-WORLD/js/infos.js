@@ -5,15 +5,23 @@
  */
 
 /**
- * @typedef {Object} Cell
- * @property {CellPos} pos
+ * @typedef {Object} CellBlock
  * @property {number} value
- * @property {Cell} aboveCell
  * @property {import("./biomes").Block} block
- * @property {{ r: number, g: number, b: number }} color
+ * @property {import("./biomes").Color} color
+ */
+
+/**
+ * @typedef {Object} CellProps
+ * @property {CellPos} pos
+ * @property {CellBlock} wall
  * @property {{ [k: number]: number[][] }} adjacentIndexes
  * @property {boolean} isInverted Only used for triangles
  * @property {{ [k: string]: Points }} dPos
+ */
+
+/**
+ * @typedef {CellBlock & CellProps} Cell
  */
 
 export const KNOWN_POLYGONS = {
@@ -23,6 +31,15 @@ export const KNOWN_POLYGONS = {
 };
 
 export const knownPolys = Object.values(KNOWN_POLYGONS);
+
+/**
+ * @typedef {Object} WallList
+ * @property {number} x
+ * @property {number} y
+ * @property {Points[]} points
+ * @property {Points[]} topPoints
+ * @property {string} color
+ */
 
 /**
  * @typedef {Object} MapInfo
@@ -35,6 +52,7 @@ export const knownPolys = Object.values(KNOWN_POLYGONS);
  * @property {number} timeOfDay
  * @property {number} touchThreshold
  * @property {{ x: number, y: number, interval: Object }} touchPos
+ * @property {WallList[]} walls
  */
 export const MAP_INFO = /** @type {MapInfo} */ ({
   currentCell: null,
@@ -46,6 +64,7 @@ export const MAP_INFO = /** @type {MapInfo} */ ({
   timeOfDay: 0,
   touchThreshold: 25,
   touchPos: { x: 0, y: 0, interval: null },
+  walls: [],
 });
 
 /**
@@ -59,8 +78,10 @@ export const MAP_INFO = /** @type {MapInfo} */ ({
  * @property {number} polySide The length of the side of the polygon
  * @property {number} xSide The half of the horizontal length of the polygon
  * @property {number} ySide The half of the vertical length of the polygon
- * @property {Points[]} points List of point of the polygon
- * @property {Points[]} invertedPoints List of point of the polygon for inverted triangles
+ * @property {Points[]} points List of points of the polygon
+ * @property {Points[]} invertedPoints List of points of the polygon for inverted triangles
+ * @property {Points[]} wallPoints List of points the wall
+ * @property {Points[]} wallInvertedPoints List of points the wall for inverted triangles
  * @property {number} bottomIndex
  * @property {number} rows
  * @property {number} columns

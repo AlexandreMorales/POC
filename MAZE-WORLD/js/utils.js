@@ -26,24 +26,24 @@ export const debounce = (fn, timeout = 10) => {
 export const isCellInverted = ({ i, j }) => (i + j) % 2 !== 0;
 
 /**
- * @param {number} number
+ * @param {number} num
  * @param {number} estimation
  * @returns {number}
  */
-export const correctRoundError = (number, estimation = 6) =>
-  +number.toFixed(estimation);
+export const correctRoundError = (num, estimation = 4) =>
+  Math.round(num * 10 ** estimation) / 10 ** estimation;
 
 /**
- * @param {{ r: number, g: number, b: number }} color
- * @returns {{ r: number, g: number, b: number }}
+ * @param {import("./biomes").Color} color
+ * @returns {import("./biomes").Color}
  */
 export const tweakColor = ({ r, g, b }) => {
-  let randSaturation = Math.random() * 0.1 + 0.95;
-  let randBrightness = Math.random() * 0.1 + 0.95;
+  const randSaturation = Math.random() * 0.1 + 0.95;
+  const randBrightness = Math.random() * 0.1 + 0.95;
 
-  r = Math.round(Math.min(r * randSaturation * randBrightness, 255));
-  g = Math.round(Math.min(g * randSaturation * randBrightness, 255));
-  b = Math.round(Math.min(b * randSaturation * randBrightness, 255));
+  r = Math.round(r * randSaturation * randBrightness);
+  g = Math.round(g * randSaturation * randBrightness);
+  b = Math.round(b * randSaturation * randBrightness);
 
   return { r, g, b };
 };

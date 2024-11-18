@@ -103,10 +103,17 @@ const moveBaseOnCode = (code, useDiagonal) => {
 
   const nextCell = GRID[nextPos[0]]?.[nextPos[1]];
 
-  if (!nextCell) return;
+  if (cellIsBlocked(nextCell)) return;
 
   move(nextCell);
 };
+
+/**
+ * @param {import("./infos.js").Cell} cell
+ * @returns {boolean}
+ */
+export const cellIsBlocked = (cell) =>
+  !cell || !!cell.wall || cell.block.isFluid;
 
 export const changePolySides = () => {
   CONFIG.polySides =

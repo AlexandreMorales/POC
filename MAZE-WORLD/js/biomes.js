@@ -1,8 +1,15 @@
 /**
+ * @typedef {Object} Color
+ * @property {number} r
+ * @property {number} g
+ * @property {number} b
+ */
+
+/**
  * @typedef {Object} Block
  * @property {number} max
  * @property {string} color
- * @property {{ r: number, g: number, b: number }} [colorRGB]
+ * @property {Color} [colorRGB]
  * @property {boolean} [isFluid]
  */
 
@@ -17,7 +24,7 @@ const addRgbToBlock = (block) => {
 
 /**
  * @param {string} hexColor
- * @returns {{ r: number, g: number, b: number }}
+ * @returns {Color}
  */
 const hexToRgb = (hexColor) => {
   let hex = hexColor.slice(1);

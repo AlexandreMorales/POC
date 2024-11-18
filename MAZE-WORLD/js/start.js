@@ -3,7 +3,12 @@ import { KNOWN_POLYGONS, knownPolys, MAP_INFO, POLY_INFO } from "./infos.js";
 import { resetCanvasSize, drawEveryCell, setCanvasSize } from "./draw.js";
 import { configCellPos, GRID, loadChunk } from "./grid.js";
 import "./movement.js";
-import { changePolySides, getCenterCell, updateOffsets } from "./movement.js";
+import {
+  cellIsBlocked,
+  changePolySides,
+  getCenterCell,
+  updateOffsets,
+} from "./movement.js";
 import { correctRoundError } from "./utils.js";
 
 const start = () => {
@@ -13,8 +18,13 @@ const start = () => {
   CONFIG.initialColumns = POLY_INFO[CONFIG.polySides].columns;
 
   loadChunk(0, 0);
-
   MAP_INFO.currentCell = getCenterCell();
+  while (cellIsBlocked(MAP_INFO.currentCell)) {
+    const nextCell =
+      GRID[MAP_INFO.currentCell.pos.i + 1][MAP_INFO.currentCell.pos.j];
+    updateOffsets(MAP_INFO.currentCell, nextCell);
+    MAP_INFO.currentCell = nextCell;
+  }
   drawEveryCell();
 };
 
@@ -25,13 +35,32 @@ const configPolys = () => {
 };
 
 /**
+ * @param {import("./infos.js").Points[]} points
+ * @param {number} height
+ * @returns {import("./infos.js").Points[]}
+ */
+const createWallPoints = (points, height) => {
+  let bottomPoints = points.filter((p) => p.y >= 0);
+  if (bottomPoints.length <= 1) bottomPoints = points.sort((a, b) => a.x - b.x);
+  const firstBottomPoint = bottomPoints[0];
+  const lastBottomPoint = bottomPoints[bottomPoints.length - 1];
+  return [
+    { x: firstBottomPoint.x, y: firstBottomPoint.y - height },
+    ...bottomPoints,
+    { x: lastBottomPoint.x, y: lastBottomPoint.y - height },
+  ];
+};
+
+/**
  * @param {number} polySides
  * @returns {import("./infos.js").PolyInfoProp}
  */
 const configPoly = (polySides) => {
   let radiusFromSide = 0;
   let radiusFromCorner = 0;
-  // The length of the side of the polygon
+  /**
+   * The length of the side of the polygon
+   */
   let polySide = 0;
   const isOddPoly = polySides % 2;
 
@@ -69,18 +98,23 @@ const configPoly = (polySides) => {
 
   for (let i = 0; i < polySides; i++) {
     const nI = i - coeficient;
-    const x = correctRoundError(radiusFromCorner * Math.cos(sideRad * nI));
+    const rad = sideRad * nI;
+    const x = correctRoundError(radiusFromCorner * Math.cos(rad));
     const y = correctRoundError(
-      radiusFromCorner * Math.sin(sideRad * nI) + yCoeficient
+      radiusFromCorner * Math.sin(rad) + yCoeficient,
+      1
     );
-
     points.push({ x, y });
   }
 
   const xSide = points.reduce((acc, { x }) => (x > acc ? x : acc), 0);
   const invertedPoints = points.map((p) => ({ x: -p.x, y: -p.y }));
+  const wallPoints = createWallPoints(points, ySide);
+  const wallInvertedPoints = createWallPoints(invertedPoints, ySide);
 
-  // Length the upper right point x to the rightmost point x
+  /**
+   * Length the upper right point x to the rightmost point x
+   */
   const slopSide = correctRoundError(
     Math.sqrt(Math.abs(polySide ** 2 - radiusFromSide ** 2))
   );
@@ -117,7 +151,8 @@ const configPoly = (polySides) => {
   if (shouldIntercalate && ((columns + 1) / 2) % 2 === 0) columns -= 2;
 
   canvasHeight = rows * CONFIG.cellHeight;
-  if (shouldIntercalate) canvasHeight += ySide;
+  // To always have the same height because of the shouldIntercalate polys
+  canvasHeight += ySide;
 
   canvasWidth = columns * (xSide * 2);
 
@@ -134,6 +169,8 @@ const configPoly = (polySides) => {
     ySide,
     points,
     invertedPoints,
+    wallPoints,
+    wallInvertedPoints,
     bottomIndex,
     rows: Math.round(rows),
     columns: Math.round(columns),
@@ -163,14 +200,14 @@ export const resetSize = (newSize) => {
 
 start();
 
-const cellHeightInput = /** @type {HTMLInputElement} */ (
+const heightSlider = /** @type {HTMLInputElement} */ (
   document.getElementById("cell-height")
 );
 if (CONFIG.showZoom) {
-  cellHeightInput.value = cellHeightInput.min = `${CONFIG.cellHeight}`;
-  cellHeightInput.oninput = () => resetSize(+cellHeightInput.value);
+  heightSlider.value = heightSlider.min = `${CONFIG.cellHeight}`;
+  heightSlider.oninput = () => resetSize(+heightSlider.value);
 } else {
-  cellHeightInput.style.display = "none";
+  heightSlider.style.display = "none";
 }
 
 const changePolyBtn = /** @type {HTMLButtonElement} */ (
