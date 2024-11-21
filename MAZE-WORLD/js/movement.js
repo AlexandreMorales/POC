@@ -4,58 +4,59 @@ import { GRID } from "./grid.js";
 import { resetCanvasSize, drawEveryCell } from "./draw.js";
 import { correctRoundError, debounce } from "./utils.js";
 
-if (CONFIG.moveManually) {
-  document.onkeydown = (e) => {
-    e = e || /** @type {KeyboardEvent} */ (window.event);
-    e.preventDefault();
+document.onkeydown = (e) => {
+  e = e || /** @type {KeyboardEvent} */ (window.event);
+  e.preventDefault();
 
-    if (e.code === "ShiftLeft") {
-      changePolySides();
-      return;
+  if (e.code === "ShiftLeft") {
+    changePolySides();
+    return;
+  }
+
+  if (e.code === "Space") {
+    move();
+    return;
+  }
+
+  moveBaseOnCode(e.code, e.altKey);
+};
+
+document.ontouchstart = (e) => {
+  e = e || /** @type {TouchEvent} */ (window.event);
+  const { screenX, screenY } = e.changedTouches[0];
+  clearInterval(MAP_INFO.touchPos.interval);
+  MAP_INFO.touchPos.x = screenX;
+  MAP_INFO.touchPos.y = screenY;
+
+  MAP_INFO.touchPos.interval = setInterval(() => {
+    const finalX = screenX - MAP_INFO.touchPos.x;
+    const finalY = screenY - MAP_INFO.touchPos.y;
+
+    let code = null;
+    let useDiagonal = false;
+    if (Math.abs(finalY) > MAP_INFO.touchThreshold) {
+      useDiagonal = finalY < 0;
+      code = useDiagonal ? "ArrowUp" : "ArrowDown";
+    }
+    if (Math.abs(finalX) > MAP_INFO.touchThreshold) {
+      code = finalX < 0 ? "ArrowLeft" : "ArrowRight";
     }
 
-    if (e.code === "Space") {
-      move();
-      return;
-    }
+    if (code) moveBaseOnCode(code, useDiagonal);
+  }, 100);
+};
 
-    moveBaseOnCode(e.code, e.altKey);
-  };
+document.ontouchmove = (e) => {
+  e = e || /** @type {TouchEvent} */ (window.event);
+  const { screenX, screenY } = e.changedTouches[0];
+  MAP_INFO.touchPos.x = screenX;
+  MAP_INFO.touchPos.y = screenY;
+};
 
-  document.ontouchstart = (e) => {
-    e = e || /** @type {TouchEvent} */ (window.event);
-    const { screenX, screenY } = e.changedTouches[0];
-    MAP_INFO.touchPos.x = screenX;
-    MAP_INFO.touchPos.y = screenY;
-
-    MAP_INFO.touchPos.interval = setInterval(() => {
-      const finalX = screenX - MAP_INFO.touchPos.x;
-      const finalY = screenY - MAP_INFO.touchPos.y;
-
-      let code = null;
-      let useDiagonal = false;
-      if (Math.abs(finalY) > MAP_INFO.touchThreshold) {
-        useDiagonal = finalY < 0;
-        code = useDiagonal ? "ArrowUp" : "ArrowDown";
-      }
-      if (Math.abs(finalX) > MAP_INFO.touchThreshold) {
-        code = finalX < 0 ? "ArrowLeft" : "ArrowRight";
-      }
-
-      if (code) moveBaseOnCode(code, useDiagonal);
-    }, 100);
-  };
-  document.ontouchmove = (e) => {
-    e = e || /** @type {TouchEvent} */ (window.event);
-    const { screenX, screenY } = e.changedTouches[0];
-    MAP_INFO.touchPos.x = screenX;
-    MAP_INFO.touchPos.y = screenY;
-  };
-  document.ontouchend = () => {
-    clearInterval(MAP_INFO.touchPos.interval);
-    MAP_INFO.touchPos = { x: 0, y: 0, interval: null };
-  };
-}
+document.ontouchend = () => {
+  clearInterval(MAP_INFO.touchPos.interval);
+  MAP_INFO.touchPos = { x: 0, y: 0, interval: null };
+};
 
 /**
  * @param {boolean} [useDiagonal]

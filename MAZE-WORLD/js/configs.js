@@ -7,7 +7,6 @@ import { KNOWN_POLYGONS } from "./infos.js";
  * @property {number} cellHeight
  * @property {number} polySides The number of sides of the current polygon
  *
- * @property {boolean} moveManually
  * @property {boolean} automaticRowsAndColumns
  * @property {boolean} showZoom
  */
@@ -17,7 +16,6 @@ export const CONFIG = /** @type {Config} */ ({
   cellHeight: 24,
   polySides: KNOWN_POLYGONS.HEXAGON,
 
-  moveManually: true,
   automaticRowsAndColumns: true,
   showZoom: false,
 });

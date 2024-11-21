@@ -71,15 +71,16 @@ export const drawEveryCell = () => {
  */
 export const drawCell = (cell) => {
   let { x, y } = cell.dPos[CONFIG.polySides];
-  const polyInfo = POLY_INFO[CONFIG.polySides];
-  const isInverted = CONFIG.polySides % 2 && cell.isInverted;
-  const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;
-  const shouldIntercalate = CONFIG.polySides > KNOWN_POLYGONS.SQUARE;
 
   x += MAP_INFO.xOffset[CONFIG.polySides] || 0;
   y += MAP_INFO.yOffset[CONFIG.polySides] || 0;
 
   if (x <= 0 || y <= 0 || x >= canvas.width || y > canvas.height) return;
+
+  const polyInfo = POLY_INFO[CONFIG.polySides];
+  const isInverted = CONFIG.polySides % 2 && cell.isInverted;
+  const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;
+  const shouldIntercalate = CONFIG.polySides > KNOWN_POLYGONS.SQUARE;
 
   const color = cell.block.isFluid ? tweakColor(cell.color) : cell.color;
   context.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;

@@ -1,7 +1,7 @@
 import { CONFIG } from "./configs.js";
 import { POLY_INFO, KNOWN_POLYGONS } from "./infos.js";
 import { BIOMES } from "./biomes.js";
-import { tweakColor, isCellInverted, getRandomInt } from "./utils.js";
+import { tweakColor, isCellInverted } from "./utils.js";
 
 export const GRID = /** @type {import("./infos.js").Cell[][]} */ ([]);
 
@@ -84,9 +84,10 @@ export const loadChunk = (offsetI, offsetJ) => {
     GRID[nI] = GRID[nI] || [];
     for (let j = 0; j < CONFIG.initialColumns; j++) {
       const nJ = j + offsetJ;
-      GRID[nI][nJ] = createCell(nI, nJ, perlin?.[i]?.[j]);
+      const value = perlin?.[i]?.[j];
+      GRID[nI][nJ] = createCell(nI, nJ, value);
 
-      if (getRandomInt(20) === 0) {
+      if (value > 0.4) {
         addWall(nI, nJ);
       }
     }
