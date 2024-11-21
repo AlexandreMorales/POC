@@ -135,8 +135,6 @@ const configPoly = (polySides) => {
   if (shouldIntercalate)
     canvasWidth = (columns * (radiusFromCorner * 2 + polySide)) / 2 + slopSide;
 
-  const bottomIndex = Math.floor(polySides / 2) % polySides;
-
   return {
     polySide,
     xSide,
@@ -145,7 +143,6 @@ const configPoly = (polySides) => {
     invertedPoints,
     wallPoints,
     wallInvertedPoints,
-    bottomIndex,
     rows: Math.round(rows),
     columns: Math.round(columns),
     canvasHeight: Math.round(canvasHeight),

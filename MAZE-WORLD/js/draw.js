@@ -2,6 +2,7 @@ import { POLY_INFO, KNOWN_POLYGONS, MAP_INFO } from "./infos.js";
 import { CONFIG, CANVAS_CONFIG } from "./configs.js";
 import { GRID, loadChunk } from "./grid.js";
 import { tweakColor } from "./utils.js";
+import { applyRotation } from "./movement.js";
 
 const canvas = /** @type {HTMLCanvasElement} */ (
   document.getElementById("init")
@@ -71,25 +72,27 @@ export const drawEveryCell = () => {
  */
 export const drawCell = (cell) => {
   let { x, y } = cell.dPos[CONFIG.polySides];
-
-  x += MAP_INFO.xOffset[CONFIG.polySides] || 0;
-  y += MAP_INFO.yOffset[CONFIG.polySides] || 0;
-
-  if (x <= 0 || y <= 0 || x >= canvas.width || y > canvas.height) return;
-
   const polyInfo = POLY_INFO[CONFIG.polySides];
   const isInverted = CONFIG.polySides % 2 && cell.isInverted;
   const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;
   const shouldIntercalate = CONFIG.polySides > KNOWN_POLYGONS.SQUARE;
+
+  x += MAP_INFO.xOffset[CONFIG.polySides] || 0;
+  y += MAP_INFO.yOffset[CONFIG.polySides] || 0;
+
+  if (shouldIntercalate && (cell.pos.j + MAP_INFO.jOffset) % 2)
+    y += MAP_INFO.currentCell.pos.j % 2 ? -polyInfo.ySide : polyInfo.ySide;
+
+  [x, y] = applyRotation(x, y, isInverted);
+
+  if (x < 0.1 || y < 0.1 || x > canvas.width - 0.1 || y > canvas.height - 0.1)
+    return;
 
   const color = cell.block.isFluid ? tweakColor(cell.color) : cell.color;
   context.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
 
   if (cell === MAP_INFO.currentCell)
     context.fillStyle = CANVAS_CONFIG.currentColor;
-
-  if (shouldIntercalate && (cell.pos.j + MAP_INFO.jOffset) % 2)
-    y += MAP_INFO.currentCell.pos.j % 2 ? -polyInfo.ySide : polyInfo.ySide;
 
   if (cell.wall) {
     const wallPoints = isInverted

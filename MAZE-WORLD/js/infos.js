@@ -49,6 +49,7 @@ export const knownPolys = Object.values(KNOWN_POLYGONS);
  * @property {{ [k: number]: number }} yOffset
  * @property {number} iOffset
  * @property {number} jOffset
+ * @property {number} rotationTurns
  * @property {number} timeOfDay
  * @property {number} touchThreshold
  * @property {{ x: number, y: number, interval: Object }} touchPos
@@ -61,6 +62,7 @@ export const MAP_INFO = /** @type {MapInfo} */ ({
   yOffset: {},
   iOffset: 0,
   jOffset: 0,
+  rotationTurns: 0,
   timeOfDay: 0,
   touchThreshold: 25,
   touchPos: { x: 0, y: 0, interval: null },
@@ -82,7 +84,6 @@ export const MAP_INFO = /** @type {MapInfo} */ ({
  * @property {Points[]} invertedPoints List of points of the polygon for inverted triangles
  * @property {Points[]} wallPoints List of points the wall
  * @property {Points[]} wallInvertedPoints List of points the wall for inverted triangles
- * @property {number} bottomIndex
  * @property {number} rows
  * @property {number} columns
  * @property {number} canvasHeight

@@ -26,6 +26,7 @@ const start = () => {
     MAP_INFO.currentCell = nextCell;
   }
   drawEveryCell();
+  drawEveryCell();
 };
 
 /**

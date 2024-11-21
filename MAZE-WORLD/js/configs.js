@@ -8,6 +8,7 @@ import { KNOWN_POLYGONS } from "./infos.js";
  * @property {number} polySides The number of sides of the current polygon
  *
  * @property {boolean} automaticRowsAndColumns
+ * @property {boolean} useRotation
  * @property {boolean} showZoom
  */
 export const CONFIG = /** @type {Config} */ ({
@@ -17,6 +18,7 @@ export const CONFIG = /** @type {Config} */ ({
   polySides: KNOWN_POLYGONS.HEXAGON,
 
   automaticRowsAndColumns: true,
+  useRotation: false,
   showZoom: false,
 });
 

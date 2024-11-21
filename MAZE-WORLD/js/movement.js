@@ -18,6 +18,20 @@ document.onkeydown = (e) => {
     return;
   }
 
+  if (CONFIG.useRotation) {
+    if (e.code === "ArrowRight") {
+      MAP_INFO.rotationTurns++;
+      move(null, true);
+      return;
+    }
+
+    if (e.code === "ArrowLeft") {
+      MAP_INFO.rotationTurns--;
+      move(null, true);
+      return;
+    }
+  }
+
   moveBaseOnCode(e.code, e.altKey);
 };
 
@@ -60,10 +74,11 @@ document.ontouchend = () => {
 
 /**
  * @param {boolean} [useDiagonal]
+ * @returns {{ [k: string]: number }}
  */
 const getMovementMap = (useDiagonal) => {
-  let topI = 0;
-  let bottomI = POLY_INFO[CONFIG.polySides].bottomIndex;
+  let topI = (CONFIG.polySides + MAP_INFO.rotationTurns) % CONFIG.polySides;
+  let bottomI = (topI + Math.floor(CONFIG.polySides / 2)) % CONFIG.polySides;
 
   let topLeftI = CONFIG.polySides - 1;
   let topRightI = topI + 1;
@@ -73,18 +88,20 @@ const getMovementMap = (useDiagonal) => {
 
   if (CONFIG.polySides % 2) {
     const isInverted = MAP_INFO.currentCell.isInverted;
-    topI = isInverted ? undefined : 0;
-    bottomI = isInverted ? 0 : undefined;
+    bottomI = isInverted ? topI : undefined;
+    topI = isInverted ? undefined : topI;
     topLeftI = bottomLeftI = isInverted ? 1 : 2;
     topRightI = bottomRightI = isInverted ? 2 : 1;
   }
 
-  return {
-    ArrowUp: topI,
-    ArrowDown: bottomI,
-    ArrowLeft: useDiagonal ? topLeftI : bottomLeftI,
-    ArrowRight: useDiagonal ? topRightI : bottomRightI,
-  };
+  return CONFIG.useRotation
+    ? { ArrowUp: topI, ArrowDown: bottomI }
+    : {
+        ArrowUp: topI,
+        ArrowDown: bottomI,
+        ArrowLeft: useDiagonal ? topLeftI : bottomLeftI,
+        ArrowRight: useDiagonal ? topRightI : bottomRightI,
+      };
 };
 
 /**
@@ -155,9 +172,43 @@ export const updateOffsets = (oldCell, nextCell) => {
 };
 
 /**
- * @param {import("./infos.js").Cell} [nextCell]
+ * @param {number} x
+ * @param {number} y
+ * @param {boolean} isInverted
+ * @returns {number[]}
  */
-const move = (nextCell) => {
+export const applyRotation = (x, y, isInverted) => {
+  if (!MAP_INFO.rotationTurns || !CONFIG.useRotation) return [x, y];
+  const polyInfo = POLY_INFO[CONFIG.polySides];
+
+  const turns = (CONFIG.polySides + MAP_INFO.rotationTurns) % CONFIG.polySides;
+  const angle = (360 / CONFIG.polySides) * turns;
+  const cx = MAP_INFO.currentCell.dPos[CONFIG.polySides].x;
+  const cy = MAP_INFO.currentCell.dPos[CONFIG.polySides].y;
+
+  const radians = (Math.PI / 180) * angle;
+  const cos = Math.cos(radians);
+  const sin = Math.sin(radians);
+  let nx = correctRoundError(cos * (x - cx) + sin * (y - cy) + cx);
+  let ny = correctRoundError(cos * (y - cy) - sin * (x - cx) + cy);
+
+  if (
+    CONFIG.polySides % 2 &&
+    isInverted !== MAP_INFO.currentCell.isInverted &&
+    angle
+  ) {
+    nx += (polyInfo.xSide / 2) * (turns === 1 ? -1 : 1);
+    ny += polyInfo.ySide;
+  }
+
+  return [nx, ny];
+};
+
+/**
+ * @param {import("./infos.js").Cell} [nextCell]
+ * @param {boolean} [onlyDraw]
+ */
+const move = (nextCell, onlyDraw) => {
   if (MAP_CONFIG.canMove) {
     if (nextCell) {
       const oldCell = MAP_INFO.currentCell;
@@ -165,20 +216,23 @@ const move = (nextCell) => {
 
       updateOffsets(oldCell, nextCell);
     }
-    moveTime();
+    moveTime(onlyDraw);
     MAP_CONFIG.canMove = false;
   }
 };
 
-const moveTime = debounce(() => {
+const moveTime = debounce((onlyDraw) => {
   drawEveryCell();
-  MAP_INFO.timeOfDay += MAP_CONFIG.passHour;
 
-  if (
-    MAP_INFO.timeOfDay >= MAP_CONFIG.midNightHour ||
-    MAP_INFO.timeOfDay <= 0
-  ) {
-    MAP_CONFIG.passHour = -MAP_CONFIG.passHour;
+  if (!onlyDraw) {
+    MAP_INFO.timeOfDay += MAP_CONFIG.passHour;
+
+    if (
+      MAP_INFO.timeOfDay >= MAP_CONFIG.midNightHour ||
+      MAP_INFO.timeOfDay <= 0
+    ) {
+      MAP_CONFIG.passHour = -MAP_CONFIG.passHour;
+    }
   }
 
   MAP_CONFIG.canMove = true;
