@@ -1,7 +1,7 @@
-import { CONFIG } from "./configs.js";
+import { CONFIG, MAP_CONFIG } from "./configs.js";
 import { POLY_INFO, KNOWN_POLYGONS } from "./infos.js";
 import { BIOMES } from "./biomes.js";
-import { tweakColor, isCellInverted } from "./utils.js";
+import { tweakColor, isCellInverted, getRandomInt } from "./utils.js";
 
 export const GRID = /** @type {import("./infos.js").Cell[][]} */ ([]);
 
@@ -9,9 +9,10 @@ export const GRID = /** @type {import("./infos.js").Cell[][]} */ ([]);
  * @param {number} i
  * @param {number} j
  * @param {number} value
+ * @param {import("./biomes.js").Biome} biome
  * @returns {import("./infos.js").Cell}
  */
-export const createCell = (i, j, value) => {
+export const createCell = (i, j, value, biome) => {
   let cell = GRID[i][j];
   if (!cell) {
     cell = /** @type {import("./infos.js").Cell} */ ({});
@@ -19,9 +20,7 @@ export const createCell = (i, j, value) => {
     cell.pos = { i, j };
 
     cell.value = value;
-    const block = Object.values(BIOMES.FOREST.ranges).find(
-      (r) => value <= r.max
-    );
+    const block = Object.values(biome.ranges).find((r) => value <= r.max);
     cell.block = block;
     cell.color = tweakColor(block.colorRGB);
   }
@@ -73,19 +72,41 @@ export const configCellPos = (cell) => {
 };
 
 /**
- * @param {number} offsetI
- * @param {number} offsetJ
+ * @param {number} n
+ * @param {number} range
  */
-export const loadChunk = (offsetI, offsetJ) => {
-  const perlin = getPerlinGrid(CONFIG.initialColumns, CONFIG.initialRows, 8);
+const getRange = (n, range) => Math.floor(n / range) * range;
 
-  for (let i = 0; i < CONFIG.initialRows; i++) {
+/**
+ * @param {number} i
+ * @param {number} j
+ */
+const getChunkStart = (i, j) => [
+  getRange(i, CONFIG.initialRows),
+  getRange(j, CONFIG.initialColumns),
+];
+
+/**
+ * @param {number} i
+ * @param {number} j
+ * @param {import("./biomes.js").Biome} [biome]
+ */
+export const loadChunk = (i, j, biome) => {
+  const [offsetI, offsetJ] = getChunkStart(i, j);
+  const biomeKeys = Object.keys(BIOMES);
+  biome = biome || BIOMES[biomeKeys[getRandomInt(biomeKeys.length)]];
+
+  const rows = CONFIG.initialRows;
+  const columns = CONFIG.initialColumns;
+  const perlin = getPerlinGrid(columns, rows, MAP_CONFIG.noiseResolution);
+
+  for (let i = 0; i < rows; i++) {
     const nI = i + offsetI;
     GRID[nI] = GRID[nI] || [];
-    for (let j = 0; j < CONFIG.initialColumns; j++) {
+    for (let j = 0; j < columns; j++) {
       const nJ = j + offsetJ;
       const value = perlin?.[i]?.[j];
-      GRID[nI][nJ] = createCell(nI, nJ, value);
+      GRID[nI][nJ] = createCell(nI, nJ, value, biome);
 
       if (value > 0.4) {
         addWall(nI, nJ);

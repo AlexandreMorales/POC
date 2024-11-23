@@ -14,6 +14,11 @@
  */
 
 /**
+ * @typedef {Object} Biome
+ * @property {{ [k: string]: Block }} ranges
+ */
+
+/**
  * @param {Block} block
  * @returns {Block}
  */
@@ -35,14 +40,14 @@ const hexToRgb = (hexColor) => {
 };
 
 const BLOCKS2 = /** @type {{ [k: string]: Block }} */ ({
-  DEEP_WATER: { max: -0.1, color: "#256299", isFluid: true },
-  MEDIUM_WATER: { max: 0.1, color: "#2375b4", isFluid: true },
-  SEA_SHORE: { max: 0.2, color: "#4699de", isFluid: true },
-  BEACH_SAND: { max: 0.35, color: "#ab976a" },
-  LOW_GRASS: { max: 0.4, color: "#457950" },
-  HIGH_GRASS: { max: 0.5, color: "#2d673e" },
-  DIRT: { max: 0.7, color: "#3F573A" },
-  ROCK: { max: 1, color: "#CBC0BB" },
+  DEEP_WATER: addRgbToBlock({ max: -0.1, color: "#256299", isFluid: true }),
+  MEDIUM_WATER: addRgbToBlock({ max: 0.1, color: "#2375b4", isFluid: true }),
+  SEA_SHORE: addRgbToBlock({ max: 0.2, color: "#4699de", isFluid: true }),
+  BEACH_SAND: addRgbToBlock({ max: 0.35, color: "#ab976a" }),
+  LOW_GRASS: addRgbToBlock({ max: 0.4, color: "#457950" }),
+  HIGH_GRASS: addRgbToBlock({ max: 0.5, color: "#2d673e" }),
+  DIRT: addRgbToBlock({ max: 0.7, color: "#3F573A" }),
+  ROCK: addRgbToBlock({ max: 1, color: "#CBC0BB" }),
 });
 
 const BLOCKS = /** @type {{ [k: string]: Block }} */ ({
@@ -56,11 +61,11 @@ const BLOCKS = /** @type {{ [k: string]: Block }} */ ({
   ROCK: addRgbToBlock({ max: 1, color: "#CBC0BB" }),
 });
 
-export const BIOMES = {
+export const BIOMES = /** @type {{ [k: string]: Biome }} */ ({
   FOREST: {
     ranges: BLOCKS,
   },
   OCEAN: {
     ranges: BLOCKS2,
   },
-};
+});

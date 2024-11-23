@@ -1,8 +1,7 @@
 import { POLY_INFO, KNOWN_POLYGONS, MAP_INFO } from "./infos.js";
 import { CONFIG, CANVAS_CONFIG } from "./configs.js";
 import { GRID, loadChunk } from "./grid.js";
-import { tweakColor } from "./utils.js";
-import { applyRotation } from "./movement.js";
+import { correctRoundError, getRotationIndex, tweakColor } from "./utils.js";
 
 const canvas = /** @type {HTMLCanvasElement} */ (
   document.getElementById("init")
@@ -30,37 +29,40 @@ export const resetCanvasSize = () => {
 export const drawEveryCell = () => {
   MAP_INFO.walls = [];
 
-  const offsetCell =
-    CONFIG.polySides > KNOWN_POLYGONS.SQUARE && MAP_INFO.currentCell.pos.j % 2;
+  const shouldIntercalate = CONFIG.polySides > KNOWN_POLYGONS.SQUARE;
+  const offsetCell = MAP_INFO.currentCell.pos.j % 2;
   const { rows, columns, ySide } = POLY_INFO[CONFIG.polySides];
-  for (let i = 0; i < rows; i++) {
+
+  // More range to encapsulate rotation
+  for (let i = -columns; i < rows + columns; i++) {
     const baseI = i + MAP_INFO.iOffset;
-    for (let j = 0; j < columns; j++) {
+    for (let j = -rows; j < rows + columns; j++) {
       let nI = baseI;
       const nJ = j + MAP_INFO.jOffset;
 
-      if (offsetCell && nJ % 2 === 0) nI = nI + 1;
+      if (shouldIntercalate && offsetCell && nJ % 2 === 0) nI = nI + 1;
 
-      if (!GRID[nI]?.[nJ]) {
-        const [cI, cJ] = getChunkStart(nI, nJ);
-        loadChunk(cI, cJ);
-      }
+      if (!GRID[nI]?.[nJ]) loadChunk(nI, nJ);
 
       drawCell(GRID[nI][nJ]);
     }
   }
 
+  // Draw wall of wall
   for (let i = 0; i < MAP_INFO.walls.length; i++) {
     const wall = MAP_INFO.walls[i];
-    context.fillStyle = wall.color;
+    context.fillStyle = `rgb(${wall.color.r / CANVAS_CONFIG.wallDarkness}, ${
+      wall.color.g / CANVAS_CONFIG.wallDarkness
+    }, ${wall.color.b / CANVAS_CONFIG.wallDarkness})`;
     fillPolygon(wall.x, wall.y, wall.points);
     applyBorders(wall.x, wall.y, wall.points);
     applyDark(wall.x, wall.y, wall.points);
   }
 
+  // Draw roof of wall
   for (let i = 0; i < MAP_INFO.walls.length; i++) {
     const wall = MAP_INFO.walls[i];
-    context.fillStyle = wall.color;
+    context.fillStyle = `rgb(${wall.color.r}, ${wall.color.g}, ${wall.color.b})`;
     fillPolygon(wall.x, wall.y - ySide, wall.topPoints);
     applyBorders(wall.x, wall.y - ySide, wall.topPoints);
     applyDark(wall.x, wall.y - ySide, wall.topPoints);
@@ -100,7 +102,7 @@ export const drawCell = (cell) => {
       : polyInfo.wallPoints;
 
     MAP_INFO.walls.push({
-      color: `rgb(${cell.wall.color.r}, ${cell.wall.color.g}, ${cell.wall.color.b})`,
+      color: cell.wall.color,
       x,
       y,
       points: wallPoints,
@@ -177,16 +179,41 @@ const applyBorders = (x, y, points) => {
 };
 
 /**
- * @param {number} n
- * @param {number} range
+ * @param {number} x
+ * @param {number} y
+ * @param {boolean} isInverted
+ * @returns {number[]}
  */
-const getRange = (n, range) => Math.floor(n / range) * range;
+const applyRotation = (x, y, isInverted) => {
+  if (!MAP_INFO.rotationTurns || !CONFIG.useRotation) return [x, y];
+  const polyInfo = POLY_INFO[CONFIG.polySides];
 
-/**
- * @param {number} i
- * @param {number} j
- */
-const getChunkStart = (i, j) => [
-  getRange(i, CONFIG.initialRows),
-  getRange(j, CONFIG.initialColumns),
-];
+  const turns = getRotationIndex(MAP_INFO.rotationTurns, CONFIG.polySides);
+  const angle = (360 / CONFIG.polySides) * turns;
+  const cx =
+    MAP_INFO.currentCell.dPos[CONFIG.polySides].x +
+    (MAP_INFO.xOffset[CONFIG.polySides] || 0);
+  const cy =
+    MAP_INFO.currentCell.dPos[CONFIG.polySides].y +
+    (MAP_INFO.yOffset[CONFIG.polySides] || 0);
+
+  const radians = (Math.PI / 180) * angle;
+  const cos = Math.cos(radians);
+  const sin = Math.sin(radians);
+  let nx = correctRoundError(cos * (x - cx) + sin * (y - cy) + cx);
+  let ny = correctRoundError(cos * (y - cy) - sin * (x - cx) + cy);
+
+  if (
+    CONFIG.polySides % 2 &&
+    isInverted !== MAP_INFO.currentCell.isInverted &&
+    angle
+  ) {
+    const oddTurn = !!(turns % 2);
+    ny += polyInfo.ySide * (MAP_INFO.currentCell.isInverted ? 1 : -1);
+    nx +=
+      (polyInfo.xSide / 2) *
+      (MAP_INFO.currentCell.isInverted === oddTurn ? -1 : 1);
+  }
+
+  return [nx, ny];
+};

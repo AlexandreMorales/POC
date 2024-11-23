@@ -18,7 +18,7 @@ export const CONFIG = /** @type {Config} */ ({
   polySides: KNOWN_POLYGONS.HEXAGON,
 
   automaticRowsAndColumns: true,
-  useRotation: false,
+  useRotation: true,
   showZoom: false,
 });
 
@@ -27,10 +27,12 @@ export const MAP_CONFIG = {
   midNightHour: 70,
   velocity: 10,
   canMove: true,
+  noiseResolution: 20,
 };
 
 export const CANVAS_CONFIG = {
   showPos: false,
   strokeColor: "black",
   currentColor: "cyan",
+  wallDarkness: 2,
 };

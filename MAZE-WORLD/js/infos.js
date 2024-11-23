@@ -33,12 +33,12 @@ export const KNOWN_POLYGONS = {
 export const knownPolys = Object.values(KNOWN_POLYGONS);
 
 /**
- * @typedef {Object} WallList
+ * @typedef {Object} Wall
  * @property {number} x
  * @property {number} y
  * @property {Points[]} points
  * @property {Points[]} topPoints
- * @property {string} color
+ * @property {import("./biomes").Color} color
  */
 
 /**
@@ -53,7 +53,7 @@ export const knownPolys = Object.values(KNOWN_POLYGONS);
  * @property {number} timeOfDay
  * @property {number} touchThreshold
  * @property {{ x: number, y: number, interval: Object }} touchPos
- * @property {WallList[]} walls
+ * @property {Wall[]} walls
  */
 export const MAP_INFO = /** @type {MapInfo} */ ({
   currentCell: null,

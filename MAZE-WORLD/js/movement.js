@@ -2,7 +2,7 @@ import { CONFIG, MAP_CONFIG } from "./configs.js";
 import { knownPolys, MAP_INFO, POLY_INFO } from "./infos.js";
 import { GRID } from "./grid.js";
 import { resetCanvasSize, drawEveryCell } from "./draw.js";
-import { correctRoundError, debounce } from "./utils.js";
+import { correctRoundError, debounce, getRotationIndex } from "./utils.js";
 
 document.onkeydown = (e) => {
   e = e || /** @type {KeyboardEvent} */ (window.event);
@@ -19,17 +19,8 @@ document.onkeydown = (e) => {
   }
 
   if (CONFIG.useRotation) {
-    if (e.code === "ArrowRight") {
-      MAP_INFO.rotationTurns++;
-      move(null, true);
-      return;
-    }
-
-    if (e.code === "ArrowLeft") {
-      MAP_INFO.rotationTurns--;
-      move(null, true);
-      return;
-    }
+    if (e.code === "ArrowRight") return rotate(1);
+    if (e.code === "ArrowLeft") return rotate(-1);
   }
 
   moveBaseOnCode(e.code, e.altKey);
@@ -53,6 +44,10 @@ document.ontouchstart = (e) => {
       code = useDiagonal ? "ArrowUp" : "ArrowDown";
     }
     if (Math.abs(finalX) > MAP_INFO.touchThreshold) {
+      if (CONFIG.useRotation) {
+        clearInterval(MAP_INFO.touchPos.interval);
+        return rotate(finalX < 0 ? -1 : 1);
+      }
       code = finalX < 0 ? "ArrowLeft" : "ArrowRight";
     }
 
@@ -73,11 +68,19 @@ document.ontouchend = () => {
 };
 
 /**
+ * @param {number} orientation
+ */
+const rotate = (orientation) => {
+  MAP_INFO.rotationTurns = MAP_INFO.rotationTurns + orientation;
+  move(null, true);
+};
+
+/**
  * @param {boolean} [useDiagonal]
  * @returns {{ [k: string]: number }}
  */
 const getMovementMap = (useDiagonal) => {
-  let topI = (CONFIG.polySides + MAP_INFO.rotationTurns) % CONFIG.polySides;
+  let topI = getRotationIndex(MAP_INFO.rotationTurns, CONFIG.polySides);
   let bottomI = (topI + Math.floor(CONFIG.polySides / 2)) % CONFIG.polySides;
 
   let topLeftI = CONFIG.polySides - 1;
@@ -137,6 +140,8 @@ export const changePolySides = () => {
   CONFIG.polySides =
     knownPolys[(knownPolys.indexOf(CONFIG.polySides) + 1) % knownPolys.length];
 
+  MAP_INFO.rotationTurns = 0;
+
   resetCanvasSize();
   updateOffsets(getCenterCell(), MAP_INFO.currentCell);
   drawEveryCell();
@@ -169,39 +174,6 @@ export const updateOffsets = (oldCell, nextCell) => {
 
   MAP_INFO.iOffset += nextCell.pos.i - oldCell.pos.i;
   MAP_INFO.jOffset += nextCell.pos.j - oldCell.pos.j;
-};
-
-/**
- * @param {number} x
- * @param {number} y
- * @param {boolean} isInverted
- * @returns {number[]}
- */
-export const applyRotation = (x, y, isInverted) => {
-  if (!MAP_INFO.rotationTurns || !CONFIG.useRotation) return [x, y];
-  const polyInfo = POLY_INFO[CONFIG.polySides];
-
-  const turns = (CONFIG.polySides + MAP_INFO.rotationTurns) % CONFIG.polySides;
-  const angle = (360 / CONFIG.polySides) * turns;
-  const cx = MAP_INFO.currentCell.dPos[CONFIG.polySides].x;
-  const cy = MAP_INFO.currentCell.dPos[CONFIG.polySides].y;
-
-  const radians = (Math.PI / 180) * angle;
-  const cos = Math.cos(radians);
-  const sin = Math.sin(radians);
-  let nx = correctRoundError(cos * (x - cx) + sin * (y - cy) + cx);
-  let ny = correctRoundError(cos * (y - cy) - sin * (x - cx) + cy);
-
-  if (
-    CONFIG.polySides % 2 &&
-    isInverted !== MAP_INFO.currentCell.isInverted &&
-    angle
-  ) {
-    nx += (polyInfo.xSide / 2) * (turns === 1 ? -1 : 1);
-    ny += polyInfo.ySide;
-  }
-
-  return [nx, ny];
 };
 
 /**

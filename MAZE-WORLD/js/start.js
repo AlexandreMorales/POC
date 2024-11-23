@@ -10,6 +10,7 @@ import {
   updateOffsets,
 } from "./movement.js";
 import { configPolys } from "./boot.js";
+import { BIOMES } from "./biomes.js";
 
 const start = () => {
   configPolys();
@@ -17,7 +18,7 @@ const start = () => {
   CONFIG.initialRows = POLY_INFO[CONFIG.polySides].rows;
   CONFIG.initialColumns = POLY_INFO[CONFIG.polySides].columns;
 
-  loadChunk(0, 0);
+  loadChunk(0, 0, BIOMES.FOREST);
   MAP_INFO.currentCell = getCenterCell();
   while (cellIsBlocked(MAP_INFO.currentCell)) {
     const nextCell =
@@ -35,7 +36,7 @@ const start = () => {
 export const resetSize = (newSize) => {
   CONFIG.cellHeight = newSize;
   configPolys();
-  GRID.flatMap((c) => c.flat()).map((c) => configCellPos(c));
+  GRID.flat().map((c) => configCellPos(c));
   setCanvasSize(null, POLY_INFO[CONFIG.polySides].canvasWidth);
   const oldOffsets = {
     xOffset: MAP_INFO.xOffset,

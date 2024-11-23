@@ -47,3 +47,11 @@ export const tweakColor = ({ r, g, b }) => {
 
   return { r, g, b };
 };
+
+/**
+ * @param {number} turns
+ * @param {number} polySides
+ * @returns {number}
+ */
+export const getRotationIndex = (turns, polySides) =>
+  (polySides + (turns % polySides)) % polySides;
