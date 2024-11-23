@@ -6,7 +6,6 @@ import { correctRoundError, debounce, getRotationIndex } from "./utils.js";
 
 document.onkeydown = (e) => {
   e = e || /** @type {KeyboardEvent} */ (window.event);
-  e.preventDefault();
 
   if (e.code === "ShiftLeft") {
     changePolySides();
