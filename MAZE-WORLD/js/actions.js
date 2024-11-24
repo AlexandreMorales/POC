@@ -1,5 +1,5 @@
 import { CONFIG } from "./configs.js";
-import { GRID } from "./grid.js";
+import { GRID, addWall } from "./grid.js";
 import { MAP_INFO } from "./infos.js";
 import { move } from "./movement.js";
 import { getRotationIndex } from "./utils.js";
@@ -20,7 +20,7 @@ export const dig = () => {
   MAP_INFO.pickedCells.push({ ...(nextCell.wall || nextCell) });
 
   if (nextCell.wall) {
-    nextCell.wall = null;
+    addWall(nextCell, null);
   } else {
     nextCell.value = null;
     nextCell.block = null;
@@ -47,7 +47,7 @@ export const place = () => {
   const nextBlock = MAP_INFO.pickedCells.pop();
 
   if (nextCell.value && nextCell.block && !nextCell.block.isFluid) {
-    nextCell.wall = nextBlock;
+    addWall(nextCell, nextBlock);
   } else {
     nextCell.value = nextBlock.value;
     nextCell.block = nextBlock.block;

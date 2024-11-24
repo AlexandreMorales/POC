@@ -106,7 +106,7 @@ export const drawCell = (cell) => {
     if (aFluid) {
       cell.value = aFluid.value;
       cell.block = aFluid.block;
-      cell.color = aFluid.color;
+      cell.color = tweakColor(aFluid.color);
     }
   }
 

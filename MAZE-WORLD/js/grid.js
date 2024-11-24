@@ -108,26 +108,26 @@ export const loadChunk = (i, j, biome) => {
     for (let j = 0; j < columns; j++) {
       const nJ = j + offsetJ;
       const value = perlin?.[i]?.[j];
-      GRID[nI][nJ] = createCell(nI, nJ, value, biome);
+      const cell = createCell(nI, nJ, value, biome);
+      GRID[nI][nJ] = cell;
 
-      if (value > 0.4) {
-        addWall(nI, nJ);
-      }
+      if (value > 0.4) addWall(cell, cell);
     }
   }
 };
 
 /**
- * @param {number} i
- * @param {number} j
+ * @param {import("./infos.js").Cell} cell
+ * @param {import("./infos.js").CellBlock} wall
  */
-const addWall = (i, j) => {
-  const wall = GRID[i][j];
-  wall.wall = {
-    block: wall.block,
-    color: wall.color,
-    value: wall.value,
-  };
+export const addWall = (cell, wall) => {
+  cell.wall = wall?.value
+    ? {
+        block: wall.block,
+        color: wall.color,
+        value: wall.value,
+      }
+    : null;
 };
 
 /**
@@ -136,7 +136,7 @@ const addWall = (i, j) => {
  * @param {number} resolution
  * @returns {number[][]}
  */
-export const getPerlinGrid = (width, height, resolution) => {
+const getPerlinGrid = (width, height, resolution) => {
   const vectors = getVectors(width, height, resolution);
   return getValues(width, height);
 
