@@ -2,6 +2,7 @@ import { CONFIG } from "./configs.js";
 import { MAP_INFO } from "./infos.js";
 import { changePolySides, move, moveBaseOnCode, rotate } from "./movement.js";
 import { resetSize, start } from "./boot.js";
+import { dig, place } from "./actions.js";
 
 start();
 
@@ -21,6 +22,16 @@ document.onkeydown = (e) => {
   if (CONFIG.useRotation) {
     if (e.code === "ArrowRight") return rotate(1);
     if (e.code === "ArrowLeft") return rotate(-1);
+  }
+
+  if (e.code === "KeyC") {
+    dig();
+    return;
+  }
+
+  if (e.code === "KeyV") {
+    place();
+    return;
   }
 
   moveBaseOnCode(e.code, e.altKey);
@@ -81,3 +92,11 @@ const changePolyBtn = /** @type {HTMLButtonElement} */ (
   document.getElementById("change-poly")
 );
 changePolyBtn.onclick = changePolySides;
+const digBtn = /** @type {HTMLButtonElement} */ (
+  document.getElementById("dig")
+);
+digBtn.onclick = dig;
+const placeBtn = /** @type {HTMLButtonElement} */ (
+  document.getElementById("place")
+);
+placeBtn.onclick = place;

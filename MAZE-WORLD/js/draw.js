@@ -31,7 +31,7 @@ export const drawEveryCell = () => {
 
   const shouldIntercalate = CONFIG.polySides > KNOWN_POLYGONS.SQUARE;
   const offsetCell = MAP_INFO.currentCell.pos.j % 2;
-  const { rows, columns, ySide } = POLY_INFO[CONFIG.polySides];
+  const { rows, columns } = POLY_INFO[CONFIG.polySides];
 
   // More range to encapsulate rotation
   for (let i = -columns; i < rows + columns; i++) {
@@ -48,25 +48,31 @@ export const drawEveryCell = () => {
     }
   }
 
-  // Draw wall of wall
-  for (let i = 0; i < MAP_INFO.walls.length; i++) {
-    const wall = MAP_INFO.walls[i];
-    context.fillStyle = `rgb(${wall.color.r / CANVAS_CONFIG.wallDarkness}, ${
-      wall.color.g / CANVAS_CONFIG.wallDarkness
-    }, ${wall.color.b / CANVAS_CONFIG.wallDarkness})`;
-    fillPolygon(wall.x, wall.y, wall.points);
-    applyBorders(wall.x, wall.y, wall.points);
-    applyDark(wall.x, wall.y, wall.points);
-  }
+  MAP_INFO.walls.forEach(drawWall);
+  MAP_INFO.walls.forEach(drawWallRoof);
+};
 
-  // Draw roof of wall
-  for (let i = 0; i < MAP_INFO.walls.length; i++) {
-    const wall = MAP_INFO.walls[i];
-    context.fillStyle = `rgb(${wall.color.r}, ${wall.color.g}, ${wall.color.b})`;
-    fillPolygon(wall.x, wall.y - ySide, wall.topPoints);
-    applyBorders(wall.x, wall.y - ySide, wall.topPoints);
-    applyDark(wall.x, wall.y - ySide, wall.topPoints);
-  }
+/**
+ * @param {import("./infos.js").Wall} wall
+ */
+export const drawWall = (wall) => {
+  context.fillStyle = `rgb(${wall.color.r / CANVAS_CONFIG.wallDarkness}, ${
+    wall.color.g / CANVAS_CONFIG.wallDarkness
+  }, ${wall.color.b / CANVAS_CONFIG.wallDarkness})`;
+  fillPolygon(wall.x, wall.y, wall.points);
+  applyBorders(wall.x, wall.y, wall.points);
+  applyDark(wall.x, wall.y, wall.points);
+};
+
+/**
+ * @param {import("./infos.js").Wall} wall
+ */
+export const drawWallRoof = (wall) => {
+  const { ySide } = POLY_INFO[CONFIG.polySides];
+  context.fillStyle = `rgb(${wall.color.r}, ${wall.color.g}, ${wall.color.b})`;
+  fillPolygon(wall.x, wall.y - ySide, wall.topPoints);
+  applyBorders(wall.x, wall.y - ySide, wall.topPoints);
+  applyDark(wall.x, wall.y - ySide, wall.topPoints);
 };
 
 /**
@@ -89,6 +95,20 @@ export const drawCell = (cell) => {
 
   if (x < 0.1 || y < 0.1 || x > canvas.width - 0.1 || y > canvas.height - 0.1)
     return;
+
+  const aCells = cell.adjacentIndexes[CONFIG.polySides].map(
+    ([ai, aj]) => GRID[ai]?.[aj]
+  );
+
+  // Near fluid cells should take over
+  if (!cell.value) {
+    const aFluid = aCells.find((c) => c?.block?.isFluid);
+    if (aFluid) {
+      cell.value = aFluid.value;
+      cell.block = aFluid.block;
+      cell.color = aFluid.color;
+    }
+  }
 
   if (cell.value) {
     const color = cell.block.isFluid ? tweakColor(cell.color) : cell.color;
@@ -133,9 +153,7 @@ export const drawCell = (cell) => {
   if (
     cell.value &&
     cell !== MAP_INFO.currentCell &&
-    cell.adjacentIndexes[CONFIG.polySides]
-      .map(([ai, aj]) => GRID[ai]?.[aj])
-      .every((c) => c !== MAP_INFO.currentCell)
+    aCells.every((c) => c !== MAP_INFO.currentCell)
   )
     applyDark(x, y, points);
 };

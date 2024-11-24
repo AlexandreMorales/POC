@@ -44,7 +44,7 @@ export const knownPolys = Object.values(KNOWN_POLYGONS);
 /**
  * @typedef {Object} MapInfo
  * @property {Cell} currentCell
- * @property {Cell[]} pickedCells
+ * @property {CellBlock[]} pickedCells
  * @property {{ [k: number]: number }} xOffset
  * @property {{ [k: number]: number }} yOffset
  * @property {number} iOffset
