@@ -1,8 +1,12 @@
+import { BIOMES } from "./biomes.js";
 import { CONFIG } from "./configs.js";
-import { KNOWN_POLYGONS, POLY_INFO, knownPolys } from "./infos.js";
+import { resetCanvasSize, drawEveryCell, setCanvasSize } from "./draw.js";
+import { loadChunk, GRID, configCellPos } from "./grid.js";
+import { KNOWN_POLYGONS, MAP_INFO, POLY_INFO, knownPolys } from "./infos.js";
+import { getCenterCell, cellIsBlocked, updateOffsets } from "./movement.js";
 import { correctRoundError } from "./utils.js";
 
-export const configPolys = () => {
+const configPolys = () => {
   for (const p of knownPolys) {
     POLY_INFO[p] = configPoly(p);
   }
@@ -148,4 +152,41 @@ const configPoly = (polySides) => {
     canvasHeight: Math.round(canvasHeight),
     canvasWidth: Math.round(canvasWidth),
   };
+};
+
+export const start = () => {
+  configPolys();
+  resetCanvasSize();
+  CONFIG.initialRows = POLY_INFO[CONFIG.polySides].rows;
+  CONFIG.initialColumns = POLY_INFO[CONFIG.polySides].columns;
+
+  loadChunk(0, 0, BIOMES.FOREST);
+  MAP_INFO.currentCell = getCenterCell();
+  while (cellIsBlocked(MAP_INFO.currentCell)) {
+    const nextCell =
+      GRID[MAP_INFO.currentCell.pos.i + 1][MAP_INFO.currentCell.pos.j];
+    updateOffsets(MAP_INFO.currentCell, nextCell);
+    MAP_INFO.currentCell = nextCell;
+  }
+  drawEveryCell();
+  drawEveryCell();
+};
+
+/**
+ * @param {number} newSize
+ */
+export const resetSize = (newSize) => {
+  CONFIG.cellHeight = newSize;
+  configPolys();
+  GRID.flat().map((c) => configCellPos(c));
+  setCanvasSize(null, POLY_INFO[CONFIG.polySides].canvasWidth);
+  const oldOffsets = {
+    xOffset: MAP_INFO.xOffset,
+    yOffset: MAP_INFO.yOffset,
+    iOffset: MAP_INFO.iOffset,
+    jOffset: MAP_INFO.jOffset,
+  };
+  updateOffsets(getCenterCell(), MAP_INFO.currentCell);
+  drawEveryCell();
+  Object.assign(MAP_INFO, oldOffsets);
 };

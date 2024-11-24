@@ -90,11 +90,15 @@ export const drawCell = (cell) => {
   if (x < 0.1 || y < 0.1 || x > canvas.width - 0.1 || y > canvas.height - 0.1)
     return;
 
-  const color = cell.block.isFluid ? tweakColor(cell.color) : cell.color;
-  context.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
+  if (cell.value) {
+    const color = cell.block.isFluid ? tweakColor(cell.color) : cell.color;
+    context.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
 
-  if (cell === MAP_INFO.currentCell)
-    context.fillStyle = CANVAS_CONFIG.currentColor;
+    if (cell === MAP_INFO.currentCell)
+      context.fillStyle = CANVAS_CONFIG.currentColor;
+  } else {
+    context.fillStyle = "black";
+  }
 
   if (cell.wall) {
     const wallPoints = isInverted
@@ -126,13 +130,14 @@ export const drawCell = (cell) => {
     );
   }
 
-  const shouldApplyDark =
+  if (
+    cell.value &&
     cell !== MAP_INFO.currentCell &&
     cell.adjacentIndexes[CONFIG.polySides]
       .map(([ai, aj]) => GRID[ai]?.[aj])
-      .every((c) => c !== MAP_INFO.currentCell);
-
-  if (shouldApplyDark) applyDark(x, y, points);
+      .every((c) => c !== MAP_INFO.currentCell)
+  )
+    applyDark(x, y, points);
 };
 
 /**

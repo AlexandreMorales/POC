@@ -1,55 +1,71 @@
 import { CONFIG } from "./configs.js";
-import { MAP_INFO, POLY_INFO } from "./infos.js";
-import { resetCanvasSize, drawEveryCell, setCanvasSize } from "./draw.js";
-import { configCellPos, GRID, loadChunk } from "./grid.js";
-import "./movement.js";
-import {
-  cellIsBlocked,
-  changePolySides,
-  getCenterCell,
-  updateOffsets,
-} from "./movement.js";
-import { configPolys } from "./boot.js";
-import { BIOMES } from "./biomes.js";
-
-const start = () => {
-  configPolys();
-  resetCanvasSize();
-  CONFIG.initialRows = POLY_INFO[CONFIG.polySides].rows;
-  CONFIG.initialColumns = POLY_INFO[CONFIG.polySides].columns;
-
-  loadChunk(0, 0, BIOMES.FOREST);
-  MAP_INFO.currentCell = getCenterCell();
-  while (cellIsBlocked(MAP_INFO.currentCell)) {
-    const nextCell =
-      GRID[MAP_INFO.currentCell.pos.i + 1][MAP_INFO.currentCell.pos.j];
-    updateOffsets(MAP_INFO.currentCell, nextCell);
-    MAP_INFO.currentCell = nextCell;
-  }
-  drawEveryCell();
-  drawEveryCell();
-};
-
-/**
- * @param {number} newSize
- */
-export const resetSize = (newSize) => {
-  CONFIG.cellHeight = newSize;
-  configPolys();
-  GRID.flat().map((c) => configCellPos(c));
-  setCanvasSize(null, POLY_INFO[CONFIG.polySides].canvasWidth);
-  const oldOffsets = {
-    xOffset: MAP_INFO.xOffset,
-    yOffset: MAP_INFO.yOffset,
-    iOffset: MAP_INFO.iOffset,
-    jOffset: MAP_INFO.jOffset,
-  };
-  updateOffsets(getCenterCell(), MAP_INFO.currentCell);
-  drawEveryCell();
-  Object.assign(MAP_INFO, oldOffsets);
-};
+import { MAP_INFO } from "./infos.js";
+import { changePolySides, move, moveBaseOnCode, rotate } from "./movement.js";
+import { resetSize, start } from "./boot.js";
 
 start();
+
+document.onkeydown = (e) => {
+  e = e || /** @type {KeyboardEvent} */ (window.event);
+
+  if (e.code === "ShiftLeft") {
+    changePolySides();
+    return;
+  }
+
+  if (e.code === "Space") {
+    move();
+    return;
+  }
+
+  if (CONFIG.useRotation) {
+    if (e.code === "ArrowRight") return rotate(1);
+    if (e.code === "ArrowLeft") return rotate(-1);
+  }
+
+  moveBaseOnCode(e.code, e.altKey);
+};
+
+document.ontouchstart = (e) => {
+  e = e || /** @type {TouchEvent} */ (window.event);
+  const { screenX, screenY } = e.changedTouches[0];
+  clearInterval(MAP_INFO.touchPos.interval);
+  MAP_INFO.touchPos.x = screenX;
+  MAP_INFO.touchPos.y = screenY;
+
+  MAP_INFO.touchPos.interval = setInterval(() => {
+    const finalX = screenX - MAP_INFO.touchPos.x;
+    const finalY = screenY - MAP_INFO.touchPos.y;
+
+    let code = null;
+    let useDiagonal = false;
+    if (Math.abs(finalY) > MAP_INFO.touchThreshold) {
+      useDiagonal = finalY < 0;
+      code = useDiagonal ? "ArrowUp" : "ArrowDown";
+    }
+    if (Math.abs(finalX) > MAP_INFO.touchThreshold) {
+      if (CONFIG.useRotation) {
+        clearInterval(MAP_INFO.touchPos.interval);
+        return rotate(finalX < 0 ? -1 : 1);
+      }
+      code = finalX < 0 ? "ArrowLeft" : "ArrowRight";
+    }
+
+    if (code) moveBaseOnCode(code, useDiagonal);
+  }, 100);
+};
+
+document.ontouchmove = (e) => {
+  e = e || /** @type {TouchEvent} */ (window.event);
+  const { screenX, screenY } = e.changedTouches[0];
+  MAP_INFO.touchPos.x = screenX;
+  MAP_INFO.touchPos.y = screenY;
+};
+
+document.ontouchend = () => {
+  clearInterval(MAP_INFO.touchPos.interval);
+  MAP_INFO.touchPos = { x: 0, y: 0, interval: null };
+};
 
 const heightSlider = /** @type {HTMLInputElement} */ (
   document.getElementById("cell-height")

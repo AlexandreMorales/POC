@@ -20,9 +20,11 @@ export const createCell = (i, j, value, biome) => {
     cell.pos = { i, j };
 
     cell.value = value;
-    const block = Object.values(biome.ranges).find((r) => value <= r.max);
-    cell.block = block;
-    cell.color = tweakColor(block.colorRGB);
+    if (value) {
+      const block = Object.values(biome.ranges).find((r) => value <= r.max);
+      cell.block = block;
+      cell.color = tweakColor(block.colorRGB);
+    }
   }
 
   cell.adjacentIndexes = getAdjacentIndexes(i, j);

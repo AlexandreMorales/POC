@@ -4,72 +4,10 @@ import { GRID } from "./grid.js";
 import { resetCanvasSize, drawEveryCell } from "./draw.js";
 import { correctRoundError, debounce, getRotationIndex } from "./utils.js";
 
-document.onkeydown = (e) => {
-  e = e || /** @type {KeyboardEvent} */ (window.event);
-
-  if (e.code === "ShiftLeft") {
-    changePolySides();
-    return;
-  }
-
-  if (e.code === "Space") {
-    move();
-    return;
-  }
-
-  if (CONFIG.useRotation) {
-    if (e.code === "ArrowRight") return rotate(1);
-    if (e.code === "ArrowLeft") return rotate(-1);
-  }
-
-  moveBaseOnCode(e.code, e.altKey);
-};
-
-document.ontouchstart = (e) => {
-  e = e || /** @type {TouchEvent} */ (window.event);
-  const { screenX, screenY } = e.changedTouches[0];
-  clearInterval(MAP_INFO.touchPos.interval);
-  MAP_INFO.touchPos.x = screenX;
-  MAP_INFO.touchPos.y = screenY;
-
-  MAP_INFO.touchPos.interval = setInterval(() => {
-    const finalX = screenX - MAP_INFO.touchPos.x;
-    const finalY = screenY - MAP_INFO.touchPos.y;
-
-    let code = null;
-    let useDiagonal = false;
-    if (Math.abs(finalY) > MAP_INFO.touchThreshold) {
-      useDiagonal = finalY < 0;
-      code = useDiagonal ? "ArrowUp" : "ArrowDown";
-    }
-    if (Math.abs(finalX) > MAP_INFO.touchThreshold) {
-      if (CONFIG.useRotation) {
-        clearInterval(MAP_INFO.touchPos.interval);
-        return rotate(finalX < 0 ? -1 : 1);
-      }
-      code = finalX < 0 ? "ArrowLeft" : "ArrowRight";
-    }
-
-    if (code) moveBaseOnCode(code, useDiagonal);
-  }, 100);
-};
-
-document.ontouchmove = (e) => {
-  e = e || /** @type {TouchEvent} */ (window.event);
-  const { screenX, screenY } = e.changedTouches[0];
-  MAP_INFO.touchPos.x = screenX;
-  MAP_INFO.touchPos.y = screenY;
-};
-
-document.ontouchend = () => {
-  clearInterval(MAP_INFO.touchPos.interval);
-  MAP_INFO.touchPos = { x: 0, y: 0, interval: null };
-};
-
 /**
  * @param {number} orientation
  */
-const rotate = (orientation) => {
+export const rotate = (orientation) => {
   MAP_INFO.rotationTurns = MAP_INFO.rotationTurns + orientation;
   move(null, true);
 };
@@ -110,7 +48,7 @@ const getMovementMap = (useDiagonal) => {
  * @param {string} code
  * @param {boolean} [useDiagonal]
  */
-const moveBaseOnCode = (code, useDiagonal) => {
+export const moveBaseOnCode = (code, useDiagonal) => {
   const moveMap = getMovementMap(useDiagonal);
   const aIndex = moveMap[code];
 
@@ -133,7 +71,7 @@ const moveBaseOnCode = (code, useDiagonal) => {
  * @returns {boolean}
  */
 export const cellIsBlocked = (cell) =>
-  !cell || !!cell.wall || cell.block.isFluid;
+  !cell || !!cell.wall || !cell.value || !cell.block || cell.block.isFluid;
 
 export const changePolySides = () => {
   CONFIG.polySides =
@@ -179,7 +117,7 @@ export const updateOffsets = (oldCell, nextCell) => {
  * @param {import("./infos.js").Cell} [nextCell]
  * @param {boolean} [onlyDraw]
  */
-const move = (nextCell, onlyDraw) => {
+export const move = (nextCell, onlyDraw) => {
   if (MAP_CONFIG.canMove) {
     if (nextCell) {
       const oldCell = MAP_INFO.currentCell;
