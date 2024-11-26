@@ -99,7 +99,7 @@ const configPoly = (polySides) => {
 
   let rows = CONFIG.initialRows;
   let columns = CONFIG.initialColumns;
-  let canvasHeight = window.innerHeight * 0.9;
+  let canvasHeight = window.innerHeight;
   let canvasWidth = window.innerWidth;
 
   rows = canvasHeight;

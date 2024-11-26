@@ -59,3 +59,5 @@ if (CONFIG.showZoom) {
 document.getElementById("change-poly").onclick = changePolySides;
 document.getElementById("dig").onclick = dig;
 document.getElementById("place").onclick = place;
+document.getElementById("rotate-left").onclick = () => rotate(-1);
+document.getElementById("rotate-right").onclick = () => rotate(1);
