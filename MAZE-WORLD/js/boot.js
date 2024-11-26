@@ -1,10 +1,10 @@
 import { BIOMES } from "./biomes.js";
 import { CONFIG } from "./configs.js";
 import { resetCanvasSize, drawEveryCell, setCanvasSize } from "./draw.js";
-import { loadChunk, GRID, configCellPos } from "./grid.js";
+import { loadChunk, GRID } from "./grid.js";
 import { KNOWN_POLYGONS, MAP_INFO, POLY_INFO, knownPolys } from "./infos.js";
 import { getCenterCell, cellIsBlocked, updateOffsets } from "./movement.js";
-import { correctRoundError } from "./utils.js";
+import { correctRoundError, debounce } from "./utils.js";
 
 const configPolys = () => {
   for (const p of knownPolys) {
@@ -31,6 +31,26 @@ const createWallPoints = (points, height) => {
 
 /**
  * @param {number} polySides
+ * @param {number} polySide
+ * @param {number} xSide
+ * @returns {(j: number) => number}
+ */
+const getXFn = (polySides, polySide, xSide) => {
+  switch (polySides) {
+    case KNOWN_POLYGONS.TRIANGLE:
+      return (j) => j * (polySide / 2) + xSide;
+
+    case KNOWN_POLYGONS.HEXAGON:
+      return (j) => j * (xSide + polySide / 2) + xSide;
+
+    case KNOWN_POLYGONS.SQUARE:
+    default:
+      return (j) => j * xSide * 2 + xSide;
+  }
+};
+
+/**
+ * @param {number} polySides
  * @returns {import("./infos.js").PolyInfoProp}
  */
 const configPoly = (polySides) => {
@@ -40,11 +60,11 @@ const configPoly = (polySides) => {
    * The length of the side of the polygon
    */
   let polySide = 0;
-  const isOddPoly = polySides % 2;
+  const hasInverted = polySides % 2 === 1;
 
   const ySide = correctRoundError(CONFIG.cellHeight / 2);
 
-  if (isOddPoly) {
+  if (hasInverted) {
     // Pythagoras of (height² + (side/2)² = side²)
     polySide = correctRoundError(
       Math.sqrt(CONFIG.cellHeight ** 2 / (1 - 1 / 4))
@@ -68,7 +88,9 @@ const configPoly = (polySides) => {
 
   const shouldIntercalate = polySides > KNOWN_POLYGONS.SQUARE;
 
-  const yCoeficient = isOddPoly ? correctRoundError(-CONFIG.cellHeight / 6) : 0;
+  const yCoeficient = hasInverted
+    ? correctRoundError(-CONFIG.cellHeight / 6)
+    : 0;
   const coeficient = (polySides / 2 + 1) / 2;
   const points = [];
 
@@ -97,25 +119,20 @@ const configPoly = (polySides) => {
     Math.sqrt(Math.abs(polySide ** 2 - radiusFromSide ** 2))
   );
 
-  let rows = CONFIG.initialRows;
-  let columns = CONFIG.initialColumns;
   let canvasHeight = window.innerHeight;
   let canvasWidth = window.innerWidth;
 
-  rows = canvasHeight;
-  if (shouldIntercalate) rows -= ySide;
+  let rows = canvasHeight;
+  // To always have the same height because of the shouldIntercalate polys
+  rows -= ySide;
   rows = rows / CONFIG.cellHeight;
+  rows = Math.floor(rows);
 
-  columns = canvasWidth / (xSide * 2);
-
-  if (isOddPoly) columns = ((canvasWidth - 2) * 2 - polySide) / polySide;
-
-  if (shouldIntercalate) {
+  let columns = canvasWidth / (xSide * 2);
+  if (hasInverted) columns = ((canvasWidth - 2) * 2 - polySide) / polySide;
+  if (shouldIntercalate)
     columns =
       ((canvasWidth - slopSide) * 2) / (radiusFromCorner * 2 + polySide);
-  }
-
-  rows = Math.floor(rows);
   columns = Math.floor(columns);
 
   if (rows % 2 === 0) rows -= 1;
@@ -126,13 +143,13 @@ const configPoly = (polySides) => {
   canvasHeight = rows * CONFIG.cellHeight;
   // To always have the same height because of the shouldIntercalate polys
   canvasHeight += ySide;
+  canvasHeight = Math.round(canvasHeight);
 
   canvasWidth = columns * (xSide * 2);
-
-  if (isOddPoly) canvasWidth = (columns * polySide) / 2 + polySide / 2 + 2;
-
+  if (hasInverted) canvasWidth = (columns * polySide) / 2 + polySide / 2 + 2;
   if (shouldIntercalate)
     canvasWidth = (columns * (radiusFromCorner * 2 + polySide)) / 2 + slopSide;
+  canvasWidth = Math.round(canvasWidth);
 
   return {
     polySide,
@@ -146,6 +163,12 @@ const configPoly = (polySides) => {
     columns: Math.round(columns),
     canvasHeight: Math.round(canvasHeight),
     canvasWidth: Math.round(canvasWidth),
+    calcX: getXFn(polySides, polySide, xSide),
+    calcY: (i) => i * ySide * 2 + ySide,
+    cx: correctRoundError(canvasWidth / 2),
+    cy: correctRoundError((canvasHeight - ySide) / 2),
+    shouldIntercalate,
+    hasInverted,
   };
 };
 
@@ -168,18 +191,10 @@ export const start = () => {
 /**
  * @param {number} newSize
  */
-export const resetSize = (newSize) => {
+export const resetSize = debounce((newSize) => {
   CONFIG.cellHeight = newSize;
   configPolys();
-  GRID.flat().map((c) => configCellPos(c));
   setCanvasSize(null, POLY_INFO[CONFIG.polySides].canvasWidth);
-  const oldOffsets = {
-    xOffset: MAP_INFO.xOffset,
-    yOffset: MAP_INFO.yOffset,
-    iOffset: MAP_INFO.iOffset,
-    jOffset: MAP_INFO.jOffset,
-  };
   updateOffsets(getCenterCell(), MAP_INFO.currentCell);
   drawEveryCell();
-  Object.assign(MAP_INFO, oldOffsets);
-};
+});

@@ -2,20 +2,16 @@ import { KNOWN_POLYGONS } from "./infos.js";
 
 /**
  * @typedef {Object} Config
- * @property {number} initialRows
- * @property {number} initialColumns
+ * @property {number} chunkRows
+ * @property {number} chunkColumns
  * @property {number} cellHeight
  * @property {number} polySides The number of sides of the current polygon
- *
- * @property {boolean} showZoom
  */
 export const CONFIG = /** @type {Config} */ ({
-  initialRows: 100,
-  initialColumns: 100,
+  chunkRows: 100,
+  chunkColumns: 100,
   cellHeight: 24,
   polySides: KNOWN_POLYGONS.HEXAGON,
-
-  showZoom: false,
 });
 
 export const MAP_CONFIG = {
@@ -23,6 +19,7 @@ export const MAP_CONFIG = {
   midNightHour: 70,
   velocity: 10,
   noiseResolution: 20,
+  touchThreshold: 25,
 };
 
 export const CANVAS_CONFIG = {

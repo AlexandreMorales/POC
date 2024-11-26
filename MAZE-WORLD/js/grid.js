@@ -28,49 +28,9 @@ export const createCell = (i, j, value, biome) => {
   }
 
   cell.adjacentIndexes = getAdjacentIndexes(i, j);
-  configCellPos(cell);
+  cell.isInverted = isCellInverted(cell.pos);
 
   return cell;
-};
-
-/**
- * @param {import("./infos.js").Cell} cell
- */
-export const configCellPos = (cell) => {
-  const { i, j } = cell.pos;
-  const triangleInfo = POLY_INFO[KNOWN_POLYGONS.TRIANGLE];
-  const squareInfo = POLY_INFO[KNOWN_POLYGONS.SQUARE];
-  const hexaInfo = POLY_INFO[KNOWN_POLYGONS.HEXAGON];
-  const y = i * triangleInfo.ySide * 2 + triangleInfo.ySide;
-
-  cell.isInverted = isCellInverted(cell.pos);
-  cell.dPos = new Proxy(
-    {
-      [KNOWN_POLYGONS.TRIANGLE]: {
-        x: j * (triangleInfo.polySide / 2) + triangleInfo.xSide,
-        y,
-      },
-      [KNOWN_POLYGONS.SQUARE]: {
-        x: j * squareInfo.xSide * 2 + squareInfo.xSide,
-        y,
-      },
-      [KNOWN_POLYGONS.HEXAGON]: {
-        x: j * (hexaInfo.xSide + hexaInfo.polySide / 2) + hexaInfo.xSide,
-        y,
-      },
-    },
-    {
-      get: (obj, prop) => {
-        const polyInfo = POLY_INFO[prop];
-        return (
-          obj[prop] || {
-            x: j * (polyInfo.xSide + polyInfo.polySide / 2) + polyInfo.xSide,
-            y,
-          }
-        );
-      },
-    }
-  );
 };
 
 /**
@@ -84,8 +44,8 @@ const getRange = (n, range) => Math.floor(n / range) * range;
  * @param {number} j
  */
 const getChunkStart = (i, j) => [
-  getRange(i, CONFIG.initialRows),
-  getRange(j, CONFIG.initialColumns),
+  getRange(i, CONFIG.chunkRows),
+  getRange(j, CONFIG.chunkColumns),
 ];
 
 /**
@@ -98,8 +58,8 @@ export const loadChunk = (i, j, biome) => {
   const biomeKeys = Object.keys(BIOMES);
   biome = biome || BIOMES[biomeKeys[getRandomInt(biomeKeys.length)]];
 
-  const rows = CONFIG.initialRows;
-  const columns = CONFIG.initialColumns;
+  const rows = CONFIG.chunkRows;
+  const columns = CONFIG.chunkColumns;
   const perlin = getPerlinGrid(columns, rows, MAP_CONFIG.noiseResolution);
 
   for (let i = 0; i < rows; i++) {

@@ -17,7 +17,6 @@
  * @property {CellBlock} wall
  * @property {{ [k: number]: number[][] }} adjacentIndexes
  * @property {boolean} isInverted Only used for triangles
- * @property {{ [k: string]: Points }} dPos
  */
 
 /**
@@ -46,26 +45,20 @@ export const knownPolys = Object.values(KNOWN_POLYGONS);
  * @typedef {Object} MapInfo
  * @property {Cell} currentCell
  * @property {CellBlock[]} pickedCells
- * @property {{ [k: number]: number }} xOffset
- * @property {{ [k: number]: number }} yOffset
  * @property {number} iOffset
  * @property {number} jOffset
  * @property {number} rotationTurns
  * @property {number} timeOfDay
- * @property {number} touchThreshold
  * @property {{ x: number, y: number, interval: Object }} touchPos
  * @property {Wall[]} walls
  */
 export const MAP_INFO = /** @type {MapInfo} */ ({
   currentCell: null,
   pickedCells: [],
-  xOffset: {},
-  yOffset: {},
   iOffset: 0,
   jOffset: 0,
   rotationTurns: 0,
   timeOfDay: 0,
-  touchThreshold: 25,
   touchPos: { x: 0, y: 0, interval: null },
   walls: [],
 });
@@ -89,5 +82,11 @@ export const MAP_INFO = /** @type {MapInfo} */ ({
  * @property {number} columns
  * @property {number} canvasHeight
  * @property {number} canvasWidth
+ * @property {(j: number) => number} calcX
+ * @property {(i: number) => number} calcY
+ * @property {number} cx
+ * @property {number} cy
+ * @property {boolean} shouldIntercalate
+ * @property {boolean} hasInverted
  */
 export const POLY_INFO = /** @type {{ [k: number]: PolyInfoProp }} */ ({});

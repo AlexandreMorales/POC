@@ -39,3 +39,18 @@ export const tweakColor = ({ r, g, b }) => {
  * @returns {number}
  */
 export const getMod = (number, mod) => (mod + (number % mod)) % mod;
+
+/**
+ * @param {function} fn
+ * @param {number} timeout
+ * @returns {(p: any) => void}
+ */
+export const debounce = (fn, timeout = 10) => {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      fn.apply(this, args);
+    }, timeout);
+  };
+};

@@ -2,7 +2,7 @@ import { CONFIG, MAP_CONFIG } from "./configs.js";
 import { knownPolys, MAP_INFO, POLY_INFO } from "./infos.js";
 import { GRID } from "./grid.js";
 import { resetCanvasSize, drawEveryCell } from "./draw.js";
-import { correctRoundError, getMod } from "./utils.js";
+import { getMod } from "./utils.js";
 
 let canRotate = true;
 /**
@@ -33,7 +33,7 @@ const getMovementMap = (useDiagonal) => {
   let bottomLeftI = bottomI + 1;
   let bottomRightI = bottomI - 1;
 
-  if (CONFIG.polySides % 2) {
+  if (POLY_INFO[CONFIG.polySides].hasInverted) {
     const isInverted = MAP_INFO.currentCell.isInverted;
     topLeftI = bottomLeftI = topI + (isInverted ? 1 : 2);
     topRightI = bottomRightI = topI + (isInverted ? 2 : 1);
@@ -86,8 +86,9 @@ export const changePolySides = () => {
 
   MAP_INFO.rotationTurns = 0;
 
+  const centerCell = getCenterCell();
   resetCanvasSize();
-  updateOffsets(getCenterCell(), MAP_INFO.currentCell);
+  updateOffsets(centerCell, MAP_INFO.currentCell);
   drawEveryCell();
   drawEveryCell();
 };
@@ -97,25 +98,6 @@ export const changePolySides = () => {
  * @param {import("./infos.js").Cell} nextCell
  */
 export const updateOffsets = (oldCell, nextCell) => {
-  MAP_INFO.xOffset = knownPolys.reduce(
-    (acc, p) => ({
-      ...acc,
-      [p]: correctRoundError(
-        (MAP_INFO.xOffset[p] || 0) + oldCell.dPos[p].x - nextCell.dPos[p].x
-      ),
-    }),
-    {}
-  );
-  MAP_INFO.yOffset = knownPolys.reduce(
-    (acc, p) => ({
-      ...acc,
-      [p]: correctRoundError(
-        (MAP_INFO.yOffset[p] || 0) + oldCell.dPos[p].y - nextCell.dPos[p].y
-      ),
-    }),
-    {}
-  );
-
   MAP_INFO.iOffset += nextCell.pos.i - oldCell.pos.i;
   MAP_INFO.jOffset += nextCell.pos.j - oldCell.pos.j;
 };
@@ -176,11 +158,11 @@ export const mobileTouchStart = (screenX, screenY) => {
 
     let code = null;
     let useDiagonal = false;
-    if (Math.abs(finalY) > MAP_INFO.touchThreshold) {
+    if (Math.abs(finalY) > MAP_CONFIG.touchThreshold) {
       useDiagonal = finalY > 0;
       code = useDiagonal ? "ArrowDown" : "ArrowUp";
     }
-    if (Math.abs(finalX) > MAP_INFO.touchThreshold) {
+    if (Math.abs(finalX) > MAP_CONFIG.touchThreshold) {
       code = finalX < 0 ? "ArrowLeft" : "ArrowRight";
     }
 

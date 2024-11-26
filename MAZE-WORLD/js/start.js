@@ -49,12 +49,8 @@ document.ontouchend = () => {
 const heightSlider = /** @type {HTMLInputElement} */ (
   document.getElementById("cell-height")
 );
-if (CONFIG.showZoom) {
-  heightSlider.value = heightSlider.min = `${CONFIG.cellHeight}`;
-  heightSlider.oninput = () => resetSize(+heightSlider.value);
-} else {
-  heightSlider.style.display = "none";
-}
+heightSlider.value = `${CONFIG.cellHeight}`;
+heightSlider.oninput = () => resetSize(+heightSlider.value);
 
 document.getElementById("change-poly").onclick = changePolySides;
 document.getElementById("dig").onclick = dig;

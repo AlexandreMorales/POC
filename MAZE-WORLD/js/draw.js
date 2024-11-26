@@ -29,9 +29,9 @@ export const resetCanvasSize = () => {
 export const drawEveryCell = () => {
   MAP_INFO.walls = [];
 
-  const shouldIntercalate = CONFIG.polySides > KNOWN_POLYGONS.SQUARE;
   const offsetCell = MAP_INFO.currentCell.pos.j % 2;
-  const { rows, columns } = POLY_INFO[CONFIG.polySides];
+  const { rows, columns, shouldIntercalate, ySide } =
+    POLY_INFO[CONFIG.polySides];
 
   // More range to encapsulate rotation
   for (let i = -columns; i < rows + columns; i++) {
@@ -49,7 +49,7 @@ export const drawEveryCell = () => {
   }
 
   MAP_INFO.walls.forEach(drawWall);
-  MAP_INFO.walls.forEach(drawWallRoof);
+  MAP_INFO.walls.forEach((w) => drawWallRoof(w, ySide));
 };
 
 /**
@@ -65,9 +65,9 @@ export const drawWall = (wall) => {
 
 /**
  * @param {import("./infos.js").Wall} wall
+ * @param {number} ySide
  */
-export const drawWallRoof = (wall) => {
-  const { ySide } = POLY_INFO[CONFIG.polySides];
+export const drawWallRoof = (wall, ySide) => {
   context.fillStyle = `rgb(${wall.color.r}, ${wall.color.g}, ${wall.color.b})`;
   fillPolygon(wall.x, wall.y - ySide, wall.topPoints);
   applyBorders(wall.x, wall.y - ySide, wall.topPoints, wall.map);
@@ -78,16 +78,18 @@ export const drawWallRoof = (wall) => {
  * @param {import("./infos.js").Cell} cell
  */
 export const drawCell = (cell) => {
-  let { x, y } = cell.dPos[CONFIG.polySides];
   const polyInfo = POLY_INFO[CONFIG.polySides];
-  const isInverted = CONFIG.polySides % 2 && cell.isInverted;
+  const isInverted = polyInfo.hasInverted && cell.isInverted;
   const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;
-  const shouldIntercalate = CONFIG.polySides > KNOWN_POLYGONS.SQUARE;
 
-  x += MAP_INFO.xOffset[CONFIG.polySides] || 0;
-  y += MAP_INFO.yOffset[CONFIG.polySides] || 0;
+  let { i, j } = cell.pos;
+  i -= MAP_INFO.iOffset || 0;
+  j -= MAP_INFO.jOffset || 0;
 
-  if (shouldIntercalate && (cell.pos.j + MAP_INFO.jOffset) % 2)
+  let x = polyInfo.calcX(j);
+  let y = polyInfo.calcY(i);
+
+  if (polyInfo.shouldIntercalate && j % 2)
     y += MAP_INFO.currentCell.pos.j % 2 ? -polyInfo.ySide : polyInfo.ySide;
 
   [x, y] = applyRotation(x, y, isInverted);
@@ -124,7 +126,7 @@ export const drawCell = (cell) => {
       ? polyInfo.wallInvertedPoints
       : polyInfo.wallPoints;
 
-    const shouldOffset = CONFIG.polySides % 2 && !cell.isInverted;
+    const shouldOffset = polyInfo.hasInverted && !cell.isInverted;
 
     MAP_INFO.walls.push({
       color: cell.wall.color,
@@ -219,33 +221,22 @@ const applyBorders = (x, y, points, map) => {
  */
 const applyRotation = (x, y, isInverted) => {
   if (!MAP_INFO.rotationTurns) return [x, y];
-  const polyInfo = POLY_INFO[CONFIG.polySides];
-
   const turns = getMod(MAP_INFO.rotationTurns, CONFIG.polySides);
-  const angle = (360 / CONFIG.polySides) * turns;
-  const cx =
-    MAP_INFO.currentCell.dPos[CONFIG.polySides].x +
-    (MAP_INFO.xOffset[CONFIG.polySides] || 0);
-  const cy =
-    MAP_INFO.currentCell.dPos[CONFIG.polySides].y +
-    (MAP_INFO.yOffset[CONFIG.polySides] || 0);
+  if (!turns) return [x, y];
 
+  const { cx, cy, ySide, xSide, hasInverted } = POLY_INFO[CONFIG.polySides];
+
+  const angle = (360 / CONFIG.polySides) * turns;
   const radians = (Math.PI / 180) * angle;
   const cos = Math.cos(radians);
   const sin = Math.sin(radians);
   let nx = correctRoundError(cos * (x - cx) + sin * (y - cy) + cx);
   let ny = correctRoundError(cos * (y - cy) - sin * (x - cx) + cy);
 
-  if (
-    CONFIG.polySides % 2 &&
-    isInverted !== MAP_INFO.currentCell.isInverted &&
-    angle
-  ) {
+  if (hasInverted && isInverted !== MAP_INFO.currentCell.isInverted && angle) {
     const oddTurn = !!(turns % 2);
-    ny += polyInfo.ySide * (MAP_INFO.currentCell.isInverted ? 1 : -1);
-    nx +=
-      (polyInfo.xSide / 2) *
-      (MAP_INFO.currentCell.isInverted === oddTurn ? -1 : 1);
+    ny += ySide * (MAP_INFO.currentCell.isInverted ? 1 : -1);
+    nx += (xSide / 2) * (MAP_INFO.currentCell.isInverted === oddTurn ? -1 : 1);
   }
 
   return [nx, ny];
