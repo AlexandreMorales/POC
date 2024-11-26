@@ -2,10 +2,10 @@ import { CONFIG } from "./configs.js";
 import { GRID, addWall } from "./grid.js";
 import { MAP_INFO } from "./infos.js";
 import { move } from "./movement.js";
-import { getRotationIndex } from "./utils.js";
+import { getMod } from "./utils.js";
 
 export const dig = () => {
-  const aIndex = getRotationIndex(MAP_INFO.rotationTurns, CONFIG.polySides);
+  const aIndex = getMod(MAP_INFO.rotationTurns, CONFIG.polySides);
 
   const nextPos =
     MAP_INFO.currentCell.adjacentIndexes[CONFIG.polySides][aIndex];
@@ -33,7 +33,7 @@ export const dig = () => {
 export const place = () => {
   if (!MAP_INFO.pickedCells.length) return;
 
-  const aIndex = getRotationIndex(MAP_INFO.rotationTurns, CONFIG.polySides);
+  const aIndex = getMod(MAP_INFO.rotationTurns, CONFIG.polySides);
 
   const nextPos =
     MAP_INFO.currentCell.adjacentIndexes[CONFIG.polySides][aIndex];

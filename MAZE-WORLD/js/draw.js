@@ -1,7 +1,7 @@
 import { POLY_INFO, KNOWN_POLYGONS, MAP_INFO } from "./infos.js";
 import { CONFIG, CANVAS_CONFIG } from "./configs.js";
 import { GRID, loadChunk } from "./grid.js";
-import { correctRoundError, getRotationIndex, tweakColor } from "./utils.js";
+import { correctRoundError, getMod, tweakColor } from "./utils.js";
 
 const canvas = /** @type {HTMLCanvasElement} */ (
   document.getElementById("init")
@@ -16,7 +16,7 @@ export const setCanvasSize = (height, width) => {
   canvas.height = height || canvas.height;
   canvas.width = width || canvas.width;
   context.strokeStyle = CANVAS_CONFIG.strokeColor;
-  context.lineWidth = Math.round(CONFIG.cellHeight / 20);
+  context.lineWidth = 1;
 };
 
 export const resetCanvasSize = () => {
@@ -60,7 +60,6 @@ export const drawWall = (wall) => {
     wall.color.g / CANVAS_CONFIG.wallDarkness
   }, ${wall.color.b / CANVAS_CONFIG.wallDarkness})`;
   fillPolygon(wall.x, wall.y, wall.points);
-  applyBorders(wall.x, wall.y, wall.points);
   applyDark(wall.x, wall.y, wall.points);
 };
 
@@ -71,7 +70,7 @@ export const drawWallRoof = (wall) => {
   const { ySide } = POLY_INFO[CONFIG.polySides];
   context.fillStyle = `rgb(${wall.color.r}, ${wall.color.g}, ${wall.color.b})`;
   fillPolygon(wall.x, wall.y - ySide, wall.topPoints);
-  applyBorders(wall.x, wall.y - ySide, wall.topPoints);
+  applyBorders(wall.x, wall.y - ySide, wall.topPoints, wall.map);
   applyDark(wall.x, wall.y - ySide, wall.topPoints);
 };
 
@@ -125,12 +124,20 @@ export const drawCell = (cell) => {
       ? polyInfo.wallInvertedPoints
       : polyInfo.wallPoints;
 
+    const shouldOffset = CONFIG.polySides % 2 && !cell.isInverted;
+
     MAP_INFO.walls.push({
       color: cell.wall.color,
       x,
       y,
       points: wallPoints,
       topPoints: points,
+      map: aCells.reduce((acc, c, i) => {
+        let index = i - MAP_INFO.rotationTurns;
+        if (shouldOffset) index = CONFIG.polySides - 1 - index;
+        acc[getMod(index, CONFIG.polySides)] = !c.wall;
+        return acc;
+      }, []),
     });
 
     return;
@@ -188,16 +195,19 @@ const fillPolygon = (x, y, points) => {
  * @param {number} x
  * @param {number} y
  * @param {import("./infos.js").Points[]} points
+ * @param {boolean[]} map
  */
-const applyBorders = (x, y, points) => {
+const applyBorders = (x, y, points, map) => {
   for (let i = 0; i < points.length; i++) {
-    let point = points[i];
-    let nextPoint = points[i + 1] || points[0];
+    if (map[i]) {
+      let point = points[i];
+      let nextPoint = points[i + 1] || points[0];
 
-    context.beginPath();
-    context.moveTo(x + point.x, y + point.y);
-    context.lineTo(x + nextPoint.x, y + nextPoint.y);
-    context.stroke();
+      context.beginPath();
+      context.moveTo(x + point.x, y + point.y);
+      context.lineTo(x + nextPoint.x, y + nextPoint.y);
+      context.stroke();
+    }
   }
 };
 
@@ -208,10 +218,10 @@ const applyBorders = (x, y, points) => {
  * @returns {number[]}
  */
 const applyRotation = (x, y, isInverted) => {
-  if (!MAP_INFO.rotationTurns || !CONFIG.useRotation) return [x, y];
+  if (!MAP_INFO.rotationTurns) return [x, y];
   const polyInfo = POLY_INFO[CONFIG.polySides];
 
-  const turns = getRotationIndex(MAP_INFO.rotationTurns, CONFIG.polySides);
+  const turns = getMod(MAP_INFO.rotationTurns, CONFIG.polySides);
   const angle = (360 / CONFIG.polySides) * turns;
   const cx =
     MAP_INFO.currentCell.dPos[CONFIG.polySides].x +

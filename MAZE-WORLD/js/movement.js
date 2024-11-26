@@ -2,14 +2,21 @@ import { CONFIG, MAP_CONFIG } from "./configs.js";
 import { knownPolys, MAP_INFO, POLY_INFO } from "./infos.js";
 import { GRID } from "./grid.js";
 import { resetCanvasSize, drawEveryCell } from "./draw.js";
-import { correctRoundError, debounce, getRotationIndex } from "./utils.js";
+import { correctRoundError, getMod } from "./utils.js";
 
+let canRotate = true;
 /**
  * @param {number} orientation
  */
 export const rotate = (orientation) => {
-  MAP_INFO.rotationTurns = MAP_INFO.rotationTurns + orientation;
-  move(null, true);
+  if (canRotate) {
+    canRotate = false;
+    MAP_INFO.rotationTurns = MAP_INFO.rotationTurns + orientation;
+    setTimeout(() => {
+      drawEveryCell();
+      canRotate = true;
+    }, 2000 / MAP_CONFIG.velocity);
+  }
 };
 
 /**
@@ -17,10 +24,10 @@ export const rotate = (orientation) => {
  * @returns {{ [k: string]: number }}
  */
 const getMovementMap = (useDiagonal) => {
-  let topI = getRotationIndex(MAP_INFO.rotationTurns, CONFIG.polySides);
-  let bottomI = (topI + Math.floor(CONFIG.polySides / 2)) % CONFIG.polySides;
+  let topI = MAP_INFO.rotationTurns;
+  let bottomI = topI + Math.floor(CONFIG.polySides / 2);
 
-  let topLeftI = CONFIG.polySides - 1;
+  let topLeftI = topI + CONFIG.polySides - 1;
   let topRightI = topI + 1;
 
   let bottomLeftI = bottomI + 1;
@@ -28,20 +35,18 @@ const getMovementMap = (useDiagonal) => {
 
   if (CONFIG.polySides % 2) {
     const isInverted = MAP_INFO.currentCell.isInverted;
+    topLeftI = bottomLeftI = topI + (isInverted ? 1 : 2);
+    topRightI = bottomRightI = topI + (isInverted ? 2 : 1);
     bottomI = isInverted ? topI : undefined;
     topI = isInverted ? undefined : topI;
-    topLeftI = bottomLeftI = isInverted ? 1 : 2;
-    topRightI = bottomRightI = isInverted ? 2 : 1;
   }
 
-  return CONFIG.useRotation
-    ? { ArrowUp: topI, ArrowDown: bottomI }
-    : {
-        ArrowUp: topI,
-        ArrowDown: bottomI,
-        ArrowLeft: useDiagonal ? topLeftI : bottomLeftI,
-        ArrowRight: useDiagonal ? topRightI : bottomRightI,
-      };
+  return {
+    ArrowUp: topI,
+    ArrowDown: bottomI,
+    ArrowLeft: useDiagonal ? bottomLeftI : topLeftI,
+    ArrowRight: useDiagonal ? bottomRightI : topRightI,
+  };
 };
 
 /**
@@ -55,7 +60,9 @@ export const moveBaseOnCode = (code, useDiagonal) => {
   if (aIndex === undefined) return;
 
   const nextPos =
-    MAP_INFO.currentCell.adjacentIndexes[CONFIG.polySides][aIndex];
+    MAP_INFO.currentCell.adjacentIndexes[CONFIG.polySides][
+      getMod(aIndex, CONFIG.polySides)
+    ];
 
   if (!nextPos) return;
 
@@ -113,39 +120,36 @@ export const updateOffsets = (oldCell, nextCell) => {
   MAP_INFO.jOffset += nextCell.pos.j - oldCell.pos.j;
 };
 
+let canMove = true;
 /**
  * @param {import("./infos.js").Cell} [nextCell]
- * @param {boolean} [onlyDraw]
  */
-export const move = (nextCell, onlyDraw) => {
-  if (MAP_CONFIG.canMove) {
+export const move = (nextCell) => {
+  if (canMove) {
+    canMove = false;
     if (nextCell) {
       const oldCell = MAP_INFO.currentCell;
       MAP_INFO.currentCell = nextCell;
 
       updateOffsets(oldCell, nextCell);
     }
-    moveTime(onlyDraw);
-    MAP_CONFIG.canMove = false;
+
+    setTimeout(() => {
+      drawEveryCell();
+
+      MAP_INFO.timeOfDay += MAP_CONFIG.passHour;
+
+      if (
+        MAP_INFO.timeOfDay >= MAP_CONFIG.midNightHour ||
+        MAP_INFO.timeOfDay <= 0
+      ) {
+        MAP_CONFIG.passHour = -MAP_CONFIG.passHour;
+      }
+
+      canMove = true;
+    }, 1000 / MAP_CONFIG.velocity);
   }
 };
-
-const moveTime = debounce((onlyDraw) => {
-  drawEveryCell();
-
-  if (!onlyDraw) {
-    MAP_INFO.timeOfDay += MAP_CONFIG.passHour;
-
-    if (
-      MAP_INFO.timeOfDay >= MAP_CONFIG.midNightHour ||
-      MAP_INFO.timeOfDay <= 0
-    ) {
-      MAP_CONFIG.passHour = -MAP_CONFIG.passHour;
-    }
-  }
-
-  MAP_CONFIG.canMove = true;
-}, 1000 / MAP_CONFIG.velocity);
 
 /**
  * @returns {import("./infos.js").Cell}
@@ -155,4 +159,45 @@ export const getCenterCell = () => {
   const middleColumn = Math.floor(POLY_INFO[CONFIG.polySides].columns / 2);
 
   return GRID[middleRow + MAP_INFO.iOffset][middleColumn + MAP_INFO.jOffset];
+};
+
+/**
+ * @param {number} screenX
+ * @param {number} screenY
+ */
+export const mobileTouchStart = (screenX, screenY) => {
+  clearInterval(MAP_INFO.touchPos.interval);
+  MAP_INFO.touchPos.x = screenX;
+  MAP_INFO.touchPos.y = screenY;
+
+  MAP_INFO.touchPos.interval = setInterval(() => {
+    const finalX = screenX - MAP_INFO.touchPos.x;
+    const finalY = screenY - MAP_INFO.touchPos.y;
+
+    let code = null;
+    let useDiagonal = false;
+    if (Math.abs(finalY) > MAP_INFO.touchThreshold) {
+      useDiagonal = finalY > 0;
+      code = useDiagonal ? "ArrowDown" : "ArrowUp";
+    }
+    if (Math.abs(finalX) > MAP_INFO.touchThreshold) {
+      code = finalX < 0 ? "ArrowLeft" : "ArrowRight";
+    }
+
+    if (code) moveBaseOnCode(code, useDiagonal);
+  }, 100);
+};
+
+/**
+ * @param {number} screenX
+ * @param {number} screenY
+ */
+export const mobileTouchMove = (screenX, screenY) => {
+  MAP_INFO.touchPos.x = screenX;
+  MAP_INFO.touchPos.y = screenY;
+};
+
+export const mobileTouchEnd = () => {
+  clearInterval(MAP_INFO.touchPos.interval);
+  MAP_INFO.touchPos = { x: 0, y: 0, interval: null };
 };

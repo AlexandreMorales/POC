@@ -38,6 +38,7 @@ export const knownPolys = Object.values(KNOWN_POLYGONS);
  * @property {number} y
  * @property {Points[]} points
  * @property {Points[]} topPoints
+ * @property {boolean[]} map
  * @property {import("./biomes").Color} color
  */
 

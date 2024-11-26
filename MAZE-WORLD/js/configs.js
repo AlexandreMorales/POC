@@ -7,18 +7,14 @@ import { KNOWN_POLYGONS } from "./infos.js";
  * @property {number} cellHeight
  * @property {number} polySides The number of sides of the current polygon
  *
- * @property {boolean} automaticRowsAndColumns
- * @property {boolean} useRotation
  * @property {boolean} showZoom
  */
 export const CONFIG = /** @type {Config} */ ({
-  initialRows: 10,
-  initialColumns: 10,
+  initialRows: 100,
+  initialColumns: 100,
   cellHeight: 24,
   polySides: KNOWN_POLYGONS.HEXAGON,
 
-  automaticRowsAndColumns: true,
-  useRotation: true,
   showZoom: false,
 });
 
@@ -26,7 +22,6 @@ export const MAP_CONFIG = {
   passHour: 0.5,
   midNightHour: 70,
   velocity: 10,
-  canMove: true,
   noiseResolution: 20,
 };
 

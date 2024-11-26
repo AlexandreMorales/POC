@@ -99,29 +99,24 @@ const configPoly = (polySides) => {
 
   let rows = CONFIG.initialRows;
   let columns = CONFIG.initialColumns;
-  let canvasHeight = 0;
-  let canvasWidth = 0;
+  let canvasHeight = window.innerHeight * 0.9;
+  let canvasWidth = window.innerWidth;
 
-  if (CONFIG.automaticRowsAndColumns) {
-    canvasHeight = window.innerHeight * 0.9;
-    canvasWidth = window.innerWidth;
+  rows = canvasHeight;
+  if (shouldIntercalate) rows -= ySide;
+  rows = rows / CONFIG.cellHeight;
 
-    rows = canvasHeight;
-    if (shouldIntercalate) rows -= ySide;
-    rows = rows / CONFIG.cellHeight;
+  columns = canvasWidth / (xSide * 2);
 
-    columns = canvasWidth / (xSide * 2);
+  if (isOddPoly) columns = ((canvasWidth - 2) * 2 - polySide) / polySide;
 
-    if (isOddPoly) columns = ((canvasWidth - 2) * 2 - polySide) / polySide;
-
-    if (shouldIntercalate) {
-      columns =
-        ((canvasWidth - slopSide) * 2) / (radiusFromCorner * 2 + polySide);
-    }
-
-    rows = Math.floor(rows);
-    columns = Math.floor(columns);
+  if (shouldIntercalate) {
+    columns =
+      ((canvasWidth - slopSide) * 2) / (radiusFromCorner * 2 + polySide);
   }
+
+  rows = Math.floor(rows);
+  columns = Math.floor(columns);
 
   if (rows % 2 === 0) rows -= 1;
   if (columns % 2 === 0) columns -= 1;
@@ -157,8 +152,6 @@ const configPoly = (polySides) => {
 export const start = () => {
   configPolys();
   resetCanvasSize();
-  CONFIG.initialRows = POLY_INFO[CONFIG.polySides].rows;
-  CONFIG.initialColumns = POLY_INFO[CONFIG.polySides].columns;
 
   loadChunk(0, 0, BIOMES.FOREST);
   MAP_INFO.currentCell = getCenterCell();

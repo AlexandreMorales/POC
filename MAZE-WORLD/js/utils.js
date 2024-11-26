@@ -5,21 +5,6 @@
 export const getRandomInt = (max) => Math.floor(Math.random() * max);
 
 /**
- * @param {function} fn
- * @param {number} timeout
- * @returns {function}
- */
-export const debounce = (fn, timeout = 10) => {
-  let timer;
-  return (...args) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      fn.apply(this, args);
-    }, timeout);
-  };
-};
-
-/**
  * @param {{ i: number, j: number }} param
  * @returns {boolean}
  */
@@ -49,9 +34,8 @@ export const tweakColor = ({ r, g, b }) => {
 };
 
 /**
- * @param {number} turns
- * @param {number} polySides
+ * @param {number} number
+ * @param {number} mod
  * @returns {number}
  */
-export const getRotationIndex = (turns, polySides) =>
-  (polySides + (turns % polySides)) % polySides;
+export const getMod = (number, mod) => (mod + (number % mod)) % mod;
