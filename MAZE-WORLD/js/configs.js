@@ -6,12 +6,17 @@ import { KNOWN_POLYGONS } from "./infos.js";
  * @property {number} chunkColumns
  * @property {number} cellHeight
  * @property {number} polySides The number of sides of the current polygon
+ * @property {number} minZoom
+ * @property {number} maxZoom
  */
 export const CONFIG = /** @type {Config} */ ({
   chunkRows: 100,
   chunkColumns: 100,
   cellHeight: 24,
   polySides: KNOWN_POLYGONS.HEXAGON,
+
+  minZoom: 10,
+  maxZoom: 120,
 });
 
 export const MAP_CONFIG = {
@@ -20,6 +25,7 @@ export const MAP_CONFIG = {
   velocity: 10,
   noiseResolution: 20,
   touchThreshold: 25,
+  passTime: false,
 };
 
 export const CANVAS_CONFIG = {

@@ -3,7 +3,7 @@ import { CONFIG } from "./configs.js";
 import { resetCanvasSize, drawEveryCell, setCanvasSize } from "./draw.js";
 import { loadChunk, GRID } from "./grid.js";
 import { KNOWN_POLYGONS, MAP_INFO, POLY_INFO, knownPolys } from "./infos.js";
-import { getCenterCell, cellIsBlocked, updateOffsets } from "./movement.js";
+import { getCenterCell, cellIsBlocked, moveCurrentCell } from "./movement.js";
 import { correctRoundError, debounce } from "./utils.js";
 
 const configPolys = () => {
@@ -13,9 +13,9 @@ const configPolys = () => {
 };
 
 /**
- * @param {import("./infos.js").Points[]} points
+ * @param {import("./infos.js").Point[]} points
  * @param {number} height
- * @returns {import("./infos.js").Points[]}
+ * @returns {import("./infos.js").Point[]}
  */
 const createWallPoints = (points, height) => {
   let bottomPoints = points.filter((p) => p.y >= 0);
@@ -179,10 +179,10 @@ export const start = () => {
   loadChunk(0, 0, BIOMES.FOREST);
   MAP_INFO.currentCell = getCenterCell();
   while (cellIsBlocked(MAP_INFO.currentCell)) {
-    const nextCell =
-      GRID[MAP_INFO.currentCell.pos.i + 1][MAP_INFO.currentCell.pos.j];
-    updateOffsets(MAP_INFO.currentCell, nextCell);
-    MAP_INFO.currentCell = nextCell;
+    moveCurrentCell(
+      MAP_INFO.currentCell,
+      GRID[MAP_INFO.currentCell.pos.i + 1][MAP_INFO.currentCell.pos.j]
+    );
   }
   drawEveryCell();
   drawEveryCell();
@@ -192,9 +192,9 @@ export const start = () => {
  * @param {number} newSize
  */
 export const resetSize = debounce((newSize) => {
-  CONFIG.cellHeight = newSize;
+  CONFIG.cellHeight = newSize || CONFIG.cellHeight;
   configPolys();
   setCanvasSize(null, POLY_INFO[CONFIG.polySides].canvasWidth);
-  updateOffsets(getCenterCell(), MAP_INFO.currentCell);
+  moveCurrentCell(getCenterCell(), MAP_INFO.currentCell);
   drawEveryCell();
 });

@@ -11,7 +11,10 @@ let canRotate = true;
 export const rotate = (orientation) => {
   if (canRotate) {
     canRotate = false;
-    MAP_INFO.rotationTurns = MAP_INFO.rotationTurns + orientation;
+    MAP_INFO.rotationTurns = getMod(
+      MAP_INFO.rotationTurns + orientation,
+      CONFIG.polySides
+    );
     setTimeout(() => {
       drawEveryCell();
       canRotate = true;
@@ -60,13 +63,13 @@ export const moveBaseOnCode = (code, useDiagonal) => {
   if (aIndex === undefined) return;
 
   const nextPos =
-    MAP_INFO.currentCell.adjacentIndexes[CONFIG.polySides][
+    MAP_INFO.currentCell.adjacentPos[CONFIG.polySides][
       getMod(aIndex, CONFIG.polySides)
     ];
 
   if (!nextPos) return;
 
-  const nextCell = GRID[nextPos[0]]?.[nextPos[1]];
+  const nextCell = GRID[nextPos.i]?.[nextPos.j];
 
   if (cellIsBlocked(nextCell)) return;
 
@@ -88,7 +91,7 @@ export const changePolySides = () => {
 
   const centerCell = getCenterCell();
   resetCanvasSize();
-  updateOffsets(centerCell, MAP_INFO.currentCell);
+  moveCurrentCell(centerCell, MAP_INFO.currentCell);
   drawEveryCell();
   drawEveryCell();
 };
@@ -97,9 +100,10 @@ export const changePolySides = () => {
  * @param {import("./infos.js").Cell} oldCell
  * @param {import("./infos.js").Cell} nextCell
  */
-export const updateOffsets = (oldCell, nextCell) => {
+export const moveCurrentCell = (oldCell, nextCell) => {
   MAP_INFO.iOffset += nextCell.pos.i - oldCell.pos.i;
   MAP_INFO.jOffset += nextCell.pos.j - oldCell.pos.j;
+  MAP_INFO.currentCell = nextCell;
 };
 
 let canMove = true;
@@ -109,27 +113,24 @@ let canMove = true;
 export const move = (nextCell) => {
   if (canMove) {
     canMove = false;
-    if (nextCell) {
-      const oldCell = MAP_INFO.currentCell;
-      MAP_INFO.currentCell = nextCell;
-
-      updateOffsets(oldCell, nextCell);
-    }
+    if (nextCell) moveCurrentCell(MAP_INFO.currentCell, nextCell);
+    if (MAP_CONFIG.passTime) passTime();
 
     setTimeout(() => {
       drawEveryCell();
-
-      MAP_INFO.timeOfDay += MAP_CONFIG.passHour;
-
-      if (
-        MAP_INFO.timeOfDay >= MAP_CONFIG.midNightHour ||
-        MAP_INFO.timeOfDay <= 0
-      ) {
-        MAP_CONFIG.passHour = -MAP_CONFIG.passHour;
-      }
-
       canMove = true;
     }, 1000 / MAP_CONFIG.velocity);
+  }
+};
+
+const passTime = () => {
+  MAP_INFO.timeOfDay += MAP_CONFIG.passHour;
+
+  if (
+    MAP_INFO.timeOfDay >= MAP_CONFIG.midNightHour ||
+    MAP_INFO.timeOfDay <= 0
+  ) {
+    MAP_CONFIG.passHour = -MAP_CONFIG.passHour;
   }
 };
 
@@ -143,18 +144,19 @@ export const getCenterCell = () => {
   return GRID[middleRow + MAP_INFO.iOffset][middleColumn + MAP_INFO.jOffset];
 };
 
+let touchPos = { x: 0, y: 0, interval: null };
 /**
  * @param {number} screenX
  * @param {number} screenY
  */
 export const mobileTouchStart = (screenX, screenY) => {
-  clearInterval(MAP_INFO.touchPos.interval);
-  MAP_INFO.touchPos.x = screenX;
-  MAP_INFO.touchPos.y = screenY;
+  clearInterval(touchPos.interval);
+  touchPos.x = screenX;
+  touchPos.y = screenY;
 
-  MAP_INFO.touchPos.interval = setInterval(() => {
-    const finalX = screenX - MAP_INFO.touchPos.x;
-    const finalY = screenY - MAP_INFO.touchPos.y;
+  touchPos.interval = setInterval(() => {
+    const finalX = screenX - touchPos.x;
+    const finalY = screenY - touchPos.y;
 
     let code = null;
     let useDiagonal = false;
@@ -175,11 +177,11 @@ export const mobileTouchStart = (screenX, screenY) => {
  * @param {number} screenY
  */
 export const mobileTouchMove = (screenX, screenY) => {
-  MAP_INFO.touchPos.x = screenX;
-  MAP_INFO.touchPos.y = screenY;
+  touchPos.x = screenX;
+  touchPos.y = screenY;
 };
 
 export const mobileTouchEnd = () => {
-  clearInterval(MAP_INFO.touchPos.interval);
-  MAP_INFO.touchPos = { x: 0, y: 0, interval: null };
+  clearInterval(touchPos.interval);
+  touchPos = { x: 0, y: 0, interval: null };
 };

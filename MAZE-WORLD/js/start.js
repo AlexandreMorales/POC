@@ -30,26 +30,51 @@ document.onkeydown = (e) => {
   if (e.code === "Space") return move();
 };
 
+let zoomDist = 0;
+
 document.ontouchstart = (e) => {
   e = e || /** @type {TouchEvent} */ (window.event);
-  const { screenX, screenY } = e.changedTouches[0];
-  mobileTouchStart(screenX, screenY);
+  const { screenX, screenY } = e.touches[0];
+
+  if (e.touches.length === 2) {
+    zoomDist = Math.hypot(
+      screenX - e.touches[1].screenX,
+      screenY - e.touches[1].screenY
+    );
+  } else mobileTouchStart(screenX, screenY);
 };
 
 document.ontouchmove = (e) => {
   e = e || /** @type {TouchEvent} */ (window.event);
-  const { screenX, screenY } = e.changedTouches[0];
-  mobileTouchMove(screenX, screenY);
+  const { screenX, screenY } = e.touches[0];
+
+  if (e.touches.length === 2) {
+    const nZoomDist = Math.hypot(
+      screenX - e.touches[1].screenX,
+      screenY - e.touches[1].screenY
+    );
+
+    if (nZoomDist > zoomDist && CONFIG.cellHeight < CONFIG.maxZoom) {
+      resetSize(CONFIG.cellHeight + 1);
+    } else if (nZoomDist < zoomDist && CONFIG.cellHeight > CONFIG.minZoom) {
+      resetSize(CONFIG.cellHeight - 1);
+    }
+
+    zoomDist = nZoomDist;
+  } else mobileTouchMove(screenX, screenY);
 };
 
 document.ontouchend = () => {
   mobileTouchEnd();
+  zoomDist = 0;
 };
 
 const heightSlider = /** @type {HTMLInputElement} */ (
-  document.getElementById("cell-height")
+  document.getElementById("zoom")
 );
 heightSlider.value = `${CONFIG.cellHeight}`;
+heightSlider.min = `${CONFIG.minZoom}`;
+heightSlider.max = `${CONFIG.maxZoom}`;
 heightSlider.oninput = () => resetSize(+heightSlider.value);
 
 document.getElementById("change-poly").onclick = changePolySides;
@@ -57,3 +82,5 @@ document.getElementById("dig").onclick = dig;
 document.getElementById("place").onclick = place;
 document.getElementById("rotate-left").onclick = () => rotate(-1);
 document.getElementById("rotate-right").onclick = () => rotate(1);
+
+window.onresize = () => resetSize();

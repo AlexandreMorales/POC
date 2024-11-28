@@ -1,7 +1,12 @@
 import { CONFIG, MAP_CONFIG } from "./configs.js";
-import { POLY_INFO, KNOWN_POLYGONS } from "./infos.js";
+import { POLY_INFO, KNOWN_POLYGONS, MAP_INFO } from "./infos.js";
 import { BIOMES } from "./biomes.js";
-import { tweakColor, isCellInverted, getRandomInt } from "./utils.js";
+import {
+  tweakColor,
+  isCellInverted,
+  getRandomInt,
+  correctRoundError,
+} from "./utils.js";
 
 export const GRID = /** @type {import("./infos.js").Cell[][]} */ ([]);
 
@@ -27,8 +32,8 @@ export const createCell = (i, j, value, biome) => {
     }
   }
 
-  cell.adjacentIndexes = getAdjacentIndexes(i, j);
   cell.isInverted = isCellInverted(cell.pos);
+  cell.adjacentPos = getAdjacentPos(cell.pos, cell.isInverted);
 
   return cell;
 };
@@ -175,49 +180,92 @@ const getPerlinGrid = (width, height, resolution) => {
 };
 
 /**
- * @param {number} i
- * @param {number} j
- * @returns {{ [k: number]: number[][] }}
+ * @param {import("./infos.js").CellPos} pos
+ * @param {boolean} isInverted
+ * @returns {{ [k: number]: import("./infos.js").CellPos[] }}
  */
-const getAdjacentIndexes = (i, j) => {
-  return new Proxy(
-    {
-      [KNOWN_POLYGONS.TRIANGLE]: !isCellInverted({ i, j })
+const getAdjacentPos = ({ i, j }, isInverted) => {
+  return {
+    [KNOWN_POLYGONS.TRIANGLE]: isInverted
+      ? [
+          { i: i + 1, j },
+          { i, j: j - 1 },
+          { i, j: j + 1 },
+        ]
+      : [
+          { i: i - 1, j },
+          { i, j: j + 1 },
+          { i, j: j - 1 },
+        ],
+    [KNOWN_POLYGONS.SQUARE]: [
+      { i: i - 1, j },
+      { i, j: j + 1 },
+      { i: i + 1, j },
+      { i, j: j - 1 },
+    ],
+    [KNOWN_POLYGONS.HEXAGON]:
+      j % 2
         ? [
-            [i - 1, j],
-            [i, j + 1],
-            [i, j - 1],
+            { i: i - 1, j },
+            { i, j: j + 1 },
+            { i: i + 1, j: j + 1 },
+            { i: i + 1, j },
+            { i: i + 1, j: j - 1 },
+            { i, j: j - 1 },
           ]
         : [
-            [i + 1, j],
-            [i, j - 1],
-            [i, j + 1],
+            { i: i - 1, j },
+            { i: i - 1, j: j + 1 },
+            { i, j: j + 1 },
+            { i: i + 1, j },
+            { i, j: j - 1 },
+            { i: i - 1, j: j - 1 },
           ],
-      [KNOWN_POLYGONS.SQUARE]: [
-        [i - 1, j],
-        [i, j + 1],
-        [i + 1, j],
-        [i, j - 1],
-      ],
-      [KNOWN_POLYGONS.HEXAGON]:
-        j % 2
-          ? [
-              [i - 1, j],
-              [i, j + 1],
-              [i + 1, j + 1],
-              [i + 1, j],
-              [i + 1, j - 1],
-              [i, j - 1],
-            ]
-          : [
-              [i - 1, j],
-              [i - 1, j + 1],
-              [i, j + 1],
-              [i + 1, j],
-              [i, j - 1],
-              [i - 1, j - 1],
-            ],
-    },
-    { get: (obj, prop) => obj[prop] || obj[KNOWN_POLYGONS.SQUARE] }
-  );
+  };
+};
+
+/**
+ * @param {import("./infos.js").CellPos} pos
+ * @param {boolean} isInverted
+ * @return {import("./infos.js").Point}
+ */
+export const calculatePointBasedOnPos = ({ i, j }, isInverted) => {
+  const { calcX, calcY, ySide, shouldIntercalate } =
+    POLY_INFO[CONFIG.polySides];
+  i -= MAP_INFO.iOffset || 0;
+  j -= MAP_INFO.jOffset || 0;
+
+  let x = calcX(j);
+  let y = calcY(i);
+
+  if (shouldIntercalate && j % 2)
+    y += MAP_INFO.currentCell.pos.j % 2 ? -ySide : ySide;
+
+  return applyRotation({ x, y }, isInverted);
+};
+
+/**
+ * @param {import("./infos.js").Point} points
+ * @param {boolean} isInverted
+ * @return {import("./infos.js").Point}
+ */
+const applyRotation = ({ x, y }, isInverted) => {
+  if (!MAP_INFO.rotationTurns) return { x, y };
+
+  const { cx, cy, ySide, xSide, hasInverted } = POLY_INFO[CONFIG.polySides];
+
+  const angle = (360 / CONFIG.polySides) * MAP_INFO.rotationTurns;
+  const radians = (Math.PI / 180) * angle;
+  const cos = Math.cos(radians);
+  const sin = Math.sin(radians);
+  let nx = correctRoundError(cos * (x - cx) + sin * (y - cy) + cx);
+  let ny = correctRoundError(cos * (y - cy) - sin * (x - cx) + cy);
+
+  if (hasInverted && isInverted !== MAP_INFO.currentCell.isInverted && angle) {
+    const oddTurn = !!(MAP_INFO.rotationTurns % 2);
+    ny += ySide * (MAP_INFO.currentCell.isInverted ? 1 : -1);
+    nx += (xSide / 2) * (MAP_INFO.currentCell.isInverted === oddTurn ? -1 : 1);
+  }
+
+  return { x: nx, y: ny };
 };
