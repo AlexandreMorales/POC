@@ -31,6 +31,10 @@ export const MAP_CONFIG = {
 export const CANVAS_CONFIG = {
   showPos: false,
   strokeColor: "black",
+  lineWidth: 1,
+  selectedStrokeColor: "white",
+  selectedLineWidth: 2,
   currentColor: "cyan",
-  wallDarkness: 2,
+  wallDarkness: 0.5,
+  selectedWallBrightness: 1.5,
 };

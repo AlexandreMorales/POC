@@ -45,11 +45,13 @@ export const knownPolys = Object.values(KNOWN_POLYGONS);
  * @property {Point[]} topPoints Points of the top of the wall
  * @property {boolean[]} borderMap Which points to draw a border
  * @property {import("./biomes").Color} color
+ * @property {boolean} isSelectedCell
  */
 
 /**
  * @typedef {Object} MapInfo
  * @property {Cell} currentCell
+ * @property {number} selectedCellIndex Cell in which the player can interact
  * @property {CellBlock[]} pickedCells Cells that the play dug
  * @property {number} iOffset
  * @property {number} jOffset
@@ -58,6 +60,7 @@ export const knownPolys = Object.values(KNOWN_POLYGONS);
  */
 export const MAP_INFO = /** @type {MapInfo} */ ({
   currentCell: null,
+  selectedCellIndex: 0,
   pickedCells: [],
   iOffset: 0,
   jOffset: 0,

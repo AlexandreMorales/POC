@@ -15,8 +15,6 @@ const context = canvas.getContext("2d");
 export const setCanvasSize = (height, width) => {
   canvas.height = height || canvas.height;
   canvas.width = width || canvas.width;
-  context.strokeStyle = CANVAS_CONFIG.strokeColor;
-  context.lineWidth = 1;
 };
 
 export const resetCanvasSize = () => {
@@ -32,6 +30,10 @@ export const drawEveryCell = () => {
 
   const offsetCell = MAP_INFO.currentCell.pos.j % 2;
   const { rows, columns, shouldIntercalate } = POLY_INFO[CONFIG.polySides];
+  const selectedCellPos =
+    MAP_INFO.currentCell.adjacentPos[CONFIG.polySides][
+      MAP_INFO.selectedCellIndex
+    ];
 
   // More range to encapsulate rotation
   for (let i = -columns; i < rows + columns; i++) {
@@ -44,7 +46,10 @@ export const drawEveryCell = () => {
 
       if (!GRID[nI]?.[nJ]) loadChunk(nI, nJ);
 
-      drawCell(GRID[nI][nJ]);
+      drawCell(
+        GRID[nI][nJ],
+        selectedCellPos.i === nI && selectedCellPos.j === nJ
+      );
     }
   }
 
@@ -56,10 +61,13 @@ export const drawEveryCell = () => {
 /**
  * @param {import("./infos.js").Wall} wall
  */
-export const drawWall = (wall) => {
-  context.fillStyle = `rgb(${wall.color.r / CANVAS_CONFIG.wallDarkness}, ${
-    wall.color.g / CANVAS_CONFIG.wallDarkness
-  }, ${wall.color.b / CANVAS_CONFIG.wallDarkness})`;
+const drawWall = (wall) => {
+  context.fillStyle = colorToRGB(
+    wall.color,
+    wall.isSelectedCell
+      ? CANVAS_CONFIG.selectedWallBrightness
+      : CANVAS_CONFIG.wallDarkness
+  );
   fillPolygon(wall.point, wall.points);
   applyDark(wall.point, wall.points);
 };
@@ -67,17 +75,28 @@ export const drawWall = (wall) => {
 /**
  * @param {import("./infos.js").Wall} wall
  */
-export const drawWallTop = (wall) => {
-  context.fillStyle = `rgb(${wall.color.r}, ${wall.color.g}, ${wall.color.b})`;
+const drawWallTop = (wall) => {
+  context.fillStyle = colorToRGB(wall.color);
   fillPolygon(wall.topPoint, wall.topPoints);
-  applyBorders(wall.topPoint, wall.topPoints, wall.borderMap);
+  context.strokeStyle = wall.isSelectedCell
+    ? CANVAS_CONFIG.selectedStrokeColor
+    : CANVAS_CONFIG.strokeColor;
+  context.lineWidth = wall.isSelectedCell
+    ? CANVAS_CONFIG.selectedLineWidth
+    : CANVAS_CONFIG.lineWidth;
+  applyBorders(
+    wall.topPoint,
+    wall.topPoints,
+    wall.isSelectedCell ? null : wall.borderMap
+  );
   applyDark(wall.topPoint, wall.topPoints);
 };
 
 /**
  * @param {import("./infos.js").Cell} cell
+ * @param {boolean} [isSelectedCell]
  */
-export const drawCell = (cell) => {
+const drawCell = (cell, isSelectedCell) => {
   const polyInfo = POLY_INFO[CONFIG.polySides];
   const isInverted = polyInfo.hasInverted && cell.isInverted;
 
@@ -108,7 +127,7 @@ export const drawCell = (cell) => {
 
   if (cell.value) {
     const color = cell.block.isFluid ? tweakColor(cell.color) : cell.color;
-    context.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
+    context.fillStyle = colorToRGB(color);
 
     if (cell === MAP_INFO.currentCell)
       context.fillStyle = CANVAS_CONFIG.currentColor;
@@ -135,6 +154,7 @@ export const drawCell = (cell) => {
         acc[getMod(index, CONFIG.polySides)] = !c.wall;
         return acc;
       }, []),
+      isSelectedCell,
     });
 
     return;
@@ -160,6 +180,12 @@ export const drawCell = (cell) => {
     aCells.every((c) => c !== MAP_INFO.currentCell)
   )
     applyDark(point, points);
+
+  if (isSelectedCell) {
+    context.strokeStyle = CANVAS_CONFIG.selectedStrokeColor;
+    context.lineWidth = CANVAS_CONFIG.selectedLineWidth;
+    applyBorders(point, points);
+  }
 };
 
 /**
@@ -204,4 +230,13 @@ const applyBorders = ({ x, y }, points, map) => {
       context.stroke();
     }
   }
+};
+
+/**
+ * @param {import("./biomes").Color} color
+ * @param {number} modifier
+ * @returns {string}
+ */
+const colorToRGB = ({ r, g, b }, modifier = 1) => {
+  return `rgb(${r * modifier}, ${g * modifier}, ${b * modifier})`;
 };

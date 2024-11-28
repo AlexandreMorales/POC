@@ -11,7 +11,7 @@ let canRotate = true;
 export const rotate = (orientation) => {
   if (canRotate) {
     canRotate = false;
-    MAP_INFO.rotationTurns = getMod(
+    MAP_INFO.rotationTurns = MAP_INFO.selectedCellIndex = getMod(
       MAP_INFO.rotationTurns + orientation,
       CONFIG.polySides
     );
@@ -24,9 +24,10 @@ export const rotate = (orientation) => {
 
 /**
  * @param {boolean} [useDiagonal]
+ * @param {import("./infos.js").Cell} [cell]
  * @returns {{ [k: string]: number }}
  */
-const getMovementMap = (useDiagonal) => {
+const getMovementMap = (useDiagonal, cell = MAP_INFO.currentCell) => {
   let topI = MAP_INFO.rotationTurns;
   let bottomI = topI + Math.floor(CONFIG.polySides / 2);
 
@@ -37,7 +38,7 @@ const getMovementMap = (useDiagonal) => {
   let bottomRightI = bottomI - 1;
 
   if (POLY_INFO[CONFIG.polySides].hasInverted) {
-    const isInverted = MAP_INFO.currentCell.isInverted;
+    const isInverted = cell.isInverted;
     topLeftI = bottomLeftI = topI + (isInverted ? 1 : 2);
     topRightI = bottomRightI = topI + (isInverted ? 2 : 1);
     bottomI = isInverted ? topI : undefined;
@@ -62,16 +63,28 @@ export const moveBaseOnCode = (code, useDiagonal) => {
 
   if (aIndex === undefined) return;
 
-  const nextPos =
-    MAP_INFO.currentCell.adjacentPos[CONFIG.polySides][
-      getMod(aIndex, CONFIG.polySides)
-    ];
+  const aModI = getMod(aIndex, CONFIG.polySides);
+  const nextPos = MAP_INFO.currentCell.adjacentPos[CONFIG.polySides][aModI];
 
   if (!nextPos) return;
 
-  const nextCell = GRID[nextPos.i]?.[nextPos.j];
+  const prevSelectedIndex = MAP_INFO.selectedCellIndex;
 
-  if (cellIsBlocked(nextCell)) return;
+  const nextCell = GRID[nextPos.i]?.[nextPos.j];
+  MAP_INFO.selectedCellIndex = aModI;
+
+  if (cellIsBlocked(nextCell)) {
+    if (prevSelectedIndex !== MAP_INFO.selectedCellIndex) drawEveryCell();
+    return;
+  }
+
+  if (POLY_INFO[CONFIG.polySides].hasInverted) {
+    const aModIOpposite = getMod(
+      getMovementMap(useDiagonal, nextCell)[code],
+      CONFIG.polySides
+    );
+    if (aModIOpposite) MAP_INFO.selectedCellIndex = aModIOpposite;
+  }
 
   move(nextCell);
 };
@@ -88,6 +101,7 @@ export const changePolySides = () => {
     knownPolys[(knownPolys.indexOf(CONFIG.polySides) + 1) % knownPolys.length];
 
   MAP_INFO.rotationTurns = 0;
+  MAP_INFO.selectedCellIndex = 0;
 
   const centerCell = getCenterCell();
   resetCanvasSize();

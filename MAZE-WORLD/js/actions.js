@@ -5,7 +5,9 @@ import { move } from "./movement.js";
 
 export const dig = () => {
   const nextPos =
-    MAP_INFO.currentCell.adjacentPos[CONFIG.polySides][MAP_INFO.rotationTurns];
+    MAP_INFO.currentCell.adjacentPos[CONFIG.polySides][
+      MAP_INFO.selectedCellIndex
+    ];
 
   if (!nextPos) return;
 
@@ -31,7 +33,9 @@ export const place = () => {
   if (!MAP_INFO.pickedCells.length) return;
 
   const nextPos =
-    MAP_INFO.currentCell.adjacentPos[CONFIG.polySides][MAP_INFO.rotationTurns];
+    MAP_INFO.currentCell.adjacentPos[CONFIG.polySides][
+      MAP_INFO.selectedCellIndex
+    ];
 
   if (!nextPos) return;
 
