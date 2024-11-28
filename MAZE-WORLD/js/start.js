@@ -37,7 +37,6 @@ document.ontouchstart = (e) => {
   const { screenX, screenY } = e.touches[0];
 
   if (e.touches.length === 2) {
-    e.preventDefault();
     zoomDist = Math.hypot(
       screenX - e.touches[1].screenX,
       screenY - e.touches[1].screenY
@@ -50,7 +49,6 @@ document.ontouchmove = (e) => {
   const { screenX, screenY } = e.touches[0];
 
   if (e.touches.length === 2) {
-    e.preventDefault();
     const nZoomDist = Math.hypot(
       screenX - e.touches[1].screenX,
       screenY - e.touches[1].screenY
