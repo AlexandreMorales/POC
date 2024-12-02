@@ -3,25 +3,40 @@ import { CONFIG, CANVAS_CONFIG } from "./configs.js";
 import { GRID, calculatePointBasedOnPos, loadChunk } from "./grid.js";
 import { getMod, tweakColor } from "./utils.js";
 
-const canvas = /** @type {HTMLCanvasElement} */ (
-  document.getElementById("init")
+const container = document.getElementById("draw-container");
+const canvasGround = /** @type {HTMLCanvasElement} */ (
+  document.getElementById("canvas-ground")
 );
-const context = canvas.getContext("2d");
+const canvasWall = /** @type {HTMLCanvasElement} */ (
+  document.getElementById("canvas-wall")
+);
+const contextGround = canvasGround.getContext("2d");
+const contextWall = canvasWall.getContext("2d");
 
 /**
  * @param {number} height
  * @param {number} width
  */
 export const setCanvasSize = (height, width) => {
-  canvas.height = height || canvas.height;
-  canvas.width = width || canvas.width;
+  if (height) {
+    container.style.height = `${height}px`;
+    canvasGround.height = canvasWall.height = height;
+  }
+  if (width) {
+    container.style.width = `${width}px`;
+    canvasGround.width = canvasWall.width = width;
+  }
 };
 
 export const resetCanvasSize = () => {
-  setCanvasSize(
-    POLY_INFO[CONFIG.polySides].canvasHeight,
-    POLY_INFO[CONFIG.polySides].canvasWidth
-  );
+  const polyInfo = POLY_INFO[CONFIG.polySides];
+  setCanvasSize(polyInfo.canvasHeight, polyInfo.canvasWidth);
+};
+
+const resetWallCanvas = () => {
+  const polyInfo = POLY_INFO[CONFIG.polySides];
+  canvasWall.height = polyInfo.canvasHeight;
+  canvasWall.width = polyInfo.canvasWidth;
 };
 
 let walls = /** @type {import("./infos.js").Wall[]} */ ([]);
@@ -53,6 +68,7 @@ export const drawEveryCell = () => {
     }
   }
 
+  resetWallCanvas();
   walls.forEach(drawWall);
   walls.forEach(drawWallTop);
   walls = [];
@@ -62,34 +78,35 @@ export const drawEveryCell = () => {
  * @param {import("./infos.js").Wall} wall
  */
 const drawWall = (wall) => {
-  context.fillStyle = colorToRGB(
+  contextWall.fillStyle = colorToRGB(
     wall.color,
     wall.isSelectedCell
       ? CANVAS_CONFIG.selectedWallBrightness
       : CANVAS_CONFIG.wallDarkness
   );
-  fillPolygon(wall.point, wall.points);
-  applyDark(wall.point, wall.points);
+  fillPolygon(contextWall, wall.point, wall.points);
+  applyDark(contextWall, wall.point, wall.points);
 };
 
 /**
  * @param {import("./infos.js").Wall} wall
  */
 const drawWallTop = (wall) => {
-  context.fillStyle = colorToRGB(wall.color);
-  fillPolygon(wall.topPoint, wall.topPoints);
-  context.strokeStyle = wall.isSelectedCell
+  contextWall.fillStyle = colorToRGB(wall.color);
+  fillPolygon(contextWall, wall.topPoint, wall.topPoints);
+  contextWall.strokeStyle = wall.isSelectedCell
     ? CANVAS_CONFIG.selectedStrokeColor
     : CANVAS_CONFIG.strokeColor;
-  context.lineWidth = wall.isSelectedCell
+  contextWall.lineWidth = wall.isSelectedCell
     ? CANVAS_CONFIG.selectedLineWidth
     : CANVAS_CONFIG.lineWidth;
   applyBorders(
+    contextWall,
     wall.topPoint,
     wall.topPoints,
     wall.isSelectedCell ? null : wall.borderMap
   );
-  applyDark(wall.topPoint, wall.topPoints);
+  applyDark(contextWall, wall.topPoint, wall.topPoints);
 };
 
 /**
@@ -103,10 +120,10 @@ const drawCell = (cell, isSelectedCell) => {
   const point = calculatePointBasedOnPos(cell.pos, isInverted);
 
   if (
-    point.x < 0.1 ||
-    point.y < 0.1 ||
-    point.x > canvas.width - 0.1 ||
-    point.y > canvas.height - 0.1
+    point.x < 0.5 ||
+    point.y < 0.5 ||
+    point.x > polyInfo.canvasWidth - 0.5 ||
+    point.y > polyInfo.canvasHeight - 0.5
   )
     return;
 
@@ -127,12 +144,12 @@ const drawCell = (cell, isSelectedCell) => {
 
   if (cell.value) {
     const color = cell.block.isFluid ? tweakColor(cell.color) : cell.color;
-    context.fillStyle = colorToRGB(color);
+    contextGround.fillStyle = colorToRGB(color);
 
     if (cell === MAP_INFO.currentCell)
-      context.fillStyle = CANVAS_CONFIG.currentColor;
+      contextGround.fillStyle = CANVAS_CONFIG.currentColor;
   } else {
-    context.fillStyle = "black";
+    contextGround.fillStyle = "black";
   }
 
   if (cell.wall) {
@@ -160,14 +177,14 @@ const drawCell = (cell, isSelectedCell) => {
     return;
   }
 
-  fillPolygon(point, points);
+  fillPolygon(contextGround, point, points);
 
   if (CANVAS_CONFIG.showPos) {
-    context.fillStyle = "black";
-    context.font = `bold ${CONFIG.cellHeight / 5}px Arial`;
-    context.textAlign = "center";
-    context.textBaseline = "middle";
-    context.fillText(
+    contextGround.fillStyle = "black";
+    contextGround.font = `bold ${CONFIG.cellHeight / 5}px Arial`;
+    contextGround.textAlign = "center";
+    contextGround.textBaseline = "middle";
+    contextGround.fillText(
       `${cell.pos.i},${cell.pos.j}`,
       point.x,
       isInverted ? point.y + polyInfo.ySide / 2 : point.y
@@ -179,30 +196,32 @@ const drawCell = (cell, isSelectedCell) => {
     cell !== MAP_INFO.currentCell &&
     aCells.every((c) => c !== MAP_INFO.currentCell)
   )
-    applyDark(point, points);
+    applyDark(contextGround, point, points);
 
   if (isSelectedCell) {
-    context.strokeStyle = CANVAS_CONFIG.selectedStrokeColor;
-    context.lineWidth = CANVAS_CONFIG.selectedLineWidth;
-    applyBorders(point, points);
+    contextGround.strokeStyle = CANVAS_CONFIG.selectedStrokeColor;
+    contextGround.lineWidth = CANVAS_CONFIG.selectedLineWidth;
+    applyBorders(contextGround, point, points);
   }
 };
 
 /**
+ * @param {CanvasRenderingContext2D} context
  * @param {import("./infos.js").Point} point
  * @param {import("./infos.js").Point[]} points
  */
-const applyDark = (point, points) => {
+const applyDark = (context, point, points) => {
   if (!MAP_INFO.timeOfDay) return;
   context.fillStyle = `rgba(0, 0, 0, ${MAP_INFO.timeOfDay / 100})`;
-  fillPolygon(point, points);
+  fillPolygon(context, point, points);
 };
 
 /**
+ * @param {CanvasRenderingContext2D} context
  * @param {import("./infos.js").Point} point
  * @param {import("./infos.js").Point[]} points
  */
-const fillPolygon = ({ x, y }, points) => {
+const fillPolygon = (context, { x, y }, points) => {
   context.beginPath();
 
   for (let i = 0; i < points.length; i++) {
@@ -214,11 +233,12 @@ const fillPolygon = ({ x, y }, points) => {
 };
 
 /**
+ * @param {CanvasRenderingContext2D} context
  * @param {import("./infos.js").Point} point
  * @param {import("./infos.js").Point[]} points
  * @param {boolean[]} [map]
  */
-const applyBorders = ({ x, y }, points, map) => {
+const applyBorders = (context, { x, y }, points, map) => {
   for (let i = 0; i < points.length; i++) {
     if (!map || map[i]) {
       let point = points[i];

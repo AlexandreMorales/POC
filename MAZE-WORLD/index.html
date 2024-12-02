@@ -3,87 +3,27 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no" />
-    <style type="text/css">
-      * {
-        margin: 0;
-        padding: 0;
-        border: 0;
-        font-size: 100%;
-        font: inherit;
-        vertical-align: baseline;
-      }
-
-      html,
-      body {
-        overscroll-behavior: contain;
-        position: fixed;
-      }
-
-      #init {
-        margin: 0 auto;
-        display: block;
-      }
-
-      button {
-        display: none;
-      }
-
-      #container {
-        position: relative;
-        width: 100vw;
-      }
-
-      #rotate-left {
-        bottom: 0;
-        left: 0;
-      }
-      #rotate-right {
-        bottom: 0;
-        right: 0;
-      }
-
-      #dig {
-        bottom: 50px;
-        left: 0;
-      }
-      #place {
-        bottom: 50px;
-        right: 0;
-      }
-
-      #change-poly {
-        bottom: 100px;
-        left: 0;
-      }
-
-      @media (max-width: 768px) {
-        #zoom {
-          display: none;
-        }
-
-        button {
-          display: block;
-          background-color: rgba(207, 207, 207, 0.4);
-          padding: 12px;
-          border-radius: 12px;
-
-          font-family: Arial, Helvetica, sans-serif;
-          font-weight: bold;
-          font-size: 12px;
-
-          position: absolute;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="css/index.css" />
   </head>
   <body>
     <div id="container">
-      <canvas id="init"></canvas>
-      <button type="button" id="change-poly">Change Polygon</button>
-      <button type="button" id="dig">Dig</button>
-      <button type="button" id="place">Place</button>
-      <button type="button" id="rotate-left">Rotate L</button>
-      <button type="button" id="rotate-right">Rotate R</button>
+      <div id="draw-container">
+        <canvas id="canvas-ground"></canvas>
+        <canvas id="canvas-wall"></canvas>
+      </div>
+      <div id="mobile-hud">
+        <button type="button" class="mobile-btn" id="change-poly">
+          Change Polygon
+        </button>
+        <button type="button" class="mobile-btn" id="dig">Dig</button>
+        <button type="button" class="mobile-btn" id="place">Place</button>
+        <button type="button" class="mobile-btn" id="rotate-left">
+          Rotate L
+        </button>
+        <button type="button" class="mobile-btn" id="rotate-right">
+          Rotate R
+        </button>
+      </div>
     </div>
     <input type="range" id="zoom" />
   </body>

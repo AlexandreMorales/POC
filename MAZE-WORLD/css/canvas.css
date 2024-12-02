@@ -1,0 +1,17 @@
+#draw-container {
+  z-index: 0;
+  margin: 0 auto;
+  position: relative;
+}
+
+canvas {
+  position: absolute;
+}
+
+#canvas-ground {
+  z-index: 0;
+}
+
+#canvas-wall {
+  z-index: 2;
+}

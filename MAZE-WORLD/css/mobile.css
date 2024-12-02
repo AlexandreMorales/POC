@@ -1,0 +1,54 @@
+#container {
+  position: relative;
+  width: 100vw;
+}
+
+#rotate-left {
+  bottom: 0;
+  left: 0;
+}
+#rotate-right {
+  bottom: 0;
+  right: 0;
+}
+
+#dig {
+  bottom: 50px;
+  left: 0;
+}
+#place {
+  bottom: 50px;
+  right: 0;
+}
+
+#change-poly {
+  bottom: 100px;
+  left: 0;
+}
+
+.mobile-btn {
+  background-color: rgba(207, 207, 207, 0.4);
+  padding: 12px;
+  border-radius: 12px;
+
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  font-size: 12px;
+
+  position: absolute;
+}
+
+#mobile-hud {
+  display: none;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  #zoom {
+    display: none;
+  }
+
+  #mobile-hud {
+    display: block;
+  }
+}
