@@ -1,6 +1,8 @@
 import { CONFIG } from "./configs.js";
 import {
+  MOVEMENT,
   changePolySides,
+  changeSelectedOnCode,
   mobileTouchEnd,
   mobileTouchMove,
   mobileTouchStart,
@@ -13,21 +15,43 @@ import { dig, place } from "./actions.js";
 
 start();
 
+let isMoving = false;
+
 document.onkeydown = (e) => {
   e = e || /** @type {KeyboardEvent} */ (window.event);
+  e.preventDefault();
 
-  if (e.altKey) {
-    if (e.code === "ArrowRight") return rotate(1);
-    if (e.code === "ArrowLeft") return rotate(-1);
-  }
-  if (e.code.includes("Arrow")) return moveBaseOnCode(e.code);
+  if (
+    e.code === "KeyW" ||
+    e.code === "KeyA" ||
+    e.code === "KeyS" ||
+    e.code === "KeyD"
+  )
+    isMoving = true;
+
+  if (e.code === "KeyW") return moveBaseOnCode(MOVEMENT.UP);
+  if (e.code === "KeyA") return moveBaseOnCode(MOVEMENT.LEFT);
+  if (e.code === "KeyS") return moveBaseOnCode(MOVEMENT.DOWN);
+  if (e.code === "KeyD") return moveBaseOnCode(MOVEMENT.RIGHT);
+
+  if (e.code === "ArrowUp") return changeSelectedOnCode(MOVEMENT.UP);
+  if (e.code === "ArrowLeft") return changeSelectedOnCode(MOVEMENT.LEFT);
+  if (e.code === "ArrowDown") return changeSelectedOnCode(MOVEMENT.DOWN);
+  if (e.code === "ArrowRight") return changeSelectedOnCode(MOVEMENT.RIGHT);
+
+  if (e.code === "KeyQ") return dig();
+  if (e.code === "KeyE") return place();
+
+  if (e.code === "Tab") return rotate(-1);
+  if (e.code === "KeyR") return rotate(1);
 
   if (e.code.includes("Shift")) return changePolySides();
 
-  if (e.code === "KeyC") return dig();
-  if (e.code === "KeyV") return place();
-
   if (e.code === "Space") return move();
+};
+
+document.onkeyup = () => {
+  isMoving = false;
 };
 
 let zoomDist = 0;
@@ -37,9 +61,10 @@ document.ontouchstart = (e) => {
   const { screenX, screenY } = e.touches[0];
 
   if (e.touches.length === 2) {
+    const secondTouch = e.touches[1];
     zoomDist = Math.hypot(
-      screenX - e.touches[1].screenX,
-      screenY - e.touches[1].screenY
+      screenX - secondTouch.screenX,
+      screenY - secondTouch.screenY
     );
   } else mobileTouchStart(screenX, screenY);
 };
@@ -49,9 +74,10 @@ document.ontouchmove = (e) => {
   const { screenX, screenY } = e.touches[0];
 
   if (e.touches.length === 2) {
+    const secondTouch = e.touches[1];
     const nZoomDist = Math.hypot(
-      screenX - e.touches[1].screenX,
-      screenY - e.touches[1].screenY
+      screenX - secondTouch.screenX,
+      screenY - secondTouch.screenY
     );
 
     if (nZoomDist > zoomDist && CONFIG.cellHeight < CONFIG.maxZoom) {
@@ -80,7 +106,7 @@ heightSlider.oninput = () => resetSize(+heightSlider.value);
 document.getElementById("change-poly").onclick = changePolySides;
 document.getElementById("dig").onclick = dig;
 document.getElementById("place").onclick = place;
-document.getElementById("rotate-left").onclick = () => rotate(-1);
-document.getElementById("rotate-right").onclick = () => rotate(1);
+document.getElementById("rotate-left").onclick = () => rotate(-1, true);
+document.getElementById("rotate-right").onclick = () => rotate(1, true);
 
 window.onresize = () => resetSize();

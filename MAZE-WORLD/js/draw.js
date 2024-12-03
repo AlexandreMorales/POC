@@ -68,6 +68,10 @@ export const drawEveryCell = () => {
     }
   }
 
+  drawWalls();
+};
+
+const drawWalls = () => {
   resetWallCanvas();
   walls.forEach(drawWall);
   walls.forEach(drawWallTop);
@@ -120,10 +124,10 @@ const drawCell = (cell, isSelectedCell) => {
   const point = calculatePointBasedOnPos(cell.pos, isInverted);
 
   if (
-    point.x < 0.5 ||
-    point.y < 0.5 ||
-    point.x > polyInfo.canvasWidth - 0.5 ||
-    point.y > polyInfo.canvasHeight - 0.5
+    point.x < 1 ||
+    point.y < 1 ||
+    point.x > polyInfo.canvasWidth - 1 ||
+    point.y > polyInfo.canvasHeight - 1
   )
     return;
 
@@ -224,8 +228,8 @@ const applyDark = (context, point, points) => {
 const fillPolygon = (context, { x, y }, points) => {
   context.beginPath();
 
-  for (let i = 0; i < points.length; i++) {
-    context.lineTo(x + points[i].x, y + points[i].y);
+  for (const point of points) {
+    context.lineTo(x + point.x, y + point.y);
   }
 
   context.closePath();

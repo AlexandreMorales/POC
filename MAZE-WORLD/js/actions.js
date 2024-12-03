@@ -3,7 +3,10 @@ import { GRID, addWall } from "./grid.js";
 import { MAP_INFO } from "./infos.js";
 import { move } from "./movement.js";
 
-export const dig = () => {
+/**
+ * @returns {import("./infos.js").Cell}
+ */
+const getSelectedCell = () => {
   const nextPos =
     MAP_INFO.currentCell.adjacentPos[CONFIG.polySides][
       MAP_INFO.selectedCellIndex
@@ -11,19 +14,28 @@ export const dig = () => {
 
   if (!nextPos) return;
 
-  const nextCell = GRID[nextPos.i]?.[nextPos.j];
+  return GRID[nextPos.i]?.[nextPos.j];
+};
 
-  if (!nextCell || !nextCell.value || !nextCell.block || nextCell.block.isFluid)
+export const dig = () => {
+  const selectedCell = getSelectedCell();
+
+  if (
+    !selectedCell ||
+    !selectedCell.value ||
+    !selectedCell.block ||
+    selectedCell.block.isFluid
+  )
     return;
 
-  MAP_INFO.pickedCells.push({ ...(nextCell.wall || nextCell) });
+  MAP_INFO.pickedCells.push({ ...(selectedCell.wall || selectedCell) });
 
-  if (nextCell.wall) {
-    addWall(nextCell, null);
+  if (selectedCell.wall) {
+    addWall(selectedCell, null);
   } else {
-    nextCell.value = null;
-    nextCell.block = null;
-    nextCell.color = null;
+    selectedCell.value = null;
+    selectedCell.block = null;
+    selectedCell.color = null;
   }
 
   move();
@@ -32,25 +44,18 @@ export const dig = () => {
 export const place = () => {
   if (!MAP_INFO.pickedCells.length) return;
 
-  const nextPos =
-    MAP_INFO.currentCell.adjacentPos[CONFIG.polySides][
-      MAP_INFO.selectedCellIndex
-    ];
+  const selectedCell = getSelectedCell();
 
-  if (!nextPos) return;
-
-  const nextCell = GRID[nextPos.i]?.[nextPos.j];
-
-  if (!nextCell || nextCell.wall) return;
+  if (!selectedCell || selectedCell.wall) return;
 
   const nextBlock = MAP_INFO.pickedCells.pop();
 
-  if (nextCell.value && nextCell.block && !nextCell.block.isFluid) {
-    addWall(nextCell, nextBlock);
+  if (selectedCell.value && selectedCell.block && !selectedCell.block.isFluid) {
+    addWall(selectedCell, nextBlock);
   } else {
-    nextCell.value = nextBlock.value;
-    nextCell.block = nextBlock.block;
-    nextCell.color = nextBlock.color;
+    selectedCell.value = nextBlock.value;
+    selectedCell.block = nextBlock.block;
+    selectedCell.color = nextBlock.color;
   }
 
   move();

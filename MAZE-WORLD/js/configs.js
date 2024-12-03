@@ -12,7 +12,7 @@ import { KNOWN_POLYGONS } from "./infos.js";
 export const CONFIG = /** @type {Config} */ ({
   chunkRows: 100,
   chunkColumns: 100,
-  cellHeight: 24,
+  cellHeight: 15,
   polySides: KNOWN_POLYGONS.HEXAGON,
 
   minZoom: 10,
@@ -22,7 +22,7 @@ export const CONFIG = /** @type {Config} */ ({
 export const MAP_CONFIG = {
   passHour: 0.5,
   midNightHour: 70,
-  velocity: 10,
+  velocity: 50,
   noiseResolution: 20,
   touchThreshold: 25,
   passTime: false,

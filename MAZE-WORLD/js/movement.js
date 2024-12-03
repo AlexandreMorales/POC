@@ -4,17 +4,28 @@ import { GRID } from "./grid.js";
 import { resetCanvasSize, drawEveryCell } from "./draw.js";
 import { getMod } from "./utils.js";
 
+export const MOVEMENT = {
+  UP: Symbol("UP"),
+  DOWN: Symbol("DOWN"),
+  LEFT: Symbol("LEFT"),
+  RIGHT: Symbol("RIGHT"),
+};
+
 let canRotate = true;
 /**
  * @param {number} orientation
+ * @param {boolean} [changeSelected]
  */
-export const rotate = (orientation) => {
+export const rotate = (orientation, changeSelected) => {
   if (canRotate) {
     canRotate = false;
-    MAP_INFO.rotationTurns = MAP_INFO.selectedCellIndex = getMod(
+    MAP_INFO.rotationTurns = getMod(
       MAP_INFO.rotationTurns + orientation,
       CONFIG.polySides
     );
+
+    if (changeSelected) MAP_INFO.selectedCellIndex = MAP_INFO.rotationTurns;
+
     setTimeout(() => {
       drawEveryCell();
       canRotate = true;
@@ -25,7 +36,7 @@ export const rotate = (orientation) => {
 /**
  * @param {boolean} [useDiagonal]
  * @param {import("./infos.js").Cell} [cell]
- * @returns {{ [k: string]: number }}
+ * @returns {{ [k: symbol]: number }}
  */
 const getMovementMap = (useDiagonal, cell = MAP_INFO.currentCell) => {
   let topI = MAP_INFO.rotationTurns;
@@ -46,47 +57,54 @@ const getMovementMap = (useDiagonal, cell = MAP_INFO.currentCell) => {
   }
 
   return {
-    ArrowUp: topI,
-    ArrowDown: bottomI,
-    ArrowLeft: useDiagonal ? bottomLeftI : topLeftI,
-    ArrowRight: useDiagonal ? bottomRightI : topRightI,
+    [MOVEMENT.UP]: topI,
+    [MOVEMENT.DOWN]: bottomI,
+    [MOVEMENT.LEFT]: useDiagonal ? bottomLeftI : topLeftI,
+    [MOVEMENT.RIGHT]: useDiagonal ? bottomRightI : topRightI,
   };
 };
 
 /**
- * @param {string} code
+ * @param {symbol} code
  * @param {boolean} [useDiagonal]
+ * @returns {number}
  */
-export const moveBaseOnCode = (code, useDiagonal) => {
-  const moveMap = getMovementMap(useDiagonal);
-  const aIndex = moveMap[code];
+const getNextCellIndexBasedOnCode = (code, useDiagonal) => {
+  const aIndex = getMovementMap(useDiagonal)[code];
 
   if (aIndex === undefined) return;
 
-  const aModI = getMod(aIndex, CONFIG.polySides);
+  return getMod(aIndex, CONFIG.polySides);
+};
+
+/**
+ * @param {symbol} code
+ * @param {boolean} [useDiagonal]
+ */
+export const moveBaseOnCode = (code, useDiagonal) => {
+  const aModI = getNextCellIndexBasedOnCode(code, useDiagonal);
+  if (aModI === undefined) return;
   const nextPos = MAP_INFO.currentCell.adjacentPos[CONFIG.polySides][aModI];
 
   if (!nextPos) return;
 
-  const prevSelectedIndex = MAP_INFO.selectedCellIndex;
-
   const nextCell = GRID[nextPos.i]?.[nextPos.j];
-  MAP_INFO.selectedCellIndex = aModI;
 
-  if (cellIsBlocked(nextCell)) {
-    if (prevSelectedIndex !== MAP_INFO.selectedCellIndex) drawEveryCell();
-    return;
-  }
-
-  if (POLY_INFO[CONFIG.polySides].hasInverted) {
-    const aModIOpposite = getMod(
-      getMovementMap(useDiagonal, nextCell)[code],
-      CONFIG.polySides
-    );
-    if (aModIOpposite) MAP_INFO.selectedCellIndex = aModIOpposite;
-  }
+  if (cellIsBlocked(nextCell)) return;
 
   move(nextCell);
+};
+
+/**
+ * @param {symbol} code
+ */
+export const changeSelectedOnCode = (code) => {
+  const aModI = getNextCellIndexBasedOnCode(code);
+  if (aModI === undefined || aModI === MAP_INFO.selectedCellIndex) return;
+
+  MAP_INFO.selectedCellIndex = aModI;
+
+  drawEveryCell();
 };
 
 /**
@@ -152,8 +170,9 @@ const passTime = () => {
  * @returns {import("./infos.js").Cell}
  */
 export const getCenterCell = () => {
-  const middleRow = Math.floor(POLY_INFO[CONFIG.polySides].rows / 2);
-  const middleColumn = Math.floor(POLY_INFO[CONFIG.polySides].columns / 2);
+  const { rows, columns } = POLY_INFO[CONFIG.polySides];
+  const middleRow = Math.floor(rows / 2);
+  const middleColumn = Math.floor(columns / 2);
 
   return GRID[middleRow + MAP_INFO.iOffset][middleColumn + MAP_INFO.jOffset];
 };
@@ -176,10 +195,10 @@ export const mobileTouchStart = (screenX, screenY) => {
     let useDiagonal = false;
     if (Math.abs(finalY) > MAP_CONFIG.touchThreshold) {
       useDiagonal = finalY > 0;
-      code = useDiagonal ? "ArrowDown" : "ArrowUp";
+      code = useDiagonal ? MOVEMENT.DOWN : MOVEMENT.UP;
     }
     if (Math.abs(finalX) > MAP_CONFIG.touchThreshold) {
-      code = finalX < 0 ? "ArrowLeft" : "ArrowRight";
+      code = finalX < 0 ? MOVEMENT.LEFT : MOVEMENT.RIGHT;
     }
 
     if (code) moveBaseOnCode(code, useDiagonal);
