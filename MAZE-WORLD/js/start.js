@@ -33,7 +33,6 @@ let lastMovement = null;
 
 document.onkeydown = (e) => {
   e = e || /** @type {KeyboardEvent} */ (window.event);
-  e.preventDefault();
 
   if (MOVEMENT_KEYS.includes(e.code)) {
     const lastLastM = lastMovement;
@@ -50,7 +49,10 @@ document.onkeydown = (e) => {
   if (e.code === "KeyQ") return dig();
   if (e.code === "KeyE") return place();
 
-  if (e.code === "Tab") return rotate(-1);
+  if (e.code === "Tab") {
+    e.preventDefault();
+    return rotate(-1);
+  }
   if (e.code === "KeyR") return rotate(1);
 
   if (e.code.includes("Shift")) return changePolySides();
