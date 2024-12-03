@@ -1,0 +1,10 @@
+#entities {
+  z-index: 2;
+}
+
+#entities img {
+  position: absolute;
+  object-fit: cover;
+  object-position: 0 0;
+  image-rendering: pixelated;
+}

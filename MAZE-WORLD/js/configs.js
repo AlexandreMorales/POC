@@ -12,7 +12,7 @@ import { KNOWN_POLYGONS } from "./infos.js";
 export const CONFIG = /** @type {Config} */ ({
   chunkRows: 100,
   chunkColumns: 100,
-  cellHeight: 15,
+  cellHeight: 24,
   polySides: KNOWN_POLYGONS.HEXAGON,
 
   minZoom: 10,
@@ -34,7 +34,13 @@ export const CANVAS_CONFIG = {
   lineWidth: 1,
   selectedStrokeColor: "white",
   selectedLineWidth: 2,
-  currentColor: "cyan",
   wallDarkness: 0.5,
   selectedWallBrightness: 1.5,
+};
+
+export const MOVEMENT = {
+  UP: Symbol("UP"),
+  DOWN: Symbol("DOWN"),
+  LEFT: Symbol("LEFT"),
+  RIGHT: Symbol("RIGHT"),
 };

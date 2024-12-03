@@ -1,6 +1,5 @@
-import { CONFIG } from "./configs.js";
+import { CONFIG, MOVEMENT } from "./configs.js";
 import {
-  MOVEMENT,
   changePolySides,
   changeSelectedOnCode,
   mobileTouchEnd,
@@ -12,32 +11,41 @@ import {
 } from "./movement.js";
 import { resetSize, start } from "./boot.js";
 import { dig, place } from "./actions.js";
+import { startRunning, updatePlayerDirection } from "./entities.js";
 
 start();
 
-let isMoving = false;
+const KEY_MOVEMENT_MAP = {
+  ["KeyW"]: MOVEMENT.UP,
+  ["KeyA"]: MOVEMENT.LEFT,
+  ["KeyS"]: MOVEMENT.DOWN,
+  ["KeyD"]: MOVEMENT.RIGHT,
+};
+const ARROW_MOVEMENT_MAP = {
+  ["ArrowUp"]: MOVEMENT.UP,
+  ["ArrowLeft"]: MOVEMENT.LEFT,
+  ["ArrowDown"]: MOVEMENT.DOWN,
+  ["ArrowRight"]: MOVEMENT.RIGHT,
+};
+const MOVEMENT_KEYS = Object.keys(KEY_MOVEMENT_MAP);
+
+let lastMovement = null;
 
 document.onkeydown = (e) => {
   e = e || /** @type {KeyboardEvent} */ (window.event);
   e.preventDefault();
 
-  if (
-    e.code === "KeyW" ||
-    e.code === "KeyA" ||
-    e.code === "KeyS" ||
-    e.code === "KeyD"
-  )
-    isMoving = true;
+  if (MOVEMENT_KEYS.includes(e.code)) {
+    const lastLastM = lastMovement;
+    lastMovement = KEY_MOVEMENT_MAP[e.code];
+    if (lastLastM !== lastMovement) startRunning(lastMovement);
+    return moveBaseOnCode(lastMovement);
+  }
 
-  if (e.code === "KeyW") return moveBaseOnCode(MOVEMENT.UP);
-  if (e.code === "KeyA") return moveBaseOnCode(MOVEMENT.LEFT);
-  if (e.code === "KeyS") return moveBaseOnCode(MOVEMENT.DOWN);
-  if (e.code === "KeyD") return moveBaseOnCode(MOVEMENT.RIGHT);
-
-  if (e.code === "ArrowUp") return changeSelectedOnCode(MOVEMENT.UP);
-  if (e.code === "ArrowLeft") return changeSelectedOnCode(MOVEMENT.LEFT);
-  if (e.code === "ArrowDown") return changeSelectedOnCode(MOVEMENT.DOWN);
-  if (e.code === "ArrowRight") return changeSelectedOnCode(MOVEMENT.RIGHT);
+  if (e.code.startsWith("Arrow")) {
+    lastMovement = ARROW_MOVEMENT_MAP[e.code];
+    return changeSelectedOnCode(lastMovement);
+  }
 
   if (e.code === "KeyQ") return dig();
   if (e.code === "KeyE") return place();
@@ -51,7 +59,10 @@ document.onkeydown = (e) => {
 };
 
 document.onkeyup = () => {
-  isMoving = false;
+  if (lastMovement) {
+    updatePlayerDirection(lastMovement);
+    lastMovement = null;
+  }
 };
 
 let zoomDist = 0;
@@ -106,7 +117,7 @@ heightSlider.oninput = () => resetSize(+heightSlider.value);
 document.getElementById("change-poly").onclick = changePolySides;
 document.getElementById("dig").onclick = dig;
 document.getElementById("place").onclick = place;
-document.getElementById("rotate-left").onclick = () => rotate(-1, true);
-document.getElementById("rotate-right").onclick = () => rotate(1, true);
+document.getElementById("rotate-left").onclick = () => rotate(-1);
+document.getElementById("rotate-right").onclick = () => rotate(1);
 
 window.onresize = () => resetSize();

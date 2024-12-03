@@ -4,8 +4,10 @@
   position: relative;
 }
 
-canvas {
+#draw-container > * {
   position: absolute;
+  width: 100%;
+  height: 100%;
 }
 
 #canvas-ground {
@@ -13,5 +15,5 @@ canvas {
 }
 
 #canvas-wall {
-  z-index: 2;
+  z-index: 1;
 }

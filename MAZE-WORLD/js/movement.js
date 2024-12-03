@@ -1,30 +1,23 @@
-import { CONFIG, MAP_CONFIG } from "./configs.js";
+import { CONFIG, MAP_CONFIG, MOVEMENT } from "./configs.js";
 import { knownPolys, MAP_INFO, POLY_INFO } from "./infos.js";
 import { GRID } from "./grid.js";
 import { resetCanvasSize, drawEveryCell } from "./draw.js";
 import { getMod } from "./utils.js";
-
-export const MOVEMENT = {
-  UP: Symbol("UP"),
-  DOWN: Symbol("DOWN"),
-  LEFT: Symbol("LEFT"),
-  RIGHT: Symbol("RIGHT"),
-};
+import { updateEntities, updatePlayerDirection } from "./entities.js";
 
 let canRotate = true;
 /**
  * @param {number} orientation
- * @param {boolean} [changeSelected]
  */
-export const rotate = (orientation, changeSelected) => {
+export const rotate = (orientation) => {
   if (canRotate) {
     canRotate = false;
-    MAP_INFO.rotationTurns = getMod(
+    MAP_INFO.rotationTurns = MAP_INFO.selectedCellIndex = getMod(
       MAP_INFO.rotationTurns + orientation,
       CONFIG.polySides
     );
 
-    if (changeSelected) MAP_INFO.selectedCellIndex = MAP_INFO.rotationTurns;
+    updatePlayerDirection(MOVEMENT.UP);
 
     setTimeout(() => {
       drawEveryCell();
@@ -103,6 +96,7 @@ export const changeSelectedOnCode = (code) => {
   if (aModI === undefined || aModI === MAP_INFO.selectedCellIndex) return;
 
   MAP_INFO.selectedCellIndex = aModI;
+  updatePlayerDirection(code);
 
   drawEveryCell();
 };
@@ -120,8 +114,10 @@ export const changePolySides = () => {
 
   MAP_INFO.rotationTurns = 0;
   MAP_INFO.selectedCellIndex = 0;
+  updatePlayerDirection(MOVEMENT.UP);
 
   const centerCell = getCenterCell();
+  updateEntities();
   resetCanvasSize();
   moveCurrentCell(centerCell, MAP_INFO.currentCell);
   drawEveryCell();

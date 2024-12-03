@@ -2,6 +2,7 @@ import { POLY_INFO, MAP_INFO } from "./infos.js";
 import { CONFIG, CANVAS_CONFIG } from "./configs.js";
 import { GRID, calculatePointBasedOnPos, loadChunk } from "./grid.js";
 import { getMod, tweakColor } from "./utils.js";
+import { verifyPlayerHeight } from "./entities.js";
 
 const container = document.getElementById("draw-container");
 const canvasGround = /** @type {HTMLCanvasElement} */ (
@@ -34,9 +35,7 @@ export const resetCanvasSize = () => {
 };
 
 const resetWallCanvas = () => {
-  const polyInfo = POLY_INFO[CONFIG.polySides];
-  canvasWall.height = polyInfo.canvasHeight;
-  canvasWall.width = polyInfo.canvasWidth;
+  canvasWall.width = POLY_INFO[CONFIG.polySides].canvasWidth;
 };
 
 let walls = /** @type {import("./infos.js").Wall[]} */ ([]);
@@ -69,6 +68,7 @@ export const drawEveryCell = () => {
   }
 
   drawWalls();
+  verifyPlayerHeight();
 };
 
 const drawWalls = () => {
@@ -149,9 +149,6 @@ const drawCell = (cell, isSelectedCell) => {
   if (cell.value) {
     const color = cell.block.isFluid ? tweakColor(cell.color) : cell.color;
     contextGround.fillStyle = colorToRGB(color);
-
-    if (cell === MAP_INFO.currentCell)
-      contextGround.fillStyle = CANVAS_CONFIG.currentColor;
   } else {
     contextGround.fillStyle = "black";
   }

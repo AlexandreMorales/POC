@@ -1,6 +1,7 @@
 import { BIOMES } from "./biomes.js";
 import { CONFIG } from "./configs.js";
 import { resetCanvasSize, drawEveryCell, setCanvasSize } from "./draw.js";
+import { updateEntities } from "./entities.js";
 import { loadChunk, GRID } from "./grid.js";
 import { KNOWN_POLYGONS, MAP_INFO, POLY_INFO, knownPolys } from "./infos.js";
 import { getCenterCell, cellIsBlocked, moveCurrentCell } from "./movement.js";
@@ -174,6 +175,7 @@ const configPoly = (polySides) => {
 
 export const start = () => {
   configPolys();
+  updateEntities();
   resetCanvasSize();
 
   loadChunk(0, 0, BIOMES.FOREST);
@@ -194,6 +196,7 @@ export const start = () => {
 export const resetSize = debounce((newSize) => {
   CONFIG.cellHeight = newSize || CONFIG.cellHeight;
   configPolys();
+  updateEntities();
   setCanvasSize(null, POLY_INFO[CONFIG.polySides].canvasWidth);
   moveCurrentCell(getCenterCell(), MAP_INFO.currentCell);
   drawEveryCell();
