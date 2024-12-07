@@ -27,7 +27,7 @@ export const rotate = (orientation) => {
       CONFIG.polySides
     );
 
-    updatePlayerDirection(MOVEMENT.UP);
+    resetDirection();
 
     setTimeout(() => {
       drawEveryCell();
@@ -80,8 +80,8 @@ const getNextCellIndexBasedOnCode = (code, useDiagonal) => {
   return getMod(aIndex, CONFIG.polySides);
 };
 
-let lastMovement = MOVEMENT.UP;
-let lastSelection = MOVEMENT.UP;
+let lastMovement = null;
+let lastSelection = null;
 
 /**
  * @param {symbol} code
@@ -110,7 +110,7 @@ export const moveBaseOnCode = (code, useDiagonal) => {
 
 export const stopMoving = () => {
   if (lastMovement) {
-    updatePlayerDirection(lastMovement);
+    updatePlayerDirection(lastSelection);
     lastMovement = null;
   }
 };
@@ -126,7 +126,7 @@ export const changeSelectedOnCode = (code) => {
   if (aModI === undefined || aModI === MAP_INFO.selectedCellIndex) return;
 
   MAP_INFO.selectedCellIndex = aModI;
-  updatePlayerDirection(code);
+  updatePlayerDirection(lastSelection);
 
   drawEveryCell();
 };
@@ -137,14 +137,19 @@ export const changePolySides = () => {
 
   MAP_INFO.rotationTurns = 0;
   MAP_INFO.selectedCellIndex = 0;
-  updatePlayerDirection(MOVEMENT.UP);
 
   const centerCell = getCenterCell();
+  resetDirection();
   updateEntities();
   resetCanvasSize();
   moveCurrentCell(centerCell, MAP_INFO.currentCell);
   drawEveryCell();
   drawEveryCell();
+};
+
+export const resetDirection = () => {
+  lastMovement = lastSelection = MOVEMENT.UP;
+  updatePlayerDirection(lastSelection);
 };
 
 /**

@@ -1,3 +1,4 @@
+import { resetDirection } from "./actions.js";
 import { BIOMES } from "./biomes.js";
 import { CONFIG } from "./configs.js";
 import { resetCanvasSize, drawEveryCell, setCanvasSize } from "./draw.js";
@@ -177,6 +178,7 @@ export const start = () => {
   configPolys();
   updateEntities();
   resetCanvasSize();
+  resetDirection();
 
   loadChunk(0, 0, BIOMES.FOREST);
   MAP_INFO.currentCell = getCenterCell();

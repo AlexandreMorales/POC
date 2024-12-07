@@ -44,10 +44,6 @@ export const drawEveryCell = () => {
 
   const offsetCell = MAP_INFO.currentCell.pos.j % 2;
   const { rows, columns, shouldIntercalate } = POLY_INFO[CONFIG.polySides];
-  const selectedCellPos =
-    MAP_INFO.currentCell.adjacentPos[CONFIG.polySides][
-      MAP_INFO.selectedCellIndex
-    ];
 
   // More range to encapsulate rotation
   for (let i = -columns; i < rows + columns; i++) {
@@ -60,10 +56,7 @@ export const drawEveryCell = () => {
 
       if (!GRID[nI]?.[nJ]) loadChunk(nI, nJ);
 
-      drawCell(
-        GRID[nI][nJ],
-        selectedCellPos.i === nI && selectedCellPos.j === nJ
-      );
+      drawCell(GRID[nI][nJ]);
     }
   }
 
@@ -84,12 +77,7 @@ const drawWalls = () => {
 const drawWall = (wall) => {
   // Only draw if there is a gap, if is sorrounded by walls it doesnt need
   if (wall.borderMap.find((b) => !!b)) {
-    contextWall.fillStyle = colorToRGB(
-      wall.color,
-      wall.isSelectedCell
-        ? CANVAS_CONFIG.selectedWallBrightness
-        : CANVAS_CONFIG.wallDarkness
-    );
+    contextWall.fillStyle = colorToRGB(wall.color, CANVAS_CONFIG.wallDarkness);
     fillPolygon(contextWall, wall.point, wall.points);
     applyDark(contextWall, wall.point, wall.points);
   }
@@ -101,26 +89,16 @@ const drawWall = (wall) => {
 const drawWallTop = (wall) => {
   contextWall.fillStyle = colorToRGB(wall.color);
   fillPolygon(contextWall, wall.topPoint, wall.topPoints);
-  contextWall.strokeStyle = wall.isSelectedCell
-    ? CANVAS_CONFIG.selectedStrokeColor
-    : CANVAS_CONFIG.strokeColor;
-  contextWall.lineWidth = wall.isSelectedCell
-    ? CANVAS_CONFIG.selectedLineWidth
-    : CANVAS_CONFIG.lineWidth;
-  applyBorders(
-    contextWall,
-    wall.topPoint,
-    wall.topPoints,
-    wall.isSelectedCell ? null : wall.borderMap
-  );
+  contextWall.strokeStyle = CANVAS_CONFIG.strokeColor;
+  contextWall.lineWidth = CANVAS_CONFIG.lineWidth;
+  applyBorders(contextWall, wall.topPoint, wall.topPoints, wall.borderMap);
   applyDark(contextWall, wall.topPoint, wall.topPoints);
 };
 
 /**
  * @param {import("./infos.js").Cell} cell
- * @param {boolean} [isSelectedCell]
  */
-const drawCell = (cell, isSelectedCell) => {
+const drawCell = (cell) => {
   const polyInfo = POLY_INFO[CONFIG.polySides];
   const isInverted = polyInfo.hasInverted && cell.isInverted;
 
@@ -175,7 +153,6 @@ const drawCell = (cell, isSelectedCell) => {
         acc[getMod(index, CONFIG.polySides)] = !c.wall;
         return acc;
       }, []),
-      isSelectedCell,
     });
 
     return;
@@ -201,12 +178,6 @@ const drawCell = (cell, isSelectedCell) => {
     aCells.every((c) => c !== MAP_INFO.currentCell)
   )
     applyDark(contextGround, point, points);
-
-  if (isSelectedCell) {
-    contextGround.strokeStyle = CANVAS_CONFIG.selectedStrokeColor;
-    contextGround.lineWidth = CANVAS_CONFIG.selectedLineWidth;
-    applyBorders(contextGround, point, points);
-  }
 };
 
 /**

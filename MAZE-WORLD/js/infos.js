@@ -45,7 +45,6 @@ export const knownPolys = Object.values(KNOWN_POLYGONS);
  * @property {Point[]} topPoints Points of the top of the wall
  * @property {boolean[]} borderMap Which points to draw a border
  * @property {import("./biomes").Color} color
- * @property {boolean} isSelectedCell
  */
 
 /**
