@@ -1,17 +1,15 @@
-import { CONFIG, MOVEMENT } from "./configs.js";
+import { CONFIG, MAP_CONFIG, MOVEMENT } from "./configs.js";
 import {
   changePolySides,
   changeSelectedOnCode,
-  mobileTouchEnd,
-  mobileTouchMove,
-  mobileTouchStart,
-  move,
   moveBaseOnCode,
   rotate,
-} from "./movement.js";
+  dig,
+  place,
+  stopMoving,
+} from "./actions.js";
 import { resetSize, start } from "./boot.js";
-import { dig, place } from "./actions.js";
-import { startRunning, updatePlayerDirection } from "./entities.js";
+import { move } from "./movement.js";
 
 start();
 
@@ -29,31 +27,20 @@ const ARROW_MOVEMENT_MAP = {
 };
 const MOVEMENT_KEYS = Object.keys(KEY_MOVEMENT_MAP);
 
-let lastMovement = null;
-
 document.onkeydown = (e) => {
   e = e || /** @type {KeyboardEvent} */ (window.event);
 
-  if (MOVEMENT_KEYS.includes(e.code)) {
-    const lastLastM = lastMovement;
-    lastMovement = KEY_MOVEMENT_MAP[e.code];
-    if (lastLastM !== lastMovement) startRunning(lastMovement);
-    return moveBaseOnCode(lastMovement);
-  }
+  if (e.code.startsWith("Arrow"))
+    return moveBaseOnCode(ARROW_MOVEMENT_MAP[e.code]);
 
-  if (e.code.startsWith("Arrow")) {
-    lastMovement = ARROW_MOVEMENT_MAP[e.code];
-    return changeSelectedOnCode(lastMovement);
-  }
+  if (MOVEMENT_KEYS.includes(e.code))
+    return changeSelectedOnCode(KEY_MOVEMENT_MAP[e.code]);
 
-  if (e.code === "KeyQ") return dig();
-  if (e.code === "KeyE") return place();
+  if (e.code === "KeyQ") return rotate(-1);
+  if (e.code === "KeyE") return rotate(1);
 
-  if (e.code === "Tab") {
-    e.preventDefault();
-    return rotate(-1);
-  }
-  if (e.code === "KeyR") return rotate(1);
+  if (e.code === "KeyR") return dig();
+  if (e.code === "KeyF") return place();
 
   if (e.code.includes("Shift")) return changePolySides();
 
@@ -61,13 +48,11 @@ document.onkeydown = (e) => {
 };
 
 document.onkeyup = () => {
-  if (lastMovement) {
-    updatePlayerDirection(lastMovement);
-    lastMovement = null;
-  }
+  stopMoving();
 };
 
 let zoomDist = 0;
+let touchPos = { x: 0, y: 0, interval: null };
 
 document.ontouchstart = (e) => {
   e = e || /** @type {TouchEvent} */ (window.event);
@@ -79,7 +64,28 @@ document.ontouchstart = (e) => {
       screenX - secondTouch.screenX,
       screenY - secondTouch.screenY
     );
-  } else mobileTouchStart(screenX, screenY);
+  } else {
+    clearInterval(touchPos.interval);
+    touchPos.x = screenX;
+    touchPos.y = screenY;
+
+    touchPos.interval = setInterval(() => {
+      const finalX = screenX - touchPos.x;
+      const finalY = screenY - touchPos.y;
+
+      let code = null;
+      let useDiagonal = false;
+      if (Math.abs(finalY) > MAP_CONFIG.touchThreshold) {
+        useDiagonal = finalY > 0;
+        code = useDiagonal ? MOVEMENT.DOWN : MOVEMENT.UP;
+      }
+      if (Math.abs(finalX) > MAP_CONFIG.touchThreshold) {
+        code = finalX < 0 ? MOVEMENT.LEFT : MOVEMENT.RIGHT;
+      }
+
+      if (code) moveBaseOnCode(code, useDiagonal);
+    }, 100);
+  }
 };
 
 document.ontouchmove = (e) => {
@@ -100,11 +106,16 @@ document.ontouchmove = (e) => {
     }
 
     zoomDist = nZoomDist;
-  } else mobileTouchMove(screenX, screenY);
+  } else {
+    touchPos.x = screenX;
+    touchPos.y = screenY;
+  }
 };
 
 document.ontouchend = () => {
-  mobileTouchEnd();
+  clearInterval(touchPos.interval);
+  touchPos = { x: 0, y: 0, interval: null };
+  stopMoving();
   zoomDist = 0;
 };
 

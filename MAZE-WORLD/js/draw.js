@@ -82,14 +82,17 @@ const drawWalls = () => {
  * @param {import("./infos.js").Wall} wall
  */
 const drawWall = (wall) => {
-  contextWall.fillStyle = colorToRGB(
-    wall.color,
-    wall.isSelectedCell
-      ? CANVAS_CONFIG.selectedWallBrightness
-      : CANVAS_CONFIG.wallDarkness
-  );
-  fillPolygon(contextWall, wall.point, wall.points);
-  applyDark(contextWall, wall.point, wall.points);
+  // Only draw if there is a gap, if is sorrounded by walls it doesnt need
+  if (wall.borderMap.find((b) => !!b)) {
+    contextWall.fillStyle = colorToRGB(
+      wall.color,
+      wall.isSelectedCell
+        ? CANVAS_CONFIG.selectedWallBrightness
+        : CANVAS_CONFIG.wallDarkness
+    );
+    fillPolygon(contextWall, wall.point, wall.points);
+    applyDark(contextWall, wall.point, wall.points);
+  }
 };
 
 /**

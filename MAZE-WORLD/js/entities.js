@@ -23,9 +23,11 @@ const RUNNING_IMG_MAP = {
 
 export const updateEntities = () => {
   const { ySide, cx, cy } = POLY_INFO[CONFIG.polySides];
-  playerImg.style.height = playerImg.style.width = `${Math.round(ySide * 3)}px`;
-  playerImg.style.top = `${cy - ySide * 2.5}px`;
-  playerImg.style.left = `${cx - ySide * 1.5}px`;
+  playerImg.style.height = playerImg.style.width = `${Math.round(
+    ySide * 2.5
+  )}px`;
+  playerImg.style.top = `${cy - ySide * 2}px`;
+  playerImg.style.left = `${cx - ySide * 1.2}px`;
 };
 
 /**
@@ -46,7 +48,7 @@ export const verifyPlayerHeight = () => {
   const downPos = MAP_INFO.currentCell.adjacentPos[CONFIG.polySides][downI];
   const downCell = GRID[downPos.i]?.[downPos.j];
 
-  playerImg.style.height = `${Math.round(ySide * (downCell.wall ? 2.5 : 3))}px`;
+  playerImg.style.height = `${Math.round(ySide * (downCell.wall ? 2 : 2.5))}px`;
 };
 
 /**

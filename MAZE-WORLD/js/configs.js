@@ -25,7 +25,7 @@ export const MAP_CONFIG = {
   velocity: 50,
   noiseResolution: 20,
   touchThreshold: 25,
-  passTime: false,
+  passTime: true,
 };
 
 export const CANVAS_CONFIG = {
