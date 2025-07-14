@@ -93,6 +93,20 @@ const drawWallTop = (wall) => {
   contextWall.lineWidth = CANVAS_CONFIG.lineWidth;
   applyBorders(contextWall, wall.topPoint, wall.topPoints, wall.borderMap);
   applyDark(contextWall, wall.topPoint, wall.topPoints);
+
+  if (CANVAS_CONFIG.showPos) {
+    const polyInfo = POLY_INFO[CONFIG.polySides];
+    const isInverted = polyInfo.hasInverted && wall.isInverted;
+    contextWall.fillStyle = "black";
+    contextWall.font = `bold ${CONFIG.cellHeight / 5}px Arial`;
+    contextWall.textAlign = "center";
+    contextWall.textBaseline = "middle";
+    contextWall.fillText(
+      `${wall.pos.i},${wall.pos.j}`,
+      wall.topPoint.x,
+      isInverted ? wall.topPoint.y + polyInfo.ySide / 2 : wall.topPoint.y
+    );
+  }
 };
 
 /**
@@ -143,6 +157,8 @@ const drawCell = (cell) => {
 
     walls.push({
       color: cell.wall.color,
+      pos: cell.pos,
+      isInverted: cell.isInverted,
       point,
       topPoint: { x: point.x, y: point.y - polyInfo.ySide },
       points: wallPoints,

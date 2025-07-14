@@ -39,6 +39,8 @@ export const knownPolys = Object.values(KNOWN_POLYGONS);
 
 /**
  * @typedef {Object} Wall
+ * @property {CellPos} pos
+ * @property {boolean} isInverted Only used for triangles
  * @property {Point} point Point of where to draw the wall
  * @property {Point} topPoint Point of where to draw the top of the wall
  * @property {Point[]} points Points of the wall

@@ -1,4 +1,4 @@
-import { CONFIG, MOVEMENT } from "./configs.js";
+import { CONFIG, ENTITIES_CONFIG, MOVEMENT } from "./configs.js";
 import { GRID } from "./grid.js";
 import { MAP_INFO, POLY_INFO } from "./infos.js";
 import { getMod } from "./utils.js";
@@ -24,7 +24,7 @@ const RUNNING_IMG_MAP = {
 export const updateEntities = () => {
   const { ySide, cx, cy } = POLY_INFO[CONFIG.polySides];
   playerImg.style.height = playerImg.style.width = `${Math.round(
-    ySide * 2.5
+    ySide * ENTITIES_CONFIG.defaultSizeRatio
   )}px`;
   playerImg.style.top = `${cy - ySide * 2}px`;
   playerImg.style.left = `${cx - ySide * 1.2}px`;
@@ -48,7 +48,32 @@ export const verifyPlayerHeight = () => {
   const downPos = MAP_INFO.currentCell.adjacentPos[CONFIG.polySides][downI];
   const downCell = GRID[downPos.i]?.[downPos.j];
 
-  playerImg.style.height = `${Math.round(ySide * (downCell.wall ? 2 : 2.5))}px`;
+  let height = ySide * ENTITIES_CONFIG.defaultSizeRatio;
+  playerImg.style.clipPath = null;
+  if (hasInverted && !MAP_INFO.currentCell.isInverted) {
+    const rightCell = downCell;
+
+    let leftI = MAP_INFO.rotationTurns + CONFIG.polySides - 1;
+    leftI = getMod(leftI, CONFIG.polySides);
+    const leftPos = MAP_INFO.currentCell.adjacentPos[CONFIG.polySides][leftI];
+    const leftCell = GRID[leftPos.i]?.[leftPos.j];
+
+    let clipPath = null;
+
+    if (rightCell.wall && leftCell.wall) {
+      clipPath = ENTITIES_CONFIG.notInvertedBothClipPath;
+    } else if (rightCell.wall) {
+      clipPath = ENTITIES_CONFIG.notInvertedRightClipPath;
+    } else if (leftCell.wall) {
+      clipPath = ENTITIES_CONFIG.notInvertedLeftClipPath;
+    }
+
+    playerImg.style.clipPath = clipPath;
+  } else if (downCell.wall) {
+    height = ySide * ENTITIES_CONFIG.wallSizeRatio;
+  }
+
+  playerImg.style.height = `${Math.round(height)}px`;
 };
 
 /**
