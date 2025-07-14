@@ -127,8 +127,6 @@ export const changeSelectedOnCode = (code) => {
 
   MAP_INFO.selectedCellIndex = aModI;
   updatePlayerDirection(lastSelection);
-
-  drawEveryCell();
 };
 
 export const changePolySides = () => {
