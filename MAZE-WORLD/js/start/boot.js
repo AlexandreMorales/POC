@@ -1,23 +1,27 @@
-import { resetDirection } from "./actions.js";
-import { BIOMES } from "./biomes.js";
-import { CONFIG } from "./configs.js";
-import { resetCanvasSize, drawEveryCell, setCanvasSize } from "./draw.js";
-import { updateEntities } from "./entities.js";
-import { loadChunk, GRID } from "./grid.js";
-import { KNOWN_POLYGONS, MAP_INFO, POLY_INFO, knownPolys } from "./infos.js";
-import { getCenterCell, cellIsBlocked, moveCurrentCell } from "./movement.js";
-import { correctRoundError, debounce } from "./utils.js";
+import { resetDirection } from "../actions.js";
+import { BIOMES } from "../configs/biomes.js";
+import {
+  CONFIG,
+  KNOWN_POLYGONS,
+  KNOWN_POLYGONS_VALUES,
+} from "../configs/configs.js";
+import { resetCanvasSize, drawEveryCell, setCanvasSize } from "../draw.js";
+import { resetEntities } from "../entities.js";
+import { loadChunk, GRID } from "../grid.js";
+import { MAP_INFO, POLY_INFO } from "../configs/infos.js";
+import { getCenterCell, cellIsBlocked, moveCurrentCell } from "../movement.js";
+import { correctRoundError, debounce } from "../utils.js";
 
 const configPolys = () => {
-  for (const p of knownPolys) {
+  for (const p of KNOWN_POLYGONS_VALUES) {
     POLY_INFO[p] = configPoly(p);
   }
 };
 
 /**
- * @param {import("./infos.js").Point[]} points
+ * @param {import("../configs/infos.js").Point[]} points
  * @param {number} height
- * @returns {import("./infos.js").Point[]}
+ * @returns {import("../configs/infos.js").Point[]}
  */
 const createWallPoints = (points, height) => {
   let bottomPoints = points.filter((p) => p.y >= 0);
@@ -53,7 +57,7 @@ const getXFn = (polySides, polySide, xSide) => {
 
 /**
  * @param {number} polySides
- * @returns {import("./infos.js").PolyInfoProp}
+ * @returns {import("../configs/infos.js").PolyInfoProp}
  */
 const configPoly = (polySides) => {
   let radiusFromSide = 0;
@@ -176,7 +180,7 @@ const configPoly = (polySides) => {
 
 export const start = () => {
   configPolys();
-  updateEntities();
+  resetEntities();
   resetCanvasSize();
   resetDirection();
 
@@ -198,8 +202,8 @@ export const start = () => {
 export const resetSize = debounce((newSize) => {
   CONFIG.cellHeight = newSize || CONFIG.cellHeight;
   configPolys();
-  updateEntities();
-  setCanvasSize(null, POLY_INFO[CONFIG.polySides].canvasWidth);
+  resetEntities();
+  setCanvasSize(null, POLY_INFO[MAP_INFO.currentPoly].canvasWidth);
   moveCurrentCell(getCenterCell(), MAP_INFO.currentCell);
   drawEveryCell();
 });

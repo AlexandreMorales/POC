@@ -1,8 +1,8 @@
-import { POLY_INFO, MAP_INFO } from "./infos.js";
-import { CONFIG, CANVAS_CONFIG } from "./configs.js";
+import { POLY_INFO, MAP_INFO } from "./configs/infos.js";
+import { CONFIG, CANVAS_CONFIG } from "./configs/configs.js";
 import { GRID, calculatePointBasedOnPos, loadChunk } from "./grid.js";
 import { getMod, tweakColor } from "./utils.js";
-import { verifyPlayerHeight } from "./entities.js";
+import { verifyEntitiesHeight } from "./entities.js";
 
 const container = document.getElementById("draw-container");
 const canvasGround = /** @type {HTMLCanvasElement} */ (
@@ -30,20 +30,20 @@ export const setCanvasSize = (height, width) => {
 };
 
 export const resetCanvasSize = () => {
-  const polyInfo = POLY_INFO[CONFIG.polySides];
+  const polyInfo = POLY_INFO[MAP_INFO.currentPoly];
   setCanvasSize(polyInfo.canvasHeight, polyInfo.canvasWidth);
 };
 
 const resetWallCanvas = () => {
-  canvasWall.width = POLY_INFO[CONFIG.polySides].canvasWidth;
+  canvasWall.width = POLY_INFO[MAP_INFO.currentPoly].canvasWidth;
 };
 
-let walls = /** @type {import("./infos.js").Wall[]} */ ([]);
+let walls = /** @type {import("./configs/infos.js").Wall[]} */ ([]);
 export const drawEveryCell = () => {
   walls = [];
 
   const offsetCell = MAP_INFO.currentCell.pos.j % 2;
-  const { rows, columns, shouldIntercalate } = POLY_INFO[CONFIG.polySides];
+  const { rows, columns, shouldIntercalate } = POLY_INFO[MAP_INFO.currentPoly];
 
   // More range to encapsulate rotation
   for (let i = -columns; i < rows + columns; i++) {
@@ -61,7 +61,7 @@ export const drawEveryCell = () => {
   }
 
   drawWalls();
-  verifyPlayerHeight();
+  verifyEntitiesHeight();
 };
 
 const drawWalls = () => {
@@ -72,7 +72,7 @@ const drawWalls = () => {
 };
 
 /**
- * @param {import("./infos.js").Wall} wall
+ * @param {import("./configs/infos.js").Wall} wall
  */
 const drawWall = (wall) => {
   // Only draw if there is a gap, if is sorrounded by walls it doesnt need
@@ -84,7 +84,7 @@ const drawWall = (wall) => {
 };
 
 /**
- * @param {import("./infos.js").Wall} wall
+ * @param {import("./configs/infos.js").Wall} wall
  */
 const drawWallTop = (wall) => {
   contextWall.fillStyle = colorToRGB(wall.color);
@@ -95,7 +95,7 @@ const drawWallTop = (wall) => {
   applyDark(contextWall, wall.topPoint, wall.topPoints);
 
   if (CANVAS_CONFIG.showPos) {
-    const polyInfo = POLY_INFO[CONFIG.polySides];
+    const polyInfo = POLY_INFO[MAP_INFO.currentPoly];
     const isInverted = polyInfo.hasInverted && wall.isInverted;
     contextWall.fillStyle = "black";
     contextWall.font = `bold ${CONFIG.cellHeight / 5}px Arial`;
@@ -110,10 +110,10 @@ const drawWallTop = (wall) => {
 };
 
 /**
- * @param {import("./infos.js").Cell} cell
+ * @param {import("./configs/infos.js").Cell} cell
  */
 const drawCell = (cell) => {
-  const polyInfo = POLY_INFO[CONFIG.polySides];
+  const polyInfo = POLY_INFO[MAP_INFO.currentPoly];
   const isInverted = polyInfo.hasInverted && cell.isInverted;
 
   const point = calculatePointBasedOnPos(cell.pos, isInverted);
@@ -127,7 +127,7 @@ const drawCell = (cell) => {
     return;
 
   const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;
-  const aCells = cell.adjacentPos[CONFIG.polySides].map(
+  const aCells = cell.adjacentPos[MAP_INFO.currentPoly].map(
     ({ i, j }) => GRID[i]?.[j]
   );
 
@@ -165,8 +165,8 @@ const drawCell = (cell) => {
       topPoints: points,
       borderMap: aCells.reduce((acc, c, i) => {
         let index = i - MAP_INFO.rotationTurns;
-        if (shouldOffset) index = CONFIG.polySides - 1 - index;
-        acc[getMod(index, CONFIG.polySides)] = !c.wall;
+        if (shouldOffset) index = MAP_INFO.currentPoly - 1 - index;
+        acc[getMod(index, MAP_INFO.currentPoly)] = !c.wall;
         return acc;
       }, []),
     });
@@ -198,8 +198,8 @@ const drawCell = (cell) => {
 
 /**
  * @param {CanvasRenderingContext2D} context
- * @param {import("./infos.js").Point} point
- * @param {import("./infos.js").Point[]} points
+ * @param {import("./configs/infos.js").Point} point
+ * @param {import("./configs/infos.js").Point[]} points
  */
 const applyDark = (context, point, points) => {
   if (!MAP_INFO.timeOfDay) return;
@@ -209,8 +209,8 @@ const applyDark = (context, point, points) => {
 
 /**
  * @param {CanvasRenderingContext2D} context
- * @param {import("./infos.js").Point} point
- * @param {import("./infos.js").Point[]} points
+ * @param {import("./configs/infos.js").Point} point
+ * @param {import("./configs/infos.js").Point[]} points
  */
 const fillPolygon = (context, { x, y }, points) => {
   context.beginPath();
@@ -225,8 +225,8 @@ const fillPolygon = (context, { x, y }, points) => {
 
 /**
  * @param {CanvasRenderingContext2D} context
- * @param {import("./infos.js").Point} point
- * @param {import("./infos.js").Point[]} points
+ * @param {import("./configs/infos.js").Point} point
+ * @param {import("./configs/infos.js").Point[]} points
  * @param {boolean[]} [map]
  */
 const applyBorders = (context, { x, y }, points, map) => {
@@ -244,7 +244,7 @@ const applyBorders = (context, { x, y }, points, map) => {
 };
 
 /**
- * @param {import("./biomes").Color} color
+ * @param {import("./configs/biomes.js").Color} color
  * @param {number} modifier
  * @returns {string}
  */

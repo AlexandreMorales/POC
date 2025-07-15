@@ -1,6 +1,6 @@
-import { CONFIG, MAP_CONFIG } from "./configs.js";
-import { POLY_INFO, KNOWN_POLYGONS, MAP_INFO } from "./infos.js";
-import { BIOMES } from "./biomes.js";
+import { CONFIG, MAP_CONFIG, KNOWN_POLYGONS } from "./configs/configs.js";
+import { POLY_INFO, MAP_INFO } from "./configs/infos.js";
+import { BIOMES } from "./configs/biomes.js";
 import {
   tweakColor,
   isCellInverted,
@@ -8,19 +8,19 @@ import {
   correctRoundError,
 } from "./utils.js";
 
-export const GRID = /** @type {import("./infos.js").Cell[][]} */ ([]);
+export const GRID = /** @type {import("./configs/infos.js").Cell[][]} */ ([]);
 
 /**
  * @param {number} i
  * @param {number} j
  * @param {number} value
- * @param {import("./biomes.js").Biome} biome
- * @returns {import("./infos.js").Cell}
+ * @param {import("./configs/biomes.js").Biome} biome
+ * @returns {import("./configs/infos.js").Cell}
  */
 export const createCell = (i, j, value, biome) => {
   let cell = GRID[i][j];
   if (!cell) {
-    cell = /** @type {import("./infos.js").Cell} */ ({});
+    cell = /** @type {import("./configs/infos.js").Cell} */ ({});
 
     cell.pos = { i, j };
 
@@ -56,7 +56,7 @@ const getChunkStart = (i, j) => [
 /**
  * @param {number} i
  * @param {number} j
- * @param {import("./biomes.js").Biome} [biome]
+ * @param {import("./configs/biomes.js").Biome} [biome]
  */
 export const loadChunk = (i, j, biome) => {
   const [offsetI, offsetJ] = getChunkStart(i, j);
@@ -82,8 +82,8 @@ export const loadChunk = (i, j, biome) => {
 };
 
 /**
- * @param {import("./infos.js").Cell} cell
- * @param {import("./infos.js").CellBlock} wall
+ * @param {import("./configs/infos.js").Cell} cell
+ * @param {import("./configs/infos.js").CellBlock} wall
  */
 export const addWall = (cell, wall) => {
   cell.wall = wall?.value
@@ -180,9 +180,9 @@ const getPerlinGrid = (width, height, resolution) => {
 };
 
 /**
- * @param {import("./infos.js").CellPos} pos
+ * @param {import("./configs/infos.js").CellPos} pos
  * @param {boolean} isInverted
- * @returns {{ [k: number]: import("./infos.js").CellPos[] }}
+ * @returns {{ [k: number]: import("./configs/infos.js").CellPos[] }}
  */
 const getAdjacentPos = ({ i, j }, isInverted) => {
   return {
@@ -225,13 +225,13 @@ const getAdjacentPos = ({ i, j }, isInverted) => {
 };
 
 /**
- * @param {import("./infos.js").CellPos} pos
+ * @param {import("./configs/infos.js").CellPos} pos
  * @param {boolean} isInverted
- * @return {import("./infos.js").Point}
+ * @return {import("./configs/infos.js").Point}
  */
 export const calculatePointBasedOnPos = ({ i, j }, isInverted) => {
   const { calcX, calcY, ySide, shouldIntercalate } =
-    POLY_INFO[CONFIG.polySides];
+    POLY_INFO[MAP_INFO.currentPoly];
   i -= MAP_INFO.iOffset || 0;
   j -= MAP_INFO.jOffset || 0;
 
@@ -245,16 +245,16 @@ export const calculatePointBasedOnPos = ({ i, j }, isInverted) => {
 };
 
 /**
- * @param {import("./infos.js").Point} points
+ * @param {import("./configs/infos.js").Point} points
  * @param {boolean} isInverted
- * @return {import("./infos.js").Point}
+ * @return {import("./configs/infos.js").Point}
  */
 const applyRotation = ({ x, y }, isInverted) => {
   if (!MAP_INFO.rotationTurns) return { x, y };
 
-  const { cx, cy, ySide, xSide, hasInverted } = POLY_INFO[CONFIG.polySides];
+  const { cx, cy, ySide, xSide, hasInverted } = POLY_INFO[MAP_INFO.currentPoly];
 
-  const angle = (360 / CONFIG.polySides) * MAP_INFO.rotationTurns;
+  const angle = (360 / MAP_INFO.currentPoly) * MAP_INFO.rotationTurns;
   const radians = (Math.PI / 180) * angle;
   const cos = Math.cos(radians);
   const sin = Math.sin(radians);

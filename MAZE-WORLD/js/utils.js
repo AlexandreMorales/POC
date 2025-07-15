@@ -5,7 +5,7 @@
 export const getRandomInt = (max) => Math.floor(Math.random() * max);
 
 /**
- * @param {{ i: number, j: number }} param
+ * @param {import("./configs/infos").CellPos} param
  * @returns {boolean}
  */
 export const isCellInverted = ({ i, j }) => (i + j) % 2 !== 0;
@@ -19,8 +19,8 @@ export const correctRoundError = (num, estimation = 4) =>
   Math.round(num * 10 ** estimation) / 10 ** estimation;
 
 /**
- * @param {import("./biomes").Color} color
- * @returns {import("./biomes").Color}
+ * @param {import("./configs/biomes").Color} color
+ * @returns {import("./configs/biomes").Color}
  */
 export const tweakColor = ({ r, g, b }) => {
   const randSaturation = Math.random() * 0.1 + 0.95;

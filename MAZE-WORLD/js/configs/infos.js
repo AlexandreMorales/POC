@@ -1,3 +1,5 @@
+import { KNOWN_POLYGONS } from "./configs.js";
+
 /**
  * @typedef {Object} CellPos
  * @property {number} i
@@ -29,14 +31,6 @@
  * @typedef {CellBlock & CellProps} Cell
  */
 
-export const KNOWN_POLYGONS = {
-  TRIANGLE: 3,
-  SQUARE: 4,
-  HEXAGON: 6,
-};
-
-export const knownPolys = Object.values(KNOWN_POLYGONS);
-
 /**
  * @typedef {Object} Wall
  * @property {CellPos} pos
@@ -51,6 +45,7 @@ export const knownPolys = Object.values(KNOWN_POLYGONS);
 
 /**
  * @typedef {Object} MapInfo
+ * @property {number} currentPoly The number of sides of the current polygon
  * @property {Cell} currentCell
  * @property {number} selectedCellIndex Cell in which the player can interact
  * @property {CellBlock[]} pickedCells Cells that the play dug
@@ -60,6 +55,7 @@ export const knownPolys = Object.values(KNOWN_POLYGONS);
  * @property {number} timeOfDay
  */
 export const MAP_INFO = /** @type {MapInfo} */ ({
+  currentPoly: KNOWN_POLYGONS.HEXAGON,
   currentCell: null,
   selectedCellIndex: 0,
   pickedCells: [],

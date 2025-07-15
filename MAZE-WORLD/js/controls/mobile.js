@@ -1,6 +1,13 @@
-import { moveBaseOnCode, stopMoving } from "../actions.js";
-import { resetSize } from "../boot.js";
-import { CONFIG, MAP_CONFIG, MOVEMENT } from "../configs.js";
+import {
+  changePolySides,
+  dig,
+  moveBaseOnCode,
+  place,
+  rotate,
+  stopMoving,
+} from "../actions.js";
+import { resetSize } from "../start/boot.js";
+import { CONFIG, MAP_CONFIG, MOVEMENT } from "../configs/configs.js";
 
 let zoomDist = 0;
 let touchPos = { x: 0, y: 0, interval: null };
@@ -69,3 +76,9 @@ document.ontouchend = () => {
   stopMoving();
   zoomDist = 0;
 };
+
+document.getElementById("change-poly").onclick = changePolySides;
+document.getElementById("dig").onclick = dig;
+document.getElementById("place").onclick = place;
+document.getElementById("rotate-left").onclick = () => rotate(-1);
+document.getElementById("rotate-right").onclick = () => rotate(1);

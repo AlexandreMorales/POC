@@ -1,18 +1,18 @@
-import { CONFIG, MAP_CONFIG } from "./configs.js";
-import { MAP_INFO, POLY_INFO } from "./infos.js";
+import { MAP_CONFIG } from "./configs/configs.js";
+import { MAP_INFO, POLY_INFO } from "./configs/infos.js";
 import { GRID } from "./grid.js";
 import { drawEveryCell } from "./draw.js";
 
 /**
- * @param {import("./infos.js").Cell} cell
+ * @param {import("./configs/infos.js").Cell} cell
  * @returns {boolean}
  */
 export const cellIsBlocked = (cell) =>
   !cell || !!cell.wall || !cell.value || !cell.block || cell.block.isFluid;
 
 /**
- * @param {import("./infos.js").Cell} oldCell
- * @param {import("./infos.js").Cell} nextCell
+ * @param {import("./configs/infos.js").Cell} oldCell
+ * @param {import("./configs/infos.js").Cell} nextCell
  */
 export const moveCurrentCell = (oldCell, nextCell) => {
   MAP_INFO.iOffset += nextCell.pos.i - oldCell.pos.i;
@@ -22,7 +22,7 @@ export const moveCurrentCell = (oldCell, nextCell) => {
 
 let canMove = true;
 /**
- * @param {import("./infos.js").Cell} [nextCell]
+ * @param {import("./configs/infos.js").Cell} [nextCell]
  */
 export const move = (nextCell) => {
   if (canMove) {
@@ -49,10 +49,10 @@ const passTime = () => {
 };
 
 /**
- * @returns {import("./infos.js").Cell}
+ * @returns {import("./configs/infos.js").Cell}
  */
 export const getCenterCell = () => {
-  const { rows, columns } = POLY_INFO[CONFIG.polySides];
+  const { rows, columns } = POLY_INFO[MAP_INFO.currentPoly];
   const middleRow = Math.floor(rows / 2);
   const middleColumn = Math.floor(columns / 2);
 

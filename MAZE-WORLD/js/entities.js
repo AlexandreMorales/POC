@@ -1,6 +1,6 @@
-import { CONFIG, ENTITIES_CONFIG, MOVEMENT } from "./configs.js";
+import { ENTITIES_CONFIG, MOVEMENT } from "./configs/configs.js";
 import { GRID } from "./grid.js";
-import { MAP_INFO, POLY_INFO } from "./infos.js";
+import { MAP_INFO, POLY_INFO } from "./configs/infos.js";
 import { getMod } from "./utils.js";
 
 const playerImg = /** @type {HTMLImageElement} */ (
@@ -21,13 +21,13 @@ const RUNNING_IMG_MAP = {
   [MOVEMENT.RIGHT]: "images/player/right-walk.gif",
 };
 
-export const updateEntities = () => {
-  const { ySide, cx, cy } = POLY_INFO[CONFIG.polySides];
+export const resetEntities = () => {
+  const { ySide, cx, cy } = POLY_INFO[MAP_INFO.currentPoly];
   playerImg.style.height = playerImg.style.width = `${Math.round(
     ySide * ENTITIES_CONFIG.defaultSizeRatio
   )}px`;
   playerImg.style.top = `${cy - ySide * 2}px`;
-  playerImg.style.left = `${cx - ySide * 1.2}px`;
+  playerImg.style.left = `${cx - ySide * 1.25}px`;
 };
 
 /**
@@ -37,25 +37,39 @@ export const updatePlayerDirection = (direction) => {
   playerImg.src = MOVEMENT_IMG_MAP[direction];
 };
 
-export const verifyPlayerHeight = () => {
-  const { ySide, hasInverted } = POLY_INFO[CONFIG.polySides];
-  let downI = MAP_INFO.rotationTurns + Math.floor(CONFIG.polySides / 2);
+/**
+ * @param {symbol} direction
+ */
+export const startRunning = (direction) => {
+  playerImg.src = RUNNING_IMG_MAP[direction];
+};
 
-  if (hasInverted && MAP_INFO.currentCell.isInverted)
-    downI = MAP_INFO.rotationTurns;
+export const verifyEntitiesHeight = () => {
+  verifyEntityHeight(playerImg, MAP_INFO.currentCell);
+};
 
-  downI = getMod(downI, CONFIG.polySides);
-  const downPos = MAP_INFO.currentCell.adjacentPos[CONFIG.polySides][downI];
+/**
+ * @param {HTMLImageElement} entityImage
+ * @param {import("./configs/infos.js").Cell} cell
+ */
+const verifyEntityHeight = (entityImage, cell) => {
+  const { ySide, hasInverted } = POLY_INFO[MAP_INFO.currentPoly];
+  let downI = MAP_INFO.rotationTurns + Math.floor(MAP_INFO.currentPoly / 2);
+
+  if (hasInverted && cell.isInverted) downI = MAP_INFO.rotationTurns;
+
+  downI = getMod(downI, MAP_INFO.currentPoly);
+  const downPos = cell.adjacentPos[MAP_INFO.currentPoly][downI];
   const downCell = GRID[downPos.i]?.[downPos.j];
 
   let height = ySide * ENTITIES_CONFIG.defaultSizeRatio;
   playerImg.style.clipPath = null;
-  if (hasInverted && !MAP_INFO.currentCell.isInverted) {
+  if (hasInverted && !cell.isInverted) {
     const rightCell = downCell;
 
-    let leftI = MAP_INFO.rotationTurns + CONFIG.polySides - 1;
-    leftI = getMod(leftI, CONFIG.polySides);
-    const leftPos = MAP_INFO.currentCell.adjacentPos[CONFIG.polySides][leftI];
+    let leftI = MAP_INFO.rotationTurns + MAP_INFO.currentPoly - 1;
+    leftI = getMod(leftI, MAP_INFO.currentPoly);
+    const leftPos = cell.adjacentPos[MAP_INFO.currentPoly][leftI];
     const leftCell = GRID[leftPos.i]?.[leftPos.j];
 
     let clipPath = null;
@@ -68,17 +82,10 @@ export const verifyPlayerHeight = () => {
       clipPath = ENTITIES_CONFIG.notInvertedLeftClipPath;
     }
 
-    playerImg.style.clipPath = clipPath;
+    entityImage.style.clipPath = clipPath;
   } else if (downCell.wall) {
     height = ySide * ENTITIES_CONFIG.wallSizeRatio;
   }
 
-  playerImg.style.height = `${Math.round(height)}px`;
-};
-
-/**
- * @param {symbol} direction
- */
-export const startRunning = (direction) => {
-  playerImg.src = RUNNING_IMG_MAP[direction];
+  entityImage.style.height = `${Math.round(height)}px`;
 };

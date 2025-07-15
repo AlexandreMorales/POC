@@ -1,4 +1,4 @@
-import { CONFIG, MOVEMENT } from "../configs.js";
+import { CONFIG, MOVEMENT } from "../configs/configs.js";
 import {
   changePolySides,
   changeSelectedOnCode,
@@ -8,7 +8,7 @@ import {
   place,
   stopMoving,
 } from "../actions.js";
-import { resetSize } from "../boot.js";
+import { resetSize } from "../start/boot.js";
 import { move } from "../movement.js";
 
 const KEY_MOVEMENT_MAP = {
@@ -27,8 +27,6 @@ const MOVEMENT_KEYS = Object.keys(KEY_MOVEMENT_MAP);
 
 document.onkeydown = (e) => {
   e = e || /** @type {KeyboardEvent} */ (window.event);
-
-  console.log(e.code);
 
   if (e.code.startsWith("Arrow"))
     return moveBaseOnCode(ARROW_MOVEMENT_MAP[e.code]);
@@ -61,9 +59,3 @@ heightSlider.oninput = () => {
   resetSize(+heightSlider.value);
   heightSlider.blur();
 };
-
-document.getElementById("change-poly").onclick = changePolySides;
-document.getElementById("dig").onclick = dig;
-document.getElementById("place").onclick = place;
-document.getElementById("rotate-left").onclick = () => rotate(-1);
-document.getElementById("rotate-right").onclick = () => rotate(1);
