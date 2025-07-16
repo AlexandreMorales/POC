@@ -17,6 +17,7 @@ import { KNOWN_POLYGONS } from "./configs.js";
  * @property {number} value
  * @property {import("./biomes").Block} block
  * @property {import("./biomes").Color} color
+ * @property {number} layer
  */
 
 /**

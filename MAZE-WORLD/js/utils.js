@@ -34,6 +34,15 @@ export const tweakColor = ({ r, g, b }) => {
 };
 
 /**
+ * @param {import("./configs/biomes.js").Color} color
+ * @param {number} modifier
+ * @returns {string}
+ */
+export const colorToRGB = ({ r, g, b }, modifier = 1) => {
+  return `rgb(${r * modifier}, ${g * modifier}, ${b * modifier})`;
+};
+
+/**
  * @param {number} number
  * @param {number} mod
  * @returns {number}

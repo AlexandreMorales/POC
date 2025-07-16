@@ -5,7 +5,7 @@ import {
   MOVEMENT_VALUES,
 } from "./configs/configs.js";
 import { MAP_INFO, POLY_INFO } from "./configs/infos.js";
-import { GRID, addWall } from "./grid.js";
+import { GRID } from "./grid.js";
 import { resetCanvasSize, drawEveryCell } from "./draw.js";
 import { getMod } from "./utils.js";
 import {
@@ -186,22 +186,17 @@ export const dig = () => {
   updatePlayerDirection(lastSelection);
   const selectedCell = getSelectedCell();
 
-  if (
-    !selectedCell ||
-    !selectedCell.value ||
-    !selectedCell.block ||
-    selectedCell.block.isFluid
-  )
-    return;
+  if (!selectedCell?.value || selectedCell.layer < 0) return;
 
   MAP_INFO.pickedCells.push({ ...(selectedCell.wall || selectedCell) });
 
   if (selectedCell.wall) {
-    addWall(selectedCell, null);
+    selectedCell.wall = null;
   } else {
     selectedCell.value = null;
     selectedCell.block = null;
     selectedCell.color = null;
+    selectedCell.layer -= 1;
   }
 
   move();
@@ -217,12 +212,18 @@ export const place = () => {
 
   const nextBlock = MAP_INFO.pickedCells.pop();
 
-  if (selectedCell.value && selectedCell.block && !selectedCell.block.isFluid) {
-    addWall(selectedCell, nextBlock);
+  if (selectedCell.value && selectedCell.layer === 0) {
+    selectedCell.wall = {
+      block: nextBlock.block,
+      color: nextBlock.color,
+      value: nextBlock.value,
+      layer: selectedCell.layer + 1,
+    };
   } else {
     selectedCell.value = nextBlock.value;
     selectedCell.block = nextBlock.block;
     selectedCell.color = nextBlock.color;
+    selectedCell.layer += 1;
   }
 
   move();

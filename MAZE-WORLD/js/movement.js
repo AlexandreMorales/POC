@@ -8,7 +8,7 @@ import { drawEveryCell } from "./draw.js";
  * @returns {boolean}
  */
 export const cellIsBlocked = (cell) =>
-  !cell || !!cell.wall || !cell.value || !cell.block || cell.block.isFluid;
+  !cell || !cell.value || !cell.block || cell.layer !== 0 || !!cell.wall;
 
 /**
  * @param {import("./configs/infos.js").Cell} oldCell

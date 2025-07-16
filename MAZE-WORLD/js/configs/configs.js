@@ -13,6 +13,8 @@ export const CONFIG = {
 
   minZoom: 10,
   maxZoom: 120,
+
+  maxLayer: 3,
 };
 
 export const MAP_CONFIG = {
@@ -27,6 +29,7 @@ export const MAP_CONFIG = {
 export const CANVAS_CONFIG = {
   showPos: false,
   strokeColor: "black",
+  emptyColor: "black",
   lineWidth: 1,
   wallDarkness: 0.5,
 };

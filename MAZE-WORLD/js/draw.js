@@ -1,18 +1,22 @@
 import { POLY_INFO, MAP_INFO } from "./configs/infos.js";
 import { CONFIG, CANVAS_CONFIG } from "./configs/configs.js";
 import { GRID, calculatePointBasedOnPos, loadChunk } from "./grid.js";
-import { getMod, tweakColor } from "./utils.js";
+import { colorToRGB, getMod, tweakColor } from "./utils.js";
 import { verifyEntitiesHeight } from "./entities.js";
 
 const container = document.getElementById("draw-container");
-const canvasGround = /** @type {HTMLCanvasElement} */ (
-  document.getElementById("canvas-ground")
-);
-const canvasWall = /** @type {HTMLCanvasElement} */ (
-  document.getElementById("canvas-wall")
-);
-const contextGround = canvasGround.getContext("2d");
-const contextWall = canvasWall.getContext("2d");
+const canvasContainer = document.getElementById("canvas-container");
+
+const canvasList = /** @type {HTMLCanvasElement[]} */ ([]);
+const contexts = /** @type {CanvasRenderingContext2D[]} */ ([]);
+
+for (let i = 0; i < CONFIG.maxLayer; i++) {
+  const canvas = document.createElement("canvas");
+  canvas.style.zIndex = `${i}`;
+  canvasContainer.appendChild(canvas);
+  canvasList.push(canvas);
+  contexts.push(canvas.getContext("2d"));
+}
 
 /**
  * @param {number} height
@@ -21,11 +25,11 @@ const contextWall = canvasWall.getContext("2d");
 export const setCanvasSize = (height, width) => {
   if (height) {
     container.style.height = `${height}px`;
-    canvasGround.height = canvasWall.height = height;
+    canvasList.forEach((canvas) => (canvas.height = height));
   }
   if (width) {
     container.style.width = `${width}px`;
-    canvasGround.width = canvasWall.width = width;
+    canvasList.forEach((canvas) => (canvas.width = width));
   }
 };
 
@@ -34,13 +38,13 @@ export const resetCanvasSize = () => {
   setCanvasSize(polyInfo.canvasHeight, polyInfo.canvasWidth);
 };
 
-const resetWallCanvas = () => {
-  canvasWall.width = POLY_INFO[MAP_INFO.currentPoly].canvasWidth;
-};
-
-let walls = /** @type {import("./configs/infos.js").Wall[]} */ ([]);
+let wallLayers = /** @type {import("./configs/infos.js").Wall[][]} */ ([]);
+let filledThisRound = /** @type {Set<import("./configs/infos.js").CellPos>} */ (
+  new Set()
+);
 export const drawEveryCell = () => {
-  walls = [];
+  wallLayers = [];
+  filledThisRound = new Set();
 
   const offsetCell = MAP_INFO.currentCell.pos.j % 2;
   const { rows, columns, shouldIntercalate } = POLY_INFO[MAP_INFO.currentPoly];
@@ -56,7 +60,7 @@ export const drawEveryCell = () => {
 
       if (!GRID[nI]?.[nJ]) loadChunk(nI, nJ);
 
-      drawCell(GRID[nI][nJ]);
+      drawCell(GRID[nI][nJ], contexts[0]);
     }
   }
 
@@ -65,54 +69,56 @@ export const drawEveryCell = () => {
 };
 
 const drawWalls = () => {
-  resetWallCanvas();
-  walls.forEach(drawWall);
-  walls.forEach(drawWallTop);
-  walls = [];
+  for (let i = 0; i < wallLayers.length; i++) {
+    const canvas = canvasList[i];
+    const context = contexts[i];
+    const walls = wallLayers[i];
+    if (!walls || !canvas || !context) continue;
+    // reset canvas
+    canvas.width = POLY_INFO[MAP_INFO.currentPoly].canvasWidth;
+    walls.forEach((w) => drawWall(w, context));
+    walls.forEach((w) => drawWallTop(w, context));
+  }
+  wallLayers = [];
 };
 
 /**
  * @param {import("./configs/infos.js").Wall} wall
+ * @param {CanvasRenderingContext2D} context
  */
-const drawWall = (wall) => {
+const drawWall = (wall, context) => {
   // Only draw if there is a gap, if is sorrounded by walls it doesnt need
   if (wall.borderMap.find((b) => !!b)) {
-    contextWall.fillStyle = colorToRGB(wall.color, CANVAS_CONFIG.wallDarkness);
-    fillPolygon(contextWall, wall.point, wall.points);
-    applyDark(contextWall, wall.point, wall.points);
+    context.fillStyle = colorToRGB(wall.color, CANVAS_CONFIG.wallDarkness);
+    fillPolygon(context, wall.point, wall.points);
+    applyDark(context, wall.point, wall.points);
   }
 };
 
 /**
  * @param {import("./configs/infos.js").Wall} wall
+ * @param {CanvasRenderingContext2D} context
  */
-const drawWallTop = (wall) => {
-  contextWall.fillStyle = colorToRGB(wall.color);
-  fillPolygon(contextWall, wall.topPoint, wall.topPoints);
-  contextWall.strokeStyle = CANVAS_CONFIG.strokeColor;
-  contextWall.lineWidth = CANVAS_CONFIG.lineWidth;
-  applyBorders(contextWall, wall.topPoint, wall.topPoints, wall.borderMap);
-  applyDark(contextWall, wall.topPoint, wall.topPoints);
+const drawWallTop = (wall, context) => {
+  context.fillStyle = colorToRGB(wall.color);
+  fillPolygon(context, wall.topPoint, wall.topPoints);
+  context.strokeStyle = CANVAS_CONFIG.strokeColor;
+  context.lineWidth = CANVAS_CONFIG.lineWidth;
+  applyBorders(context, wall.topPoint, wall.topPoints, wall.borderMap);
+  applyDark(context, wall.topPoint, wall.topPoints);
 
   if (CANVAS_CONFIG.showPos) {
     const polyInfo = POLY_INFO[MAP_INFO.currentPoly];
     const isInverted = polyInfo.hasInverted && wall.isInverted;
-    contextWall.fillStyle = "black";
-    contextWall.font = `bold ${CONFIG.cellHeight / 5}px Arial`;
-    contextWall.textAlign = "center";
-    contextWall.textBaseline = "middle";
-    contextWall.fillText(
-      `${wall.pos.i},${wall.pos.j}`,
-      wall.topPoint.x,
-      isInverted ? wall.topPoint.y + polyInfo.ySide / 2 : wall.topPoint.y
-    );
+    showPos(context, wall.pos, wall.topPoint, isInverted, polyInfo);
   }
 };
 
 /**
  * @param {import("./configs/infos.js").Cell} cell
+ * @param {CanvasRenderingContext2D} context
  */
-const drawCell = (cell) => {
+const drawCell = (cell, context) => {
   const polyInfo = POLY_INFO[MAP_INFO.currentPoly];
   const isInverted = polyInfo.hasInverted && cell.isInverted;
 
@@ -131,42 +137,28 @@ const drawCell = (cell) => {
     ({ i, j }) => GRID[i]?.[j]
   );
 
-  // Near fluid cells should take over
-  if (!cell.value) {
-    const aFluid = aCells.find((c) => c?.block?.isFluid);
-    if (aFluid) {
-      cell.value = aFluid.value;
-      cell.block = aFluid.block;
-      cell.color = aFluid.color;
-    }
-  }
-
-  if (cell.value) {
-    const color = cell.block.isFluid ? tweakColor(cell.color) : cell.color;
-    contextGround.fillStyle = colorToRGB(color);
-  } else {
-    contextGround.fillStyle = "black";
-  }
-
   if (cell.wall) {
     const wallPoints = isInverted
       ? polyInfo.wallInvertedPoints
       : polyInfo.wallPoints;
+    const { layer } = cell.wall;
 
     const shouldOffset = polyInfo.hasInverted && !cell.isInverted;
 
-    walls.push({
+    if (!wallLayers[layer]) wallLayers[layer] = [];
+
+    wallLayers[layer].push({
       color: cell.wall.color,
       pos: cell.pos,
       isInverted: cell.isInverted,
-      point,
-      topPoint: { x: point.x, y: point.y - polyInfo.ySide },
+      point: { x: point.x, y: point.y - polyInfo.ySide * (layer - 1) },
+      topPoint: { x: point.x, y: point.y - polyInfo.ySide * layer },
       points: wallPoints,
       topPoints: points,
       borderMap: aCells.reduce((acc, c, i) => {
         let index = i - MAP_INFO.rotationTurns;
         if (shouldOffset) index = MAP_INFO.currentPoly - 1 - index;
-        acc[getMod(index, MAP_INFO.currentPoly)] = !c.wall;
+        acc[getMod(index, MAP_INFO.currentPoly)] = c.wall?.layer !== layer;
         return acc;
       }, []),
     });
@@ -174,26 +166,32 @@ const drawCell = (cell) => {
     return;
   }
 
-  fillPolygon(contextGround, point, points);
-
-  if (CANVAS_CONFIG.showPos) {
-    contextGround.fillStyle = "black";
-    contextGround.font = `bold ${CONFIG.cellHeight / 5}px Arial`;
-    contextGround.textAlign = "center";
-    contextGround.textBaseline = "middle";
-    contextGround.fillText(
-      `${cell.pos.i},${cell.pos.j}`,
-      point.x,
-      isInverted ? point.y + polyInfo.ySide / 2 : point.y
-    );
+  // Near fluid cells should take over
+  if (!cell.value) {
+    const aFluid = aCells.find((c) => c?.block?.isFluid);
+    if (aFluid && !filledThisRound.has(aFluid.pos)) {
+      filledThisRound.add(cell.pos);
+      cell.value = aFluid.value;
+      cell.block = aFluid.block;
+      cell.color = aFluid.color;
+    }
   }
+
+  context.fillStyle = cell.value
+    ? colorToRGB(cell.block.isFluid ? tweakColor(cell.color) : cell.color)
+    : CANVAS_CONFIG.emptyColor;
+
+  fillPolygon(context, point, points);
 
   if (
     cell.value &&
     cell !== MAP_INFO.currentCell &&
     aCells.every((c) => c !== MAP_INFO.currentCell)
   )
-    applyDark(contextGround, point, points);
+    applyDark(context, point, points);
+
+  if (CANVAS_CONFIG.showPos)
+    showPos(context, cell.pos, point, isInverted, polyInfo);
 };
 
 /**
@@ -244,10 +242,20 @@ const applyBorders = (context, { x, y }, points, map) => {
 };
 
 /**
- * @param {import("./configs/biomes.js").Color} color
- * @param {number} modifier
- * @returns {string}
+ * @param {CanvasRenderingContext2D} context
+ * @param {import("./configs/infos.js").CellPos} pos
+ * @param {import("./configs/infos.js").Point} point
+ * @param {boolean} isInverted
+ * @param {import("./configs/infos.js").PolyInfoProp} polyInfo
  */
-const colorToRGB = ({ r, g, b }, modifier = 1) => {
-  return `rgb(${r * modifier}, ${g * modifier}, ${b * modifier})`;
+const showPos = (context, pos, point, isInverted, polyInfo) => {
+  context.fillStyle = "black";
+  context.font = `bold ${CONFIG.cellHeight / 5}px Arial`;
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.fillText(
+    `${pos.i},${pos.j}`,
+    point.x,
+    isInverted ? point.y + polyInfo.ySide / 2 : point.y
+  );
 };
