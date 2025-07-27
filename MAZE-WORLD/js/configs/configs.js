@@ -17,7 +17,7 @@ export const CONFIG = {
   chunkColumns: 100,
   cellHeight: 24,
 
-  minZoom: 5,
+  minZoom: 10,
   maxZoom: 120,
 
   maxLayer: 2,
@@ -27,6 +27,7 @@ export const MAP_CONFIG = {
   passHour: 0.5,
   midNightHour: 70,
   velocity: 25,
+  rotateDelay: 500,
   noiseResolutionBiome: 75,
   noiseResolution: 20,
   mapGeneration: MAP_GENERATION.DISTANCE,

@@ -1,5 +1,5 @@
 import { POLY_INFO, MAP_INFO } from "./configs/infos.js";
-import { CONFIG, CANVAS_CONFIG } from "./configs/configs.js";
+import { CONFIG, CANVAS_CONFIG, MAP_CONFIG } from "./configs/configs.js";
 import { GRID, calculatePointBasedOnPos, getGridCell } from "./grid.js";
 import { colorToRGB, getMod, tweakColor } from "./utils.js";
 import { verifyEntitiesHeight } from "./entities.js";
@@ -278,11 +278,20 @@ const showChunks = (context, pos, point, points) => {
  * @param {number} deg
  */
 export const rotateCanvas = (deg) => {
+  const urls = [];
+  const transitionDuration = `${
+    MAP_CONFIG.rotateDelay + 6000 / CONFIG.cellHeight
+  }ms`;
+  const transitionProperty = "transform";
+  const transform = `rotate(${deg}deg)`;
+
   for (let i = 0; i < CONFIG.maxLayer; i++) {
-    canvasList[i].style.transitionDuration = "0.75s";
-    canvasList[i].style.transitionProperty = "transform";
-    canvasList[i].style.transform = `rotate(${deg}deg)`;
+    canvasList[i].style.transitionDuration = transitionDuration;
+    canvasList[i].style.transitionProperty = transitionProperty;
+    canvasList[i].style.transform = transform;
+    urls.push(`url(${canvasList[i].toDataURL()})`);
   }
+  container.style.background = urls.join(", ");
 };
 
 export const resetRotateCanvas = () => {
@@ -291,4 +300,5 @@ export const resetRotateCanvas = () => {
     canvasList[i].style.transitionProperty = null;
     canvasList[i].style.transform = null;
   }
+  container.style.background = null;
 };

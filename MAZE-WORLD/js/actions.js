@@ -3,6 +3,7 @@ import {
   KNOWN_POLYGONS_VALUES,
   MOVEMENT_VALUES,
   CANVAS_CONFIG,
+  MAP_CONFIG,
 } from "./configs/configs.js";
 import { MAP_INFO, POLY_INFO } from "./configs/infos.js";
 import { GRID, getCenterCell } from "./grid.js";
@@ -41,7 +42,7 @@ export const rotate = (orientation) => {
       if (CANVAS_CONFIG.rotationAnimation) resetRotateCanvas();
       drawEveryCell();
       canRotate = true;
-    }, 500);
+    }, MAP_CONFIG.rotateDelay);
   }
 };
 
