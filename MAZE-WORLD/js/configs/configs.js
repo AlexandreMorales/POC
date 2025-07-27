@@ -12,6 +12,7 @@ export const MAP_GENERATION = {
 };
 
 export const CONFIG = {
+  debugMode: true,
   chunkRows: 100,
   chunkColumns: 100,
   cellHeight: 24,

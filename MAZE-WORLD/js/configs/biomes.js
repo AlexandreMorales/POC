@@ -58,7 +58,7 @@ const hexToRgb = (hexColor) => {
  */
 const addPropsToBlock = (block, props) => ({ ...block, ...props });
 
-const blocks = /** @type {{ [k: string]: BlockEntity }} */ ({
+export const BLOCKS = /** @type {{ [k: string]: BlockEntity }} */ ({
   DEEP_WATER: addRgbToBlock({ color: "#256299", layer: -1, isFluid: true }),
   MEDIUM_WATER: addRgbToBlock({ color: "#2375b4", layer: -1, isFluid: true }),
   SEA_SHORE: addRgbToBlock({ color: "#4699de", layer: -1, isFluid: true }),
@@ -74,29 +74,29 @@ const BIOMES_RAW = /** @type {{ [k: string]: Biome }} */ ({
   FOREST: {
     maxValue: 0,
     maxDistance: 100,
-    higherGroundBlock: blocks.MID_GRASS,
+    higherGroundBlock: BLOCKS.MID_GRASS,
     ranges: [
-      addPropsToBlock(blocks.MEDIUM_WATER, { max: -0.5 }),
-      addPropsToBlock(blocks.SEA_SHORE, { max: -0.4 }),
-      addPropsToBlock(blocks.LOW_GRASS, { max: -0.2 }),
-      addPropsToBlock(blocks.MID_GRASS, { max: 0.4 }),
-      addPropsToBlock(blocks.HIGH_GRASS, { max: 0.5 }),
-      addPropsToBlock(blocks.DIRT, { max: 0.7 }),
-      addPropsToBlock(blocks.ROCK, { max: 1 }),
+      addPropsToBlock(BLOCKS.MEDIUM_WATER, { max: -0.5 }),
+      addPropsToBlock(BLOCKS.SEA_SHORE, { max: -0.4 }),
+      addPropsToBlock(BLOCKS.LOW_GRASS, { max: -0.2 }),
+      addPropsToBlock(BLOCKS.MID_GRASS, { max: 0.4 }),
+      addPropsToBlock(BLOCKS.HIGH_GRASS, { max: 0.5 }),
+      addPropsToBlock(BLOCKS.DIRT, { max: 0.7 }),
+      addPropsToBlock(BLOCKS.ROCK, { max: 1 }),
     ],
   },
   OCEAN: {
     maxValue: Infinity,
     maxDistance: Infinity,
-    higherGroundBlock: blocks.MID_GRASS,
+    higherGroundBlock: BLOCKS.MID_GRASS,
     ranges: [
-      addPropsToBlock(blocks.DEEP_WATER, { max: -0.1 }),
-      addPropsToBlock(blocks.MEDIUM_WATER, { max: 0.1 }),
-      addPropsToBlock(blocks.SEA_SHORE, { max: 0.2 }),
-      addPropsToBlock(blocks.BEACH_SAND, { max: 0.35 }),
-      addPropsToBlock(blocks.LOW_GRASS, { max: 0.4 }),
-      addPropsToBlock(blocks.HIGH_GRASS, { max: 0.5 }),
-      addPropsToBlock(blocks.DIRT, { max: 1 }),
+      addPropsToBlock(BLOCKS.DEEP_WATER, { max: -0.1 }),
+      addPropsToBlock(BLOCKS.MEDIUM_WATER, { max: 0.1 }),
+      addPropsToBlock(BLOCKS.SEA_SHORE, { max: 0.2 }),
+      addPropsToBlock(BLOCKS.BEACH_SAND, { max: 0.35 }),
+      addPropsToBlock(BLOCKS.LOW_GRASS, { max: 0.4 }),
+      addPropsToBlock(BLOCKS.HIGH_GRASS, { max: 0.5 }),
+      addPropsToBlock(BLOCKS.DIRT, { max: 1 }),
     ],
   },
 });

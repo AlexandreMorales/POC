@@ -67,13 +67,13 @@ export const drawEveryCell = () => {
 };
 
 const drawWalls = () => {
-  for (let i = 0; i < wallLayers.length; i++) {
+  for (let i = 1; i < CONFIG.maxLayer; i++) {
     const canvas = canvasList[i];
     const context = contexts[i];
     const walls = wallLayers[i];
-    if (!walls || !canvas || !context) continue;
     // reset canvas
     canvas.width = POLY_INFO[MAP_INFO.currentPoly].canvasWidth;
+    if (!walls || !canvas || !context) continue;
     walls.forEach((w) => drawWall(w, context));
     walls.forEach((w) => drawWallTop(w, context));
   }
