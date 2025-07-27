@@ -5,7 +5,7 @@ import {
   MOVEMENT_VALUES,
 } from "./configs/configs.js";
 import { MAP_INFO, POLY_INFO } from "./configs/infos.js";
-import { GRID } from "./grid.js";
+import { GRID, getCenterCell } from "./grid.js";
 import { resetCanvasSize, drawEveryCell } from "./draw.js";
 import { getMod } from "./utils.js";
 import {
@@ -13,12 +13,7 @@ import {
   resetEntities,
   updatePlayerDirection,
 } from "./entities.js";
-import {
-  cellIsBlocked,
-  getCenterCell,
-  move,
-  moveCurrentCell,
-} from "./movement.js";
+import { cellIsBlocked, move, moveCurrentCell } from "./movement.js";
 
 let canRotate = true;
 /**
@@ -154,12 +149,10 @@ export const changePolySides = () => {
   MAP_INFO.rotationTurns = 0;
   MAP_INFO.selectedCellIndex = 0;
 
-  const centerCell = getCenterCell();
   resetDirection();
   resetEntities();
   resetCanvasSize();
-  moveCurrentCell(centerCell, MAP_INFO.currentCell);
-  drawEveryCell();
+  moveCurrentCell(getCenterCell(), MAP_INFO.currentCell);
   drawEveryCell();
 };
 

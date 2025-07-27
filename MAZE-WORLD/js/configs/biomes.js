@@ -25,6 +25,8 @@
 /**
  * @typedef {Object} Biome
  * @property {Block[]} ranges
+ * @property {number} maxDistance The max distance from 0,0 for this biome to appear
+ * @property {number} maxValue The max value from perlin noise for this biome to appear
  * @property {BlockEntity} higherGroundBlock
  */
 
@@ -68,8 +70,10 @@ const blocks = /** @type {{ [k: string]: BlockEntity }} */ ({
   ROCK: addRgbToBlock({ color: "#CBC0BB", layer: 1 }),
 });
 
-export const BIOMES = /** @type {{ [k: string]: Biome }} */ ({
+const BIOMES_RAW = /** @type {{ [k: string]: Biome }} */ ({
   FOREST: {
+    maxValue: 0,
+    maxDistance: 100,
     higherGroundBlock: blocks.MID_GRASS,
     ranges: [
       addPropsToBlock(blocks.MEDIUM_WATER, { max: -0.5 }),
@@ -82,6 +86,8 @@ export const BIOMES = /** @type {{ [k: string]: Biome }} */ ({
     ],
   },
   OCEAN: {
+    maxValue: Infinity,
+    maxDistance: Infinity,
     higherGroundBlock: blocks.MID_GRASS,
     ranges: [
       addPropsToBlock(blocks.DEEP_WATER, { max: -0.1 }),
@@ -94,3 +100,5 @@ export const BIOMES = /** @type {{ [k: string]: Biome }} */ ({
     ],
   },
 });
+
+export const BIOMES = /** @type {Biome[]} */ (Object.values(BIOMES_RAW));

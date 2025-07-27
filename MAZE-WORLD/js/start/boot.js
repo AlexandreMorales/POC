@@ -6,9 +6,9 @@ import {
 } from "../configs/configs.js";
 import { resetCanvasSize, drawEveryCell, setCanvasSize } from "../draw.js";
 import { resetEntities } from "../entities.js";
-import { GRID } from "../grid.js";
+import { getGridCell, getCenterCell } from "../grid.js";
 import { MAP_INFO, POLY_INFO } from "../configs/infos.js";
-import { getCenterCell, cellIsBlocked, moveCurrentCell } from "../movement.js";
+import { cellIsBlocked, moveCurrentCell } from "../movement.js";
 import { correctRoundError, debounce } from "../utils.js";
 
 const configPolys = () => {
@@ -183,11 +183,11 @@ export const start = () => {
   resetCanvasSize();
   resetDirection();
 
-  MAP_INFO.currentCell = getCenterCell();
+  moveCurrentCell(getCenterCell(), getGridCell(0, 0));
   while (cellIsBlocked(MAP_INFO.currentCell)) {
     moveCurrentCell(
       MAP_INFO.currentCell,
-      GRID[MAP_INFO.currentCell.pos.i + 1][MAP_INFO.currentCell.pos.j]
+      getGridCell(MAP_INFO.currentCell.pos.i + 1, MAP_INFO.currentCell.pos.j)
     );
   }
   drawEveryCell();

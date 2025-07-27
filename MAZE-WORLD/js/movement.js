@@ -1,6 +1,5 @@
 import { MAP_CONFIG } from "./configs/configs.js";
-import { MAP_INFO, POLY_INFO } from "./configs/infos.js";
-import { GRID, loadChunk } from "./grid.js";
+import { MAP_INFO } from "./configs/infos.js";
 import { drawEveryCell } from "./draw.js";
 
 /**
@@ -11,12 +10,20 @@ export const cellIsBlocked = (cell) =>
   !cell || !cell.value || !cell.block || cell.layer !== 0 || !!cell.wall;
 
 /**
+ * @param {import("./configs/infos.js").CellPos} pos
+ * @returns {import("./configs/infos.js").CellPos}
+ */
+const getCleanCellPos = (pos) => ({ i: pos?.i || 0, j: pos?.j || 0 });
+
+/**
  * @param {import("./configs/infos.js").Cell} oldCell
  * @param {import("./configs/infos.js").Cell} nextCell
  */
 export const moveCurrentCell = (oldCell, nextCell) => {
-  MAP_INFO.iOffset += nextCell.pos.i - oldCell.pos.i;
-  MAP_INFO.jOffset += nextCell.pos.j - oldCell.pos.j;
+  const oldPos = getCleanCellPos(oldCell?.pos);
+  const nextPos = getCleanCellPos(nextCell?.pos);
+  MAP_INFO.iOffset += nextPos.i - oldPos.i;
+  MAP_INFO.jOffset += nextPos.j - oldPos.j;
   MAP_INFO.currentCell = nextCell;
 };
 
@@ -46,19 +53,4 @@ const passTime = () => {
   ) {
     MAP_CONFIG.passHour = -MAP_CONFIG.passHour;
   }
-};
-
-/**
- * @returns {import("./configs/infos.js").Cell}
- */
-export const getCenterCell = () => {
-  const { rows, columns } = POLY_INFO[MAP_INFO.currentPoly];
-  const middleRow = Math.floor(rows / 2);
-  const middleColumn = Math.floor(columns / 2);
-  const i = middleRow + MAP_INFO.iOffset;
-  const j = middleColumn + MAP_INFO.jOffset;
-
-  if (!GRID[i]?.[j]) loadChunk(i, j);
-
-  return GRID[i][j];
 };

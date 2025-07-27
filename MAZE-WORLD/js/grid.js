@@ -1,4 +1,9 @@
-import { CONFIG, KNOWN_POLYGONS } from "./configs/configs.js";
+import {
+  CONFIG,
+  KNOWN_POLYGONS,
+  MAP_CONFIG,
+  MAP_GENERATION,
+} from "./configs/configs.js";
 import { POLY_INFO, MAP_INFO } from "./configs/infos.js";
 import { BIOMES } from "./configs/biomes.js";
 import {
@@ -19,7 +24,7 @@ export const GRID = /** @type {import("./configs/infos.js").Cell[][]} */ ([]);
  * @returns {import("./configs/infos.js").Cell}
  */
 const createCell = (i, j, value, block) => {
-  let cell = GRID[i][j];
+  let cell = GRID[i]?.[j];
   if (!cell) {
     cell = /** @type {import("./configs/infos.js").Cell} */ ({});
 
@@ -49,11 +54,13 @@ const getChunkStart = (i, j) => [
 ];
 
 /**
- * @param {number} i
- * @param {number} j
+ * @param {number} initialI
+ * @param {number} initialJ
  */
-export const loadChunk = (i, j) => {
-  const [offsetI, offsetJ] = getChunkStart(i, j);
+export const loadChunk = (initialI, initialJ) => {
+  const [offsetI, offsetJ] = getChunkStart(initialI, initialJ);
+
+  const { mapGeneration } = MAP_CONFIG;
 
   for (let i = 0; i < CONFIG.chunkRows; i++) {
     const nI = i + offsetI;
@@ -61,8 +68,18 @@ export const loadChunk = (i, j) => {
     for (let j = 0; j < CONFIG.chunkColumns; j++) {
       const nJ = j + offsetJ;
 
-      const biome =
-        getValue(nI, nJ, VECTORS.BIOME) > 0 ? BIOMES.FOREST : BIOMES.OCEAN;
+      let biome = /** @type {import("./configs/biomes.js").Biome} */ (null);
+      switch (mapGeneration) {
+        case MAP_GENERATION.MIX:
+          const biomeValue = getValue(nI, nJ, VECTORS.BIOME);
+          biome = BIOMES.find((b) => biomeValue <= b.maxValue);
+          break;
+        default:
+        case MAP_GENERATION.DISTANCE:
+          const distance = Math.sqrt(nI ** 2 + nJ ** 2);
+          biome = BIOMES.find((b) => distance <= b.maxDistance);
+          break;
+      }
 
       const value = getValue(nI, nJ, VECTORS.BLOCK);
       const originalBlock = biome.ranges.find((r) => value <= r.max);
@@ -172,4 +189,27 @@ const applyRotation = ({ x, y }, isInverted) => {
   }
 
   return { x: nx, y: ny };
+};
+
+/**
+ * @param {number} i
+ * @param {number} j
+ * @returns {import("./configs/infos.js").Cell}
+ */
+export const getGridCell = (i, j) => {
+  if (!GRID[i]?.[j]) loadChunk(i, j);
+  return GRID[i][j];
+};
+
+/**
+ * @returns {import("./configs/infos.js").Cell}
+ */
+export const getCenterCell = () => {
+  const { rows, columns } = POLY_INFO[MAP_INFO.currentPoly];
+  const middleRow = Math.floor(rows / 2);
+  const middleColumn = Math.floor(columns / 2);
+  return getGridCell(
+    middleRow + MAP_INFO.iOffset,
+    middleColumn + MAP_INFO.jOffset
+  );
 };

@@ -6,6 +6,11 @@ export const KNOWN_POLYGONS = {
 
 export const KNOWN_POLYGONS_VALUES = Object.values(KNOWN_POLYGONS);
 
+export const MAP_GENERATION = {
+  MIX: Symbol("MIX"),
+  DISTANCE: Symbol("DISTANCE"),
+};
+
 export const CONFIG = {
   chunkRows: 100,
   chunkColumns: 100,
@@ -23,6 +28,7 @@ export const MAP_CONFIG = {
   velocity: 25,
   noiseResolutionBiome: 75,
   noiseResolution: 20,
+  mapGeneration: MAP_GENERATION.DISTANCE,
   touchThreshold: 25,
   passTime: false,
 };

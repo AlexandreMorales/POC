@@ -1,6 +1,6 @@
 import { POLY_INFO, MAP_INFO } from "./configs/infos.js";
 import { CONFIG, CANVAS_CONFIG } from "./configs/configs.js";
-import { GRID, calculatePointBasedOnPos, loadChunk } from "./grid.js";
+import { GRID, calculatePointBasedOnPos, getGridCell } from "./grid.js";
 import { colorToRGB, getMod, tweakColor } from "./utils.js";
 import { verifyEntitiesHeight } from "./entities.js";
 
@@ -58,9 +58,7 @@ export const drawEveryCell = () => {
 
       if (shouldIntercalate && offsetCell && nJ % 2 === 0) nI = nI + 1;
 
-      if (!GRID[nI]?.[nJ]) loadChunk(nI, nJ);
-
-      drawCell(GRID[nI][nJ], contexts[0]);
+      drawCell(getGridCell(nI, nJ), contexts[0]);
     }
   }
 
@@ -158,7 +156,7 @@ const drawCell = (cell, context) => {
       borderMap: aCells.reduce((acc, c, i) => {
         let index = i - MAP_INFO.rotationTurns;
         if (shouldOffset) index = MAP_INFO.currentPoly - 1 - index;
-        acc[getMod(index, MAP_INFO.currentPoly)] = c.wall?.layer !== layer;
+        acc[getMod(index, MAP_INFO.currentPoly)] = c?.wall?.layer !== layer;
         return acc;
       }, []),
     });
