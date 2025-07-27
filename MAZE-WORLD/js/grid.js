@@ -1,8 +1,8 @@
 import {
   CONFIG,
   KNOWN_POLYGONS,
-  MAP_CONFIG,
   MAP_GENERATION,
+  MENU_CONFIG,
 } from "./configs/configs.js";
 import { POLY_INFO, MAP_INFO } from "./configs/infos.js";
 import { BIOMES } from "./configs/biomes.js";
@@ -14,7 +14,7 @@ import {
 } from "./utils.js";
 import { getValue, VECTORS } from "./perlin.js";
 
-export const GRID = /** @type {import("./configs/infos.js").Cell[][]} */ ([]);
+export let GRID = /** @type {import("./configs/infos.js").Cell[][]} */ ([]);
 
 /**
  * @param {number} i
@@ -60,7 +60,7 @@ const getChunkStart = (i, j) => [
 export const loadChunk = (initialI, initialJ) => {
   const [offsetI, offsetJ] = getChunkStart(initialI, initialJ);
 
-  const { mapGeneration } = MAP_CONFIG;
+  const { mapGeneration } = MENU_CONFIG;
 
   for (let i = 0; i < CONFIG.chunkRows; i++) {
     const nI = i + offsetI;
@@ -212,4 +212,8 @@ export const getCenterCell = () => {
     middleRow + MAP_INFO.iOffset,
     middleColumn + MAP_INFO.jOffset
   );
+};
+
+export const resetGrid = () => {
+  GRID = [];
 };

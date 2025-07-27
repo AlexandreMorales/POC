@@ -1,4 +1,4 @@
-import { MAP_CONFIG } from "./configs/configs.js";
+import { MAP_CONFIG, MENU_CONFIG } from "./configs/configs.js";
 import { MAP_INFO } from "./configs/infos.js";
 import { drawEveryCell } from "./draw.js";
 
@@ -35,7 +35,7 @@ export const move = (nextCell) => {
   if (canMove) {
     canMove = false;
     if (nextCell) moveCurrentCell(MAP_INFO.currentCell, nextCell);
-    if (MAP_CONFIG.passTime) passTime();
+    if (MENU_CONFIG.passTime) passTime();
 
     setTimeout(() => {
       drawEveryCell();

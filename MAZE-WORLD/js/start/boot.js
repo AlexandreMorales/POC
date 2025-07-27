@@ -6,7 +6,7 @@ import {
 } from "../configs/configs.js";
 import { resetCanvasSize, drawEveryCell, setCanvasSize } from "../draw.js";
 import { resetEntities } from "../entities.js";
-import { getGridCell, getCenterCell } from "../grid.js";
+import { getGridCell, getCenterCell, resetGrid } from "../grid.js";
 import { MAP_INFO, POLY_INFO } from "../configs/infos.js";
 import { cellIsBlocked, moveCurrentCell } from "../movement.js";
 import { correctRoundError, debounce } from "../utils.js";
@@ -164,10 +164,10 @@ const configPoly = (polySides) => {
     invertedPoints,
     wallPoints,
     wallInvertedPoints,
-    rows: Math.round(rows),
-    columns: Math.round(columns),
-    canvasHeight: Math.round(canvasHeight),
-    canvasWidth: Math.round(canvasWidth),
+    rows,
+    columns,
+    canvasHeight,
+    canvasWidth,
     calcX: getXFn(polySides, polySide, xSide),
     calcY: (i) => i * ySide * 2 + ySide,
     cx: correctRoundError(canvasWidth / 2),
@@ -179,6 +179,7 @@ const configPoly = (polySides) => {
 
 export const start = () => {
   configPolys();
+  resetGrid();
   resetEntities();
   resetCanvasSize();
   resetDirection();

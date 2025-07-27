@@ -1,13 +1,13 @@
 import { GRID } from "../grid.js";
 import { move } from "../movement.js";
 import { BLOCKS } from "./biomes.js";
-import { CONFIG, KNOWN_POLYGONS } from "./configs.js";
+import { KNOWN_POLYGONS, MENU_CONFIG } from "./configs.js";
 import { MAP_INFO, POLY_INFO } from "./infos.js";
 
 const canvasContainer = document.getElementById("canvas-container");
 
 canvasContainer.onclick = (e) => {
-  if (!CONFIG.debugMode || MAP_INFO.rotationTurns) return;
+  if (!MENU_CONFIG.debugMode || MAP_INFO.rotationTurns) return;
   e = e || /** @type {Event} */ (window.event);
   const rect = canvasContainer.getBoundingClientRect(); // Get canvas position and size
   const x = e.clientX - rect.left;

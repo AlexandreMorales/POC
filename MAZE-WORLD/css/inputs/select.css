@@ -1,0 +1,11 @@
+:root {
+  --select-padding: 5px;
+}
+
+select {
+  border-right: var(--select-padding) solid var(--background-color);
+  background: var(--background-color);
+  padding: var(--select-padding);
+  outline: 0;
+  max-width: 120px;
+}

@@ -2,8 +2,8 @@ import {
   MOVEMENT,
   KNOWN_POLYGONS_VALUES,
   MOVEMENT_VALUES,
-  CANVAS_CONFIG,
   MAP_CONFIG,
+  MENU_CONFIG,
 } from "./configs/configs.js";
 import { MAP_INFO, POLY_INFO } from "./configs/infos.js";
 import { GRID, getCenterCell } from "./grid.js";
@@ -33,13 +33,13 @@ export const rotate = (orientation) => {
       MAP_INFO.currentPoly
     );
 
-    if (CANVAS_CONFIG.rotationAnimation)
+    if (MENU_CONFIG.rotationAnimation)
       rotateCanvas((360 / MAP_INFO.currentPoly) * -orientation);
 
     resetDirection();
 
     setTimeout(() => {
-      if (CANVAS_CONFIG.rotationAnimation) resetRotateCanvas();
+      if (MENU_CONFIG.rotationAnimation) resetRotateCanvas();
       drawEveryCell();
       canRotate = true;
     }, MAP_CONFIG.rotateDelay);

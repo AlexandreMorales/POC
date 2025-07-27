@@ -1,5 +1,10 @@
 import { POLY_INFO, MAP_INFO } from "./configs/infos.js";
-import { CONFIG, CANVAS_CONFIG, MAP_CONFIG } from "./configs/configs.js";
+import {
+  CONFIG,
+  CANVAS_CONFIG,
+  MAP_CONFIG,
+  MENU_CONFIG,
+} from "./configs/configs.js";
 import { GRID, calculatePointBasedOnPos, getGridCell } from "./grid.js";
 import { colorToRGB, getMod, tweakColor } from "./utils.js";
 import { verifyEntitiesHeight } from "./entities.js";
@@ -105,7 +110,7 @@ const drawWallTop = (wall, context) => {
   applyBorders(context, wall.topPoint, wall.topPoints, wall.borderMap);
   applyDark(context, wall.topPoint, wall.topPoints);
 
-  if (CANVAS_CONFIG.showPos) {
+  if (MENU_CONFIG.showPos) {
     const polyInfo = POLY_INFO[MAP_INFO.currentPoly];
     const isInverted = polyInfo.hasInverted && wall.isInverted;
     showPos(context, wall.pos, wall.topPoint, isInverted, polyInfo);
@@ -188,10 +193,10 @@ const drawCell = (cell, context) => {
   )
     applyDark(context, point, points);
 
-  if (CANVAS_CONFIG.showPos)
+  if (MENU_CONFIG.showPos)
     showPos(context, cell.pos, point, isInverted, polyInfo);
 
-  if (CANVAS_CONFIG.showChunks) showChunks(context, cell.pos, point, points);
+  if (MENU_CONFIG.showChunks) showChunks(context, cell.pos, point, points);
 };
 
 /**

@@ -1,3 +1,10 @@
+:root {
+  --action-color: rgba(207, 207, 207, 0.4);
+  --action-border-radius: 12px;
+
+  --background-color: #ededed;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -5,10 +12,20 @@
   font-size: 100%;
   font: inherit;
   vertical-align: baseline;
+
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
 }
 
 html,
 body {
   overscroll-behavior: contain;
   position: fixed;
+
+  background: var(--background-color);
+}
+
+#container {
+  position: relative;
+  width: 100vw;
 }

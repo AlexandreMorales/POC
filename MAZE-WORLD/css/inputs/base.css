@@ -1,0 +1,16 @@
+label {
+  display: flex;
+  cursor: pointer;
+
+  align-items: center;
+  justify-content: space-between;
+}
+
+label > * {
+  flex: 1;
+}
+
+label input,
+label select {
+  margin-left: 12px;
+}

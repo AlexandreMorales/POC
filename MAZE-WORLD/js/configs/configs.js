@@ -7,12 +7,20 @@ export const KNOWN_POLYGONS = {
 export const KNOWN_POLYGONS_VALUES = Object.values(KNOWN_POLYGONS);
 
 export const MAP_GENERATION = {
-  MIX: Symbol("MIX"),
-  DISTANCE: Symbol("DISTANCE"),
+  MIX: "MIX",
+  DISTANCE: "DISTANCE",
+};
+
+export const MENU_CONFIG = {
+  debugMode: false,
+  passTime: false,
+  rotationAnimation: true,
+  showPos: false,
+  showChunks: false,
+  mapGeneration: MAP_GENERATION.DISTANCE,
 };
 
 export const CONFIG = {
-  debugMode: true,
   chunkRows: 100,
   chunkColumns: 100,
   cellHeight: 24,
@@ -30,15 +38,10 @@ export const MAP_CONFIG = {
   rotateDelay: 500,
   noiseResolutionBiome: 75,
   noiseResolution: 20,
-  mapGeneration: MAP_GENERATION.DISTANCE,
   touchThreshold: 25,
-  passTime: false,
 };
 
 export const CANVAS_CONFIG = {
-  rotationAnimation: true,
-  showPos: false,
-  showChunks: false,
   strokeColor: "black",
   emptyColor: "black",
   lineWidth: 1,

@@ -6,6 +6,86 @@
     <link rel="stylesheet" href="css/index.css" />
   </head>
   <body>
+    <div id="menu-container">
+      <input type="checkbox" id="menuToggle" />
+
+      <span></span>
+      <span></span>
+      <span></span>
+
+      <ul id="menu">
+        <li>
+          <label for="debugMode"
+            >Debug Mode
+            <input type="checkbox" class="checkbox" id="debugMode" />
+          </label>
+        </li>
+        <li>
+          <label for="passTime"
+            >Pass Time
+            <input type="checkbox" class="checkbox" id="passTime" />
+          </label>
+        </li>
+        <li>
+          <label for="rotationAnimation"
+            >Animate on Rotate
+            <input type="checkbox" class="checkbox" id="rotationAnimation" />
+          </label>
+        </li>
+        <li>
+          <label for="showPos"
+            >Show Position
+            <input type="checkbox" class="checkbox" id="showPos" />
+          </label>
+        </li>
+        <li>
+          <label for="showChunks"
+            >Show Chunk border
+            <input type="checkbox" class="checkbox" id="showChunks" />
+          </label>
+        </li>
+        <li>
+          <label for="mapGeneration"
+            >Map Generation
+            <select id="mapGeneration"></select>
+          </label>
+        </li>
+        <li>
+          <label for="zoom"
+            >Zoom
+            <input type="range" id="zoom" tabindex="-1" />
+          </label>
+        </li>
+
+        <div id="controls">
+          <li>Controls</li>
+          <li>
+            <p><bold>WASD</bold> - Change direction</p>
+          </li>
+          <li>
+            <p><bold>Arrows</bold> - Walk</p>
+          </li>
+          <li>
+            <p><bold>Q</bold> - Rotate Left</p>
+          </li>
+          <li>
+            <p><bold>E</bold> - Rotate Right</p>
+          </li>
+          <li>
+            <p><bold>R</bold> - Dig</p>
+          </li>
+          <li>
+            <p><bold>F</bold> - Place</p>
+          </li>
+          <li>
+            <p><bold>Shift</bold> - Change Polygon</p>
+          </li>
+          <li>
+            <p><bold>Space</bold> - Pass Time</p>
+          </li>
+        </div>
+      </ul>
+    </div>
     <div id="container">
       <div id="draw-container">
         <div id="canvas-container"></div>
@@ -27,7 +107,6 @@
         </button>
       </div>
     </div>
-    <input type="range" id="zoom" tabindex="-1" />
   </body>
   <script type="module" src="js/start/start.js"></script>
 </html>
