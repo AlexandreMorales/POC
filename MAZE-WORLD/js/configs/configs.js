@@ -11,16 +11,17 @@ export const CONFIG = {
   chunkColumns: 100,
   cellHeight: 24,
 
-  minZoom: 10,
+  minZoom: 5,
   maxZoom: 120,
 
-  maxLayer: 3,
+  maxLayer: 2,
 };
 
 export const MAP_CONFIG = {
   passHour: 0.5,
   midNightHour: 70,
   velocity: 25,
+  noiseResolutionBiome: 75,
   noiseResolution: 20,
   touchThreshold: 25,
   passTime: false,
@@ -28,6 +29,7 @@ export const MAP_CONFIG = {
 
 export const CANVAS_CONFIG = {
   showPos: false,
+  showChunks: false,
   strokeColor: "black",
   emptyColor: "black",
   lineWidth: 1,

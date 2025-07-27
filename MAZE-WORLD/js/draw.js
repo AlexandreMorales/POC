@@ -192,6 +192,8 @@ const drawCell = (cell, context) => {
 
   if (CANVAS_CONFIG.showPos)
     showPos(context, cell.pos, point, isInverted, polyInfo);
+
+  if (CANVAS_CONFIG.showChunks) showChunks(context, cell.pos, point, points);
 };
 
 /**
@@ -258,4 +260,18 @@ const showPos = (context, pos, point, isInverted, polyInfo) => {
     point.x,
     isInverted ? point.y + polyInfo.ySide / 2 : point.y
   );
+};
+
+/**
+ * @param {CanvasRenderingContext2D} context
+ * @param {import("./configs/infos.js").CellPos} pos
+ * @param {import("./configs/infos.js").Point} point
+ * @param {import("./configs/infos.js").Point[]} points
+ */
+const showChunks = (context, pos, point, points) => {
+  if (pos.i % CONFIG.chunkRows === 0 || pos.j % CONFIG.chunkColumns === 0) {
+    context.strokeStyle = CANVAS_CONFIG.strokeColor;
+    context.lineWidth = CANVAS_CONFIG.lineWidth;
+    applyBorders(context, point, points);
+  }
 };

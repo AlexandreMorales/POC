@@ -1,10 +1,4 @@
 /**
- * @param {number} max
- * @returns {number}
- */
-export const getRandomInt = (max) => Math.floor(Math.random() * max);
-
-/**
  * @param {import("./configs/infos").CellPos} param
  * @returns {boolean}
  */
@@ -63,3 +57,9 @@ export const debounce = (fn, timeout = 10) => {
     }, timeout);
   };
 };
+
+/**
+ * @param {number} n
+ * @param {number} range
+ */
+export const getRange = (n, range) => Math.floor(n / range) * range;

@@ -1,83 +1,144 @@
+import { CONFIG, MAP_CONFIG } from "./configs/configs.js";
+import { getRange } from "./utils.js";
+
+export const VECTORS = {
+  BIOME: Symbol("BIOME"),
+  BLOCK: Symbol("BLOCK"),
+};
+
 /**
- * @param {number} width
- * @param {number} height
- * @param {number} resolution
- * @returns {number[][]}
+ * @typedef {Object} Vector
+ * @property {import("./configs/infos.js").Point[][]} vectors
+ * @property {number} width
+ * @property {number} height
+ * @property {number} resolution
  */
-export const getPerlinGrid = (width, height, resolution) => {
-  const vectors = getVectors(width, height, resolution);
-  return getValues(width, height);
 
-  function getVectors(width, height, resolution) {
-    const numVectorsX = Math.floor(width / resolution) + 1;
-    const extraVectorX = width % resolution == 0 ? 0 : 1;
-    const finalNumVectorsX = numVectorsX + extraVectorX;
+/**
+ * @param {number} size
+ * @param {number} resolution
+ * @returns {number}
+ */
+const getSizeFromNoise = (size, resolution) => {
+  const numVectorsX = Math.floor(size / resolution) + 1;
+  const extraVectorX = size % resolution == 0 ? 0 : 1;
+  return numVectorsX + extraVectorX;
+};
 
-    const numVectorsY = Math.floor(height / resolution) + 1;
-    const extraVectorY = height % resolution == 0 ? 0 : 1;
-    const finalNumVectorsY = numVectorsY + extraVectorY;
+/**
+ * @param {Vector} vector
+ * @returns {Vector}
+ */
+const initializeVector = (vector) => {
+  return {
+    width: getSizeFromNoise(vector.width, vector.resolution),
+    height: getSizeFromNoise(vector.height, vector.resolution),
+    vectors: [],
+    resolution: vector.resolution,
+  };
+};
 
-    return new Array(finalNumVectorsY)
-      .fill(0)
-      .map(() => new Array(finalNumVectorsX).fill(0).map(getRandUnitVect));
-  }
+const vectors = /** @type {{ [k: symbol]: Vector }} */ ({
+  [VECTORS.BIOME]: initializeVector({
+    width: CONFIG.chunkColumns,
+    height: CONFIG.chunkRows,
+    vectors: [],
+    resolution: MAP_CONFIG.noiseResolutionBiome,
+  }),
+  [VECTORS.BLOCK]: initializeVector({
+    width: CONFIG.chunkColumns,
+    height: CONFIG.chunkRows,
+    vectors: [],
+    resolution: MAP_CONFIG.noiseResolution,
+  }),
+});
 
-  function getRandUnitVect() {
-    const theta = Math.random() * 2 * Math.PI;
-    return { x: Math.cos(theta), y: Math.sin(theta) };
-  }
+/**
+ * @param {number} i
+ * @param {number} j
+ * @param {Vector} vector
+ */
+const getChunkStart = (i, j, vector) => [
+  getRange(i, vector.height),
+  getRange(j, vector.width),
+];
 
-  function getValues(width, height) {
-    const values = [];
-
-    for (let y = 0; y < height; y++) {
-      values[y] = [];
-      for (let x = 0; x < width; x++) {
-        values[y][x] = getValue(x, y);
-      }
+/**
+ * @param {number} i
+ * @param {number} j
+ * @param {Vector} vector
+ */
+const updateVector = (i, j, vector) => {
+  const [offsetI, offsetJ] = getChunkStart(i, j, vector);
+  for (let i = 0; i <= vector.height - 1; i++) {
+    const nI = i + offsetI;
+    vector.vectors[nI] = vector.vectors[nI] || [];
+    for (let j = 0; j <= vector.width - 1; j++) {
+      const nJ = j + offsetJ;
+      vector.vectors[nI][nJ] = getRandUnitVect();
     }
-    return values;
-  }
-
-  function getValue(x, y) {
-    const offset = 0.5 / resolution;
-
-    x = x / resolution + offset;
-    y = y / resolution + offset;
-
-    const xF = Math.floor(x);
-    const yF = Math.floor(y);
-
-    const tlv = dotProduct(x, y, xF, yF);
-    const trv = dotProduct(x, y, xF + 1, yF);
-    const blv = dotProduct(x, y, xF, yF + 1);
-    const brv = dotProduct(x, y, xF + 1, yF + 1);
-
-    const lerpTop = lerp(tlv, trv, x - xF);
-    const lerpBottom = lerp(blv, brv, x - xF);
-    const value = lerp(lerpTop, lerpBottom, y - yF);
-
-    return value;
-  }
-
-  function dotProduct(x, y, vx, vy) {
-    const distVector = {
-      x: x - vx,
-      y: y - vy,
-    };
-
-    return dot(distVector, vectors[vy][vx]);
-  }
-
-  function dot(v1, v2) {
-    return v1.x * v2.x + v1.y * v2.y;
-  }
-
-  function lerp(a, b, x) {
-    return a + smootherstep(x) * (b - a);
-  }
-
-  function smootherstep(x) {
-    return 6 * x ** 5 - 15 * x ** 4 + 10 * x ** 3;
   }
 };
+
+const getRandUnitVect = () => {
+  const theta = Math.random() * 2 * Math.PI;
+  return { x: Math.cos(theta), y: Math.sin(theta) };
+};
+
+/**
+ * @param {number} i
+ * @param {number} j
+ * @param {symbol} vectorType
+ */
+export const getValue = (i, j, vectorType) => {
+  const vector = vectors[vectorType];
+
+  const offset = 0.5 / vector.resolution;
+
+  const x = i / vector.resolution + offset;
+  const y = j / vector.resolution + offset;
+
+  const xF = Math.floor(x);
+  const yF = Math.floor(y);
+
+  const tlv = dotProduct(vector, x, y, xF, yF);
+  const trv = dotProduct(vector, x, y, xF + 1, yF);
+  const blv = dotProduct(vector, x, y, xF, yF + 1);
+  const brv = dotProduct(vector, x, y, xF + 1, yF + 1);
+
+  const lerpTop = lerp(tlv, trv, x - xF);
+  const lerpBottom = lerp(blv, brv, x - xF);
+  const value = lerp(lerpTop, lerpBottom, y - yF);
+
+  return value;
+};
+
+/**
+ * @param {number} x
+ * @param {number} y
+ * @param {number} vx
+ * @param {number} vy
+ * @param {Vector} vector
+ */
+const dotProduct = (vector, x, y, vx, vy) => {
+  if (!vector.vectors[vy]?.[vx]) updateVector(vy, vx, vector);
+  return dot({ x: x - vx, y: y - vy }, vector.vectors[vy][vx]);
+};
+
+/**
+ * @param {import("./configs/infos.js").Point} v1
+ * @param {import("./configs/infos.js").Point} v2
+ */
+const dot = (v1, v2) => v1.x * v2.x + v1.y * v2.y;
+
+/**
+ * @param {number} a
+ * @param {number} b
+ * @param {number} c
+ */
+const lerp = (a, b, c) => a + smootherstep(c) * (b - a);
+
+/**
+ * @param {number} x
+ */
+const smootherstep = (x) => 6 * x ** 5 - 15 * x ** 4 + 10 * x ** 3;

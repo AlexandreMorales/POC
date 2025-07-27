@@ -1,6 +1,6 @@
 import { MAP_CONFIG } from "./configs/configs.js";
 import { MAP_INFO, POLY_INFO } from "./configs/infos.js";
-import { GRID } from "./grid.js";
+import { GRID, loadChunk } from "./grid.js";
 import { drawEveryCell } from "./draw.js";
 
 /**
@@ -55,6 +55,10 @@ export const getCenterCell = () => {
   const { rows, columns } = POLY_INFO[MAP_INFO.currentPoly];
   const middleRow = Math.floor(rows / 2);
   const middleColumn = Math.floor(columns / 2);
+  const i = middleRow + MAP_INFO.iOffset;
+  const j = middleColumn + MAP_INFO.jOffset;
 
-  return GRID[middleRow + MAP_INFO.iOffset][middleColumn + MAP_INFO.jOffset];
+  if (!GRID[i]?.[j]) loadChunk(i, j);
+
+  return GRID[i][j];
 };

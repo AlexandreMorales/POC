@@ -1,13 +1,13 @@
-import { CONFIG, MAP_CONFIG, KNOWN_POLYGONS } from "./configs/configs.js";
+import { CONFIG, KNOWN_POLYGONS } from "./configs/configs.js";
 import { POLY_INFO, MAP_INFO } from "./configs/infos.js";
 import { BIOMES } from "./configs/biomes.js";
 import {
   tweakColor,
   isCellInverted,
-  getRandomInt,
   correctRoundError,
+  getRange,
 } from "./utils.js";
-import { getPerlinGrid } from "./perlin.js";
+import { getValue, VECTORS } from "./perlin.js";
 
 export const GRID = /** @type {import("./configs/infos.js").Cell[][]} */ ([]);
 
@@ -15,7 +15,7 @@ export const GRID = /** @type {import("./configs/infos.js").Cell[][]} */ ([]);
  * @param {number} i
  * @param {number} j
  * @param {number} value
- * @param {import("./configs/biomes.js").Block} block
+ * @param {import("./configs/biomes.js").BlockEntity} block
  * @returns {import("./configs/infos.js").Cell}
  */
 const createCell = (i, j, value, block) => {
@@ -40,12 +40,6 @@ const createCell = (i, j, value, block) => {
 };
 
 /**
- * @param {number} n
- * @param {number} range
- */
-const getRange = (n, range) => Math.floor(n / range) * range;
-
-/**
  * @param {number} i
  * @param {number} j
  */
@@ -57,29 +51,23 @@ const getChunkStart = (i, j) => [
 /**
  * @param {number} i
  * @param {number} j
- * @param {import("./configs/biomes.js").Biome} [biome]
  */
-export const loadChunk = (i, j, biome) => {
+export const loadChunk = (i, j) => {
   const [offsetI, offsetJ] = getChunkStart(i, j);
-  const biomeKeys = Object.keys(BIOMES);
-  biome = biome || BIOMES[biomeKeys[getRandomInt(biomeKeys.length)]];
-  const blocks = Object.values(biome.ranges);
-  const higherGroundBlock = [...blocks].reverse().find((r) => r.layer === 0);
 
-  const rows = CONFIG.chunkRows;
-  const columns = CONFIG.chunkColumns;
-  const perlin = getPerlinGrid(columns, rows, MAP_CONFIG.noiseResolution);
-
-  for (let i = 0; i < rows; i++) {
+  for (let i = 0; i < CONFIG.chunkRows; i++) {
     const nI = i + offsetI;
     GRID[nI] = GRID[nI] || [];
-    for (let j = 0; j < columns; j++) {
+    for (let j = 0; j < CONFIG.chunkColumns; j++) {
       const nJ = j + offsetJ;
 
-      const value = perlin?.[i]?.[j];
-      const originalBlock = blocks.find((r) => value <= r.max);
+      const biome =
+        getValue(nI, nJ, VECTORS.BIOME) > 0 ? BIOMES.FOREST : BIOMES.OCEAN;
+
+      const value = getValue(nI, nJ, VECTORS.BLOCK);
+      const originalBlock = biome.ranges.find((r) => value <= r.max);
       const isHighBlock = originalBlock.layer > 0;
-      const cellBlock = isHighBlock ? higherGroundBlock : originalBlock;
+      const cellBlock = isHighBlock ? biome.higherGroundBlock : originalBlock;
 
       const cell = createCell(nI, nJ, value, cellBlock);
       GRID[nI][nJ] = cell;

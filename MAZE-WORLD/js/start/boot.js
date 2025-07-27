@@ -1,5 +1,4 @@
 import { resetDirection } from "../actions.js";
-import { BIOMES } from "../configs/biomes.js";
 import {
   CONFIG,
   KNOWN_POLYGONS,
@@ -7,7 +6,7 @@ import {
 } from "../configs/configs.js";
 import { resetCanvasSize, drawEveryCell, setCanvasSize } from "../draw.js";
 import { resetEntities } from "../entities.js";
-import { loadChunk, GRID } from "../grid.js";
+import { GRID } from "../grid.js";
 import { MAP_INFO, POLY_INFO } from "../configs/infos.js";
 import { getCenterCell, cellIsBlocked, moveCurrentCell } from "../movement.js";
 import { correctRoundError, debounce } from "../utils.js";
@@ -184,7 +183,6 @@ export const start = () => {
   resetCanvasSize();
   resetDirection();
 
-  loadChunk(0, 0, BIOMES.FOREST);
   MAP_INFO.currentCell = getCenterCell();
   while (cellIsBlocked(MAP_INFO.currentCell)) {
     moveCurrentCell(
@@ -192,7 +190,6 @@ export const start = () => {
       GRID[MAP_INFO.currentCell.pos.i + 1][MAP_INFO.currentCell.pos.j]
     );
   }
-  drawEveryCell();
   drawEveryCell();
 };
 

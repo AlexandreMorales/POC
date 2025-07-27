@@ -85,8 +85,8 @@ const getNextCellIndexBasedOnCode = (code, useDiagonal) => {
   return getMod(aIndex, MAP_INFO.currentPoly);
 };
 
-let lastMovement = null;
-let lastSelection = null;
+let lastMovement = /** @type {symbol} */ (null);
+let lastSelection = /** @type {symbol} */ (null);
 
 /**
  * @param {symbol} code
