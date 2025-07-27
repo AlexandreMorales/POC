@@ -273,3 +273,22 @@ const showChunks = (context, pos, point, points) => {
     applyBorders(context, point, points);
   }
 };
+
+/**
+ * @param {number} deg
+ */
+export const rotateCanvas = (deg) => {
+  for (let i = 0; i < CONFIG.maxLayer; i++) {
+    canvasList[i].style.transitionDuration = "0.75s";
+    canvasList[i].style.transitionProperty = "transform";
+    canvasList[i].style.transform = `rotate(${deg}deg)`;
+  }
+};
+
+export const resetRotateCanvas = () => {
+  for (let i = 0; i < CONFIG.maxLayer; i++) {
+    canvasList[i].style.transitionDuration = null;
+    canvasList[i].style.transitionProperty = null;
+    canvasList[i].style.transform = null;
+  }
+};

@@ -1,12 +1,17 @@
 import {
-  MAP_CONFIG,
   MOVEMENT,
   KNOWN_POLYGONS_VALUES,
   MOVEMENT_VALUES,
+  CANVAS_CONFIG,
 } from "./configs/configs.js";
 import { MAP_INFO, POLY_INFO } from "./configs/infos.js";
 import { GRID, getCenterCell } from "./grid.js";
-import { resetCanvasSize, drawEveryCell } from "./draw.js";
+import {
+  resetCanvasSize,
+  drawEveryCell,
+  resetRotateCanvas,
+  rotateCanvas,
+} from "./draw.js";
 import { getMod } from "./utils.js";
 import {
   startRunning,
@@ -27,12 +32,16 @@ export const rotate = (orientation) => {
       MAP_INFO.currentPoly
     );
 
+    if (CANVAS_CONFIG.rotationAnimation)
+      rotateCanvas((360 / MAP_INFO.currentPoly) * -orientation);
+
     resetDirection();
 
     setTimeout(() => {
+      if (CANVAS_CONFIG.rotationAnimation) resetRotateCanvas();
       drawEveryCell();
       canRotate = true;
-    }, 2000 / MAP_CONFIG.velocity);
+    }, 500);
   }
 };
 

@@ -35,6 +35,7 @@ export const MAP_CONFIG = {
 };
 
 export const CANVAS_CONFIG = {
+  rotationAnimation: true,
   showPos: false,
   showChunks: false,
   strokeColor: "black",
