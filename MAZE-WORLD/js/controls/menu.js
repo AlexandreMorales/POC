@@ -1,5 +1,5 @@
 import { MAP_GENERATION, MENU_CONFIG } from "../configs/configs.js";
-import { drawEveryCell } from "../draw.js";
+import { drawEveryCell, updateCanvasCss } from "../draw/draw.js";
 import { start } from "../start/boot.js";
 
 const SELECT_OPTIONS = {
@@ -20,11 +20,12 @@ menuLabels.map((l) => {
     check.checked = MENU_CONFIG[config];
     check.onchange = () => {
       MENU_CONFIG[config] = check.checked;
+      updateCanvasCss();
       drawEveryCell();
     };
   } else if (element.tagName === "SELECT") {
     const select = /** @type {HTMLSelectElement} */ (element);
-    SELECT_OPTIONS[config].map(([key, value]) => {
+    SELECT_OPTIONS[config].forEach(([key, value]) => {
       const option = document.createElement("option");
       option.value = value;
       option.innerHTML = key;

@@ -17,6 +17,7 @@ export const MENU_CONFIG = {
   rotationAnimation: true,
   showPos: false,
   showChunks: false,
+  usePerspective: false,
   mapGeneration: MAP_GENERATION.DISTANCE,
 };
 
@@ -25,7 +26,7 @@ export const CONFIG = {
   chunkColumns: 100,
   cellHeight: 24,
 
-  minZoom: 10,
+  minZoom: 6,
   maxZoom: 120,
 
   maxLayer: 2,
@@ -46,6 +47,7 @@ export const CANVAS_CONFIG = {
   emptyColor: "black",
   lineWidth: 1,
   wallDarkness: 0.5,
+  fluidSpeed: 500,
 };
 
 export const ENTITIES_CONFIG = {

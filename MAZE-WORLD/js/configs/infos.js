@@ -33,18 +33,6 @@ import { KNOWN_POLYGONS } from "./configs.js";
  */
 
 /**
- * @typedef {Object} Wall
- * @property {CellPos} pos
- * @property {boolean} isInverted Only used for triangles
- * @property {Point} point Point of where to draw the wall
- * @property {Point} topPoint Point of where to draw the top of the wall
- * @property {Point[]} points Points of the wall
- * @property {Point[]} topPoints Points of the top of the wall
- * @property {boolean[]} borderMap Which points to draw a border
- * @property {import("./biomes").Color} color
- */
-
-/**
  * @typedef {Object} MapInfo
  * @property {number} currentPoly The number of sides of the current polygon
  * @property {Cell} currentCell

@@ -4,7 +4,7 @@ import {
   KNOWN_POLYGONS,
   KNOWN_POLYGONS_VALUES,
 } from "../configs/configs.js";
-import { resetCanvasSize, drawEveryCell, setCanvasSize } from "../draw.js";
+import { resetCanvasSize, drawEveryCell, setCanvasSize } from "../draw/draw.js";
 import { resetEntities } from "../entities.js";
 import { getGridCell, getCenterCell, resetGrid } from "../grid.js";
 import { MAP_INFO, POLY_INFO } from "../configs/infos.js";

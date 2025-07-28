@@ -1,6 +1,6 @@
 import { MAP_CONFIG, MENU_CONFIG } from "./configs/configs.js";
 import { MAP_INFO } from "./configs/infos.js";
-import { drawEveryCell } from "./draw.js";
+import { drawEveryCell } from "./draw/draw.js";
 
 /**
  * @param {import("./configs/infos.js").Cell} cell

@@ -10,8 +10,12 @@ canvasContainer.onclick = (e) => {
   if (!MENU_CONFIG.debugMode || MAP_INFO.rotationTurns) return;
   e = e || /** @type {Event} */ (window.event);
   const rect = canvasContainer.getBoundingClientRect(); // Get canvas position and size
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
+  let x = e.clientX - rect.left;
+  let y = e.clientY - rect.top;
+  if (MENU_CONFIG.usePerspective) {
+    x += 125;
+    y += 70;
+  }
   const { i, j } = calculatePosBasedOnPoint({ x, y });
   const cell = GRID[i]?.[j];
 

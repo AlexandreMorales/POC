@@ -12,7 +12,7 @@ import {
   drawEveryCell,
   resetRotateCanvas,
   rotateCanvas,
-} from "./draw.js";
+} from "./draw/draw.js";
 import { getMod } from "./utils.js";
 import {
   startRunning,
