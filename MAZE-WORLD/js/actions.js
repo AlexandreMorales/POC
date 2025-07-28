@@ -18,6 +18,9 @@ import {
   startRunning,
   resetEntities,
   updatePlayerDirection,
+  addBoat,
+  PLAYER_INFO,
+  BOAT_INFO,
 } from "./entities.js";
 import { cellIsBlocked, move, moveCurrentCell } from "./movement.js";
 
@@ -175,6 +178,7 @@ export const resetDirection = () => {
  * @returns {import("./configs/infos.js").Cell}
  */
 const getSelectedCell = () => {
+  updatePlayerDirection(lastSelection);
   const nextPos =
     MAP_INFO.currentCell.adjacentPos[MAP_INFO.currentPoly][
       MAP_INFO.selectedCellIndex
@@ -186,7 +190,6 @@ const getSelectedCell = () => {
 };
 
 export const dig = () => {
-  updatePlayerDirection(lastSelection);
   const selectedCell = getSelectedCell();
 
   if (!selectedCell?.value || selectedCell.layer < 0) return;
@@ -206,7 +209,6 @@ export const dig = () => {
 };
 
 export const place = () => {
-  updatePlayerDirection(lastSelection);
   if (!MAP_INFO.pickedCells.length) return;
 
   const selectedCell = getSelectedCell();
@@ -230,4 +232,25 @@ export const place = () => {
   }
 
   move();
+};
+
+export const useBoat = () => {
+  const selectedCell = getSelectedCell();
+  const canMove = !selectedCell.wall && selectedCell.value;
+
+  if (PLAYER_INFO.isInBoat) {
+    if (!selectedCell?.block?.isFluid && canMove) {
+      PLAYER_INFO.isInBoat = false;
+      addBoat(MAP_INFO.currentCell);
+      move(selectedCell);
+    }
+    return;
+  }
+
+  if (BOAT_INFO.cell === selectedCell) {
+    PLAYER_INFO.isInBoat = true;
+    move(selectedCell);
+  } else if (canMove) {
+    addBoat(selectedCell);
+  }
 };

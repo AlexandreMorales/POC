@@ -7,6 +7,7 @@ import {
   dig,
   place,
   stopMoving,
+  useBoat,
 } from "../actions.js";
 import { resetSize } from "../start/boot.js";
 import { move } from "../movement.js";
@@ -39,6 +40,7 @@ document.onkeydown = (e) => {
 
   if (e.code === "KeyR") return dig();
   if (e.code === "KeyF") return place();
+  if (e.code === "KeyB") return useBoat();
 
   if (e.code.includes("Shift")) return changePolySides();
 

@@ -59,9 +59,9 @@ const hexToRgb = (hexColor) => {
 const addPropsToBlock = (block, props) => ({ ...block, ...props });
 
 export const BLOCKS = /** @type {{ [k: string]: BlockEntity }} */ ({
-  DEEP_WATER: addRgbToBlock({ color: "#256299", layer: -1, isFluid: true }),
-  MEDIUM_WATER: addRgbToBlock({ color: "#2375b4", layer: -1, isFluid: true }),
-  SEA_SHORE: addRgbToBlock({ color: "#4699de", layer: -1, isFluid: true }),
+  DEEP_WATER: addRgbToBlock({ color: "#256299", layer: 0, isFluid: true }),
+  MEDIUM_WATER: addRgbToBlock({ color: "#2375b4", layer: 0, isFluid: true }),
+  SEA_SHORE: addRgbToBlock({ color: "#4699de", layer: 0, isFluid: true }),
   BEACH_SAND: addRgbToBlock({ color: "#ab976a", layer: 0 }),
   LOW_GRASS: addRgbToBlock({ color: "#457950", layer: 0 }),
   MID_GRASS: addRgbToBlock({ color: "#2d673e", layer: 0 }),

@@ -5,6 +5,7 @@ import {
   place,
   rotate,
   stopMoving,
+  useBoat,
 } from "../actions.js";
 import { resetSize } from "../start/boot.js";
 import { CONFIG, MAP_CONFIG, MOVEMENT } from "../configs/configs.js";
@@ -78,6 +79,7 @@ document.ontouchend = () => {
 };
 
 document.getElementById("change-poly").onclick = changePolySides;
+document.getElementById("use-boat").onclick = useBoat;
 document.getElementById("dig").onclick = dig;
 document.getElementById("place").onclick = place;
 document.getElementById("rotate-left").onclick = () => rotate(-1);

@@ -1,5 +1,5 @@
+import { drawEveryCell } from "../draw/draw.js";
 import { GRID } from "../grid.js";
-import { move } from "../movement.js";
 import { BLOCKS } from "./biomes.js";
 import { KNOWN_POLYGONS, MENU_CONFIG } from "./configs.js";
 import { MAP_INFO, POLY_INFO } from "./infos.js";
@@ -37,7 +37,7 @@ canvasContainer.onclick = (e) => {
     cell.layer += 1;
   }
 
-  move();
+  drawEveryCell();
 };
 
 /**

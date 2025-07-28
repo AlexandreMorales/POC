@@ -7,7 +7,7 @@ import {
 } from "../configs/configs.js";
 import { GRID, calculatePointBasedOnPos, getGridCell } from "../grid.js";
 import { colorToRGB, debounce, getMod, tweakColor } from "../utils.js";
-import { verifyEntitiesHeight } from "../entities.js";
+import { updateEntities } from "../entities.js";
 
 const container = document.getElementById("draw-container");
 const canvasContainer = document.getElementById("canvas-container");
@@ -78,7 +78,7 @@ export const drawEveryCell = () => {
   }
 
   drawWalls();
-  verifyEntitiesHeight();
+  updateEntities();
   tweakFluids();
 };
 

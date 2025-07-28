@@ -1,13 +1,18 @@
 import { MAP_CONFIG, MENU_CONFIG } from "./configs/configs.js";
 import { MAP_INFO } from "./configs/infos.js";
 import { drawEveryCell } from "./draw/draw.js";
+import { BOAT_INFO, PLAYER_INFO } from "./entities.js";
 
 /**
  * @param {import("./configs/infos.js").Cell} cell
  * @returns {boolean}
  */
 export const cellIsBlocked = (cell) =>
-  !cell || !cell.value || !cell.block || cell.layer !== 0 || !!cell.wall;
+  !cell ||
+  !cell.value ||
+  !!cell.wall ||
+  BOAT_INFO.cell === cell ||
+  (PLAYER_INFO.isInBoat ? !cell.block.isFluid : cell.block.isFluid);
 
 /**
  * @param {import("./configs/infos.js").CellPos} pos

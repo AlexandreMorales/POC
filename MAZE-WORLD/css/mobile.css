@@ -20,8 +20,12 @@
   bottom: 100px;
   left: 0;
 }
+#use-boat {
+  bottom: 100px;
+  right: 0;
+}
 
-.mobile-btn {
+#mobile-hud button {
   background-color: var(--action-color);
   border-radius: var(--action-border-radius);
   padding: 12px;
