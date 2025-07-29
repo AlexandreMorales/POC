@@ -6,7 +6,7 @@ import {
   MENU_CONFIG,
 } from "./configs/configs.js";
 import { MAP_INFO, POLY_INFO } from "./configs/infos.js";
-import { GRID, getCenterCell } from "./grid.js";
+import { GRID, getCenterCell, placeBlock } from "./grid.js";
 import {
   resetCanvasSize,
   drawEveryCell,
@@ -192,17 +192,15 @@ const getSelectedCell = () => {
 export const dig = () => {
   const selectedCell = getSelectedCell();
 
-  if (!selectedCell?.value || selectedCell.layer < 0) return;
+  if (!selectedCell?.block || selectedCell.block.isFluid) return;
 
   MAP_INFO.pickedCells.push({ ...(selectedCell.wall || selectedCell) });
 
   if (selectedCell.wall) {
     selectedCell.wall = null;
   } else {
-    selectedCell.value = null;
     selectedCell.block = null;
     selectedCell.color = null;
-    selectedCell.layer -= 1;
   }
 
   move();
@@ -217,26 +215,14 @@ export const place = () => {
 
   const nextBlock = MAP_INFO.pickedCells.pop();
 
-  if (selectedCell.value && selectedCell.layer === 0) {
-    selectedCell.wall = {
-      block: nextBlock.block,
-      color: nextBlock.color,
-      value: nextBlock.value,
-      layer: selectedCell.layer + 1,
-    };
-  } else {
-    selectedCell.value = nextBlock.value;
-    selectedCell.block = nextBlock.block;
-    selectedCell.color = nextBlock.color;
-    selectedCell.layer += 1;
-  }
+  placeBlock(selectedCell, nextBlock.block, nextBlock.color);
 
   move();
 };
 
 export const useBoat = () => {
   const selectedCell = getSelectedCell();
-  const canMove = !selectedCell.wall && selectedCell.value;
+  const canMove = !selectedCell.wall && selectedCell.block;
 
   if (PLAYER_INFO.isInBoat) {
     if (!selectedCell?.block?.isFluid && canMove) {

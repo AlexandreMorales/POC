@@ -19,19 +19,17 @@ export let GRID = /** @type {import("./configs/infos.js").Cell[][]} */ ([]);
 /**
  * @param {number} i
  * @param {number} j
- * @param {number} value
  * @param {import("./configs/biomes.js").BlockEntity} block
  * @returns {import("./configs/infos.js").Cell}
  */
-const createCell = (i, j, value, block) => {
+const createCell = (i, j, block) => {
   let cell = GRID[i]?.[j];
   if (!cell) {
     cell = /** @type {import("./configs/infos.js").Cell} */ ({});
 
     cell.pos = { i, j };
 
-    cell.value = value;
-    if (value) {
+    if (block) {
       cell.block = block;
       cell.layer = block.layer;
       cell.color = tweakColor(block.colorRGB);
@@ -86,14 +84,13 @@ export const loadChunk = (initialI, initialJ) => {
       const isHighBlock = originalBlock.layer > 0;
       const cellBlock = isHighBlock ? biome.higherGroundBlock : originalBlock;
 
-      const cell = createCell(nI, nJ, value, cellBlock);
+      const cell = createCell(nI, nJ, cellBlock);
       GRID[nI][nJ] = cell;
 
       if (isHighBlock)
         cell.wall = {
           block: originalBlock,
           color: tweakColor(originalBlock.colorRGB),
-          value,
           layer: originalBlock.layer,
         };
     }
@@ -216,4 +213,22 @@ export const getCenterCell = () => {
 
 export const resetGrid = () => {
   GRID = [];
+};
+
+/**
+ * @param {import("./configs/infos.js").Cell} cell
+ * @param {import("./configs/biomes.js").BlockEntity} block
+ * @param {import("./configs/biomes.js").Color} color
+ */
+export const placeBlock = (cell, block, color) => {
+  if (cell.block && !cell.block.isFluid) {
+    cell.wall = {
+      block: block,
+      color: color,
+      layer: (cell.layer || 0) + 1,
+    };
+  } else {
+    cell.block = block;
+    cell.color = color;
+  }
 };

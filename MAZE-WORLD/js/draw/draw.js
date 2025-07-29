@@ -6,7 +6,13 @@ import {
   MENU_CONFIG,
 } from "../configs/configs.js";
 import { GRID, calculatePointBasedOnPos, getGridCell } from "../grid.js";
-import { colorToRGB, debounce, getMod, tweakColor } from "../utils.js";
+import {
+  colorToRGB,
+  debounce,
+  getMod,
+  isPointOutsideCanvas,
+  tweakColor,
+} from "../utils.js";
 import { updateEntities } from "../entities.js";
 
 const container = document.getElementById("draw-container");
@@ -29,11 +35,11 @@ for (let i = 0; i < CONFIG.maxLayer; i++) {
  */
 export const setCanvasSize = (height, width) => {
   if (height) {
-    container.style.height = `${height}px`;
+    container.style.height = canvasContainer.style.height = `${height}px`;
     canvasLayers.forEach((canvas) => (canvas.height = height));
   }
   if (width) {
-    container.style.width = `${width}px`;
+    container.style.width = canvasContainer.style.width = `${width}px`;
     canvasLayers.forEach((canvas) => (canvas.width = width));
   }
 };
@@ -45,11 +51,11 @@ export const resetCanvasSize = () => {
 
 export const updateCanvasCss = () => {
   if (MENU_CONFIG.usePerspective) {
-    container.style.transform = "perspective(50px) rotateX(1deg)";
-    container.style.marginTop = "-60px";
+    canvasContainer.style.transform = "perspective(50px) rotateX(1deg)";
+    canvasContainer.style.marginTop = "-70px";
   } else {
-    container.style.transform = null;
-    container.style.marginTop = null;
+    canvasContainer.style.transform = null;
+    canvasContainer.style.marginTop = null;
   }
 };
 
@@ -157,13 +163,7 @@ const drawCell = (cell, context) => {
 
   const point = calculatePointBasedOnPos(cell.pos, isInverted);
 
-  if (
-    point.x < 1 ||
-    point.y < 1 ||
-    point.x > polyInfo.canvasWidth - 1 ||
-    point.y > polyInfo.canvasHeight - 1
-  )
-    return;
+  if (isPointOutsideCanvas(point, polyInfo)) return;
 
   const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;
   const aCells = cell.adjacentPos[MAP_INFO.currentPoly].map(
@@ -205,11 +205,10 @@ const drawCell = (cell, context) => {
   }
 
   // Near fluid cells should take over
-  if (!cell.value) {
+  if (!cell.block) {
     const aFluid = aCells.find((c) => c?.block?.isFluid);
     if (aFluid && !filledThisRound.has(aFluid.pos)) {
       filledThisRound.add(cell.pos);
-      cell.value = aFluid.value;
       cell.block = aFluid.block;
       cell.color = aFluid.color;
     }
@@ -351,7 +350,7 @@ export const rotateCanvas = (deg) => {
     canvas.style.transform = transform;
     urls.push(`url(${canvas.toDataURL()})`);
   });
-  container.style.background = urls.join(", ");
+  canvasContainer.style.background = urls.join(", ");
 };
 
 export const resetRotateCanvas = () => {
@@ -360,5 +359,5 @@ export const resetRotateCanvas = () => {
     canvas.style.transitionProperty = null;
     canvas.style.transform = null;
   });
-  container.style.background = null;
+  canvasContainer.style.background = null;
 };

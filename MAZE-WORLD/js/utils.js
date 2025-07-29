@@ -32,9 +32,8 @@ export const tweakColor = ({ r, g, b }) => {
  * @param {number} modifier
  * @returns {string}
  */
-export const colorToRGB = ({ r, g, b }, modifier = 1) => {
-  return `rgb(${r * modifier}, ${g * modifier}, ${b * modifier})`;
-};
+export const colorToRGB = ({ r, g, b }, modifier = 1) =>
+  `rgb(${r * modifier}, ${g * modifier}, ${b * modifier})`;
 
 /**
  * @param {number} number
@@ -63,3 +62,13 @@ export const debounce = (fn, timeout = 10) => {
  * @param {number} range
  */
 export const getRange = (n, range) => Math.floor(n / range) * range;
+
+/**
+ * @param {import("./configs/infos").Point} point
+ * @param {{ canvasHeight: number, canvasWidth: number }} range
+ */
+export const isPointOutsideCanvas = (point, { canvasHeight, canvasWidth }) =>
+  point.x < 1 ||
+  point.y < 1 ||
+  point.x > canvasWidth - 1 ||
+  point.y > canvasHeight - 1;

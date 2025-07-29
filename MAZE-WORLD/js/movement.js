@@ -9,7 +9,7 @@ import { BOAT_INFO, PLAYER_INFO } from "./entities.js";
  */
 export const cellIsBlocked = (cell) =>
   !cell ||
-  !cell.value ||
+  !cell.block ||
   !!cell.wall ||
   BOAT_INFO.cell === cell ||
   (PLAYER_INFO.isInBoat ? !cell.block.isFluid : cell.block.isFluid);

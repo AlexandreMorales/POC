@@ -1,7 +1,7 @@
 import { ENTITIES_CONFIG, MOVEMENT } from "./configs/configs.js";
 import { calculatePointBasedOnPos, GRID } from "./grid.js";
 import { MAP_INFO, POLY_INFO } from "./configs/infos.js";
-import { getMod } from "./utils.js";
+import { getMod, isPointOutsideCanvas } from "./utils.js";
 
 const container = document.getElementById("entities");
 const playerImg = /** @type {HTMLImageElement} */ (
@@ -69,20 +69,27 @@ const resetBoat = () => {
   updateBoat();
 };
 
-export const updateBoat = () => {
-  const { ySide, hasInverted, cx, cy } = POLY_INFO[MAP_INFO.currentPoly];
+const updateBoat = () => {
+  const { ySide, hasInverted, cx, cy, canvasHeight, canvasWidth } =
+    POLY_INFO[MAP_INFO.currentPoly];
+  let point = { x: cx, y: cy };
 
-  if (PLAYER_INFO.isInBoat) {
-    BOAT_INFO.img.style.top = `${cy - ySide * 0.75}px`;
-    BOAT_INFO.img.style.left = `${cx - ySide * 1.25}px`;
-  } else {
-    const point = calculatePointBasedOnPos(
+  if (!PLAYER_INFO.isInBoat) {
+    point = calculatePointBasedOnPos(
       BOAT_INFO.cell.pos,
       hasInverted && BOAT_INFO.cell.isInverted
     );
-    BOAT_INFO.img.style.top = `${point.y - ySide * 1.25}px`;
-    BOAT_INFO.img.style.left = `${point.x - ySide * 1.25}px`;
+
+    BOAT_INFO.img.style.display = isPointOutsideCanvas(point, {
+      canvasHeight,
+      canvasWidth,
+    })
+      ? "none"
+      : "block";
   }
+
+  BOAT_INFO.img.style.top = `${point.y - ySide * 2}px`;
+  BOAT_INFO.img.style.left = `${point.x - ySide * 1.25}px`;
 };
 
 export const resetEntities = () => {
@@ -102,7 +109,10 @@ export const resetEntities = () => {
 export const updatePlayerDirection = (direction) => {
   playerImg.src = MOVEMENT_IMG_MAP[direction];
 
-  if (PLAYER_INFO.isInBoat) BOAT_INFO.img.src = BOAT_IMG_MAP[MOVEMENT.RIGHT];
+  if (PLAYER_INFO.isInBoat) {
+    BOAT_INFO.img.src = BOAT_IMG_MAP[MOVEMENT.RIGHT];
+    BOAT_INFO.img.style.marginTop = null;
+  }
 };
 
 /**
@@ -112,6 +122,13 @@ export const startRunning = (direction) => {
   if (PLAYER_INFO.isInBoat) {
     playerImg.src = MOVEMENT_IMG_MAP[direction];
     BOAT_INFO.img.src = BOAT_IMG_MAP[direction];
+
+    if (direction === MOVEMENT.UP || direction === MOVEMENT.DOWN) {
+      const { ySide } = POLY_INFO[MAP_INFO.currentPoly];
+      BOAT_INFO.img.style.marginTop = `${ySide}px`;
+    } else {
+      BOAT_INFO.img.style.marginTop = null;
+    }
   } else {
     playerImg.src = RUNNING_IMG_MAP[direction];
   }
@@ -157,7 +174,7 @@ const verifyEntityHeight = (entityImage, cell) => {
     }
 
     entityImage.style.clipPath = clipPath;
-  } else if (downCell.wall) {
+  } else if (downCell.wall || PLAYER_INFO.isInBoat) {
     height = ySide * ENTITIES_CONFIG.wallSizeRatio;
   }
 

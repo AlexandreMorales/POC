@@ -14,7 +14,6 @@ import { KNOWN_POLYGONS } from "./configs.js";
 
 /**
  * @typedef {Object} CellBlock
- * @property {number} value
  * @property {import("./biomes").BlockEntity} block
  * @property {import("./biomes").Color} color
  * @property {number} layer

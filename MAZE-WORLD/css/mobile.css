@@ -36,12 +36,12 @@
 
 #mobile-hud {
   display: none;
+  position: relative;
   z-index: 1;
 }
 
 @media (max-width: 768px) {
-  #zoom,
-  #controls {
+  .hide-mobile {
     display: none;
   }
 

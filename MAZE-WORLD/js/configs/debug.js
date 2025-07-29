@@ -1,5 +1,5 @@
 import { drawEveryCell } from "../draw/draw.js";
-import { GRID } from "../grid.js";
+import { GRID, placeBlock } from "../grid.js";
 import { BLOCKS } from "./biomes.js";
 import { KNOWN_POLYGONS, MENU_CONFIG } from "./configs.js";
 import { MAP_INFO, POLY_INFO } from "./infos.js";
@@ -23,18 +23,8 @@ canvasContainer.onclick = (e) => {
 
   if (cell.wall) {
     cell.wall = null;
-  } else if (cell.value && cell.layer === 0) {
-    cell.wall = {
-      block: block,
-      color: block.colorRGB,
-      value: cell.value,
-      layer: cell.layer + 1,
-    };
   } else {
-    cell.value = cell.value;
-    cell.block = block;
-    cell.color = block.colorRGB;
-    cell.layer += 1;
+    placeBlock(cell, block, block.colorRGB);
   }
 
   drawEveryCell();
