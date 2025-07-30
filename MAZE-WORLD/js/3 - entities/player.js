@@ -58,24 +58,26 @@ export const startRunning = (direction) => {
     Object.values(PLAYER_ENTITY.connectedEntities)
   );
 
-  if (connectedEntities.length) {
-    PLAYER_ENTITY.img.src = MOVEMENT_IMG_MAP[direction];
-
-    connectedEntities.forEach((entity) => {
-      entity.img.src = entity.imageMap[direction];
-
-      if (entity.movementsToCut?.length) {
-        if (entity.movementsToCut.includes(direction)) {
-          const { ySide } = POLY_INFO[GRID_INFO.currentPoly];
-          entity.img.style[CUT_MOVEMENTS_MAP[direction]] = `${ySide}px`;
-        } else {
-          entity.img.style.marginTop = null;
-          entity.img.style.marginLeft = null;
-          entity.img.style.marginRight = null;
-        }
-      }
-    });
-  } else {
+  if (!connectedEntities.length) {
     PLAYER_ENTITY.img.src = RUNNING_IMG_MAP[direction];
+    return;
   }
+
+  PLAYER_ENTITY.img.src = MOVEMENT_IMG_MAP[direction];
+
+  connectedEntities.forEach((entity) => {
+    entity.img.src = entity.imageMap[direction];
+
+    if (entity.movementsToCut?.length) {
+      if (entity.movementsToCut.includes(direction)) {
+        const { ySide } = POLY_INFO[GRID_INFO.currentPoly];
+        entity.img.style[CUT_MOVEMENTS_MAP[direction]] = `${ySide}px`;
+        return;
+      }
+
+      entity.img.style.marginTop = null;
+      entity.img.style.marginLeft = null;
+      entity.img.style.marginRight = null;
+    }
+  });
 };

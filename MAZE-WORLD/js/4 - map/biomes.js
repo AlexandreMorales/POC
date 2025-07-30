@@ -16,15 +16,6 @@
  */
 
 /**
- * @param {import("../0 - configs/infos").Block} block
- * @returns {import("../0 - configs/infos").Block}
- */
-const addRgbToBlock = (block) => {
-  block.colorRGB = hexToRgb(block.color);
-  return block;
-};
-
-/**
  * @param {string} hexColor
  * @returns {import("../0 - configs/infos").Color}
  */
@@ -45,15 +36,15 @@ const addPropsToBlock = (block, props) => ({ ...block, ...props });
 
 export const BLOCKS =
   /** @type {{ [k: string]: import("../0 - configs/infos").Block }} */ ({
-    DEEP_WATER: addRgbToBlock({ color: "#256299", layer: 0, isFluid: true }),
-    MEDIUM_WATER: addRgbToBlock({ color: "#2375b4", layer: 0, isFluid: true }),
-    SEA_SHORE: addRgbToBlock({ color: "#4699de", layer: 0, isFluid: true }),
-    BEACH_SAND: addRgbToBlock({ color: "#ab976a", layer: 0 }),
-    LOW_GRASS: addRgbToBlock({ color: "#457950", layer: 0 }),
-    MID_GRASS: addRgbToBlock({ color: "#2d673e", layer: 0 }),
-    HIGH_GRASS: addRgbToBlock({ color: "#2d673e", layer: 1 }),
-    DIRT: addRgbToBlock({ color: "#3F573A", layer: 1 }),
-    ROCK: addRgbToBlock({ color: "#CBC0BB", layer: 1 }),
+    DEEP_WATER: { color: hexToRgb("#256299"), layer: 0, isFluid: true },
+    MEDIUM_WATER: { color: hexToRgb("#2375b4"), layer: 0, isFluid: true },
+    SEA_SHORE: { color: hexToRgb("#4699de"), layer: 0, isFluid: true },
+    BEACH_SAND: { color: hexToRgb("#ab976a"), layer: 0 },
+    LOW_GRASS: { color: hexToRgb("#457950"), layer: 0 },
+    MID_GRASS: { color: hexToRgb("#2d673e"), layer: 0 },
+    HIGH_GRASS: { color: hexToRgb("#2d673e"), layer: 1 },
+    DIRT: { color: hexToRgb("#3F573A"), layer: 1 },
+    ROCK: { color: hexToRgb("#CBC0BB"), layer: 1 },
   });
 
 const BIOMES_RAW = /** @type {{ [k: string]: Biome }} */ ({

@@ -3,17 +3,27 @@ import { correctRoundError } from "../1 - utils/utils.js";
 
 import { GRID_INFO } from "./infos.js";
 
-export const GRID =
-  /** @type {import("../0 - configs/infos.js").Cell[][]} */ ([]);
-
-export const resetGrid = () => {
-  for (let i = 0; i < GRID.length; i++) {
-    GRID[i] = [];
-  }
-};
+let GRID = /** @type {import("../0 - configs/infos.js").Cell[][]} */ ([]);
 
 /**
- * @param {import("../0 - configs/infos.js").CellPos} pos
+ * @param {import("../0 - configs/infos.js").Pos} pos
+ * @return {import("../0 - configs/infos.js").Cell}
+ */
+export const getCell = ({ i, j }) => GRID[i]?.[j];
+
+/**
+ * @param {import("../0 - configs/infos.js").Pos} pos
+ * @param {import("../0 - configs/infos.js").Cell} cell
+ */
+export const addCell = ({ i, j }, cell) => {
+  GRID[i] = GRID[i] || [];
+  GRID[i][j] = cell;
+};
+
+export const resetGrid = () => (GRID = []);
+
+/**
+ * @param {import("../0 - configs/infos.js").Pos} pos
  * @param {boolean} isInverted
  * @param {import("../0 - configs/infos.js").Cell} baseCell
  * @return {import("../0 - configs/infos.js").Point}

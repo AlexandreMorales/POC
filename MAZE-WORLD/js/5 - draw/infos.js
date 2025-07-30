@@ -2,7 +2,7 @@
  * @typedef {Object} Drawable
  * @property {import("../0 - configs/infos.js").Point} point Point of where to draw
  * @property {import("../0 - configs/infos.js").Point[]} points Points of the vertices
- * @property {import("../0 - configs/infos.js").CellPos} pos
+ * @property {import("../0 - configs/infos.js").Pos} pos
  * @property {import("../0 - configs/infos.js").Color} color
  * @property {boolean} isInverted Only used for triangles
  * @property {boolean} shoulApplyDark

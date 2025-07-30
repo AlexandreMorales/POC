@@ -7,7 +7,7 @@ import {
 import { POLY_INFO } from "../0 - configs/infos.js";
 import { tweakColor } from "../1 - utils/utils.js";
 import { GRID_INFO } from "../2 - grid/infos.js";
-import { GRID } from "../2 - grid/grid.js";
+import { addCell, getCell } from "../2 - grid/grid.js";
 
 import { getChunkStart } from "./utils.js";
 import { getValue, VECTORS } from "./perlin.js";
@@ -15,15 +15,15 @@ import { BIOMES } from "./biomes.js";
 import { PLAYER_ENTITY } from "../3 - entities/player.js";
 
 /**
- * @param {import("../0 - configs/infos").CellPos} param
+ * @param {import("../0 - configs/infos").Pos} param
  * @returns {boolean}
  */
 export const isCellInverted = ({ i, j }) => (i + j) % 2 !== 0;
 
 /**
- * @param {import("../0 - configs/infos.js").CellPos} pos
+ * @param {import("../0 - configs/infos.js").Pos} pos
  * @param {boolean} isInverted
- * @returns {{ [k: number]: import("../0 - configs/infos.js").CellPos[] }}
+ * @returns {{ [k: number]: import("../0 - configs/infos.js").Pos[] }}
  */
 const getAdjacentPos = ({ i, j }, isInverted) => {
   return {
@@ -66,23 +66,22 @@ const getAdjacentPos = ({ i, j }, isInverted) => {
 };
 
 /**
- * @param {number} i
- * @param {number} j
+ * @param {import("../0 - configs/infos.js").Pos} pos
  * @param {import("../0 - configs/infos.js").Block} block
  * @returns {import("../0 - configs/infos.js").Cell}
  */
-const createCell = (i, j, block) => {
-  let cell = GRID[i]?.[j];
+const createCell = (pos, block) => {
+  let cell = getCell(pos);
   if (!cell) {
     cell = /** @type {import("../0 - configs/infos.js").Cell} */ ({});
 
-    cell.pos = { i, j };
+    cell.pos = pos;
     cell.entityName = null;
 
     if (block) {
       cell.block = block;
       cell.layer = block.layer;
-      cell.color = tweakColor(block.colorRGB);
+      cell.color = tweakColor(block.color);
     }
   }
 
@@ -111,13 +110,11 @@ const createCell = (i, j, block) => {
 };
 
 /**
- * @param {number} initialI
- * @param {number} initialJ
+ * @param {import("../0 - configs/infos.js").Pos} initialPos
  */
-export const loadChunk = (initialI, initialJ) => {
+export const loadChunk = (initialPos) => {
   const [offsetI, offsetJ] = getChunkStart(
-    initialI,
-    initialJ,
+    initialPos,
     CONFIG.chunkRows,
     CONFIG.chunkColumns
   );
@@ -126,9 +123,9 @@ export const loadChunk = (initialI, initialJ) => {
 
   for (let i = 0; i < CONFIG.chunkRows; i++) {
     const nI = i + offsetI;
-    GRID[nI] = GRID[nI] || [];
     for (let j = 0; j < CONFIG.chunkColumns; j++) {
       const nJ = j + offsetJ;
+      const pos = { i: nI, j: nJ };
 
       let biome = /** @type {import("./biomes.js").Biome} */ (null);
       switch (mapGeneration) {
@@ -148,26 +145,25 @@ export const loadChunk = (initialI, initialJ) => {
       const isHighBlock = originalBlock.layer > 0;
       const cellBlock = isHighBlock ? biome.higherGroundBlock : originalBlock;
 
-      const cell = createCell(nI, nJ, cellBlock);
-      GRID[nI][nJ] = cell;
+      const cell = createCell(pos, cellBlock);
+      addCell(pos, cell);
 
       if (isHighBlock)
         cell.wall = {
           block: originalBlock,
-          color: tweakColor(originalBlock.colorRGB),
+          color: tweakColor(originalBlock.color),
         };
     }
   }
 };
 
 /**
- * @param {number} i
- * @param {number} j
+ * @param {import("../0 - configs/infos.js").Pos} pos
  * @returns {import("../0 - configs/infos.js").Cell}
  */
-export const getGridCell = (i, j) => {
-  if (!GRID[i]?.[j]) loadChunk(i, j);
-  return GRID[i][j];
+export const getGridCell = (pos) => {
+  if (!getCell(pos)) loadChunk(pos);
+  return getCell(pos);
 };
 
 /**
@@ -176,7 +172,7 @@ export const getGridCell = (i, j) => {
 export const getCenterCell = () => {
   const { rows, columns } = POLY_INFO[GRID_INFO.currentPoly];
   const { iOffset, jOffset } = GRID_INFO;
-  const middleRow = Math.floor(rows / 2);
-  const middleColumn = Math.floor(columns / 2);
-  return getGridCell(middleRow + iOffset, middleColumn + jOffset);
+  const i = Math.floor(rows / 2) + iOffset;
+  const j = Math.floor(columns / 2) + jOffset;
+  return getGridCell({ i, j });
 };

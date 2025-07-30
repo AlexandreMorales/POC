@@ -29,28 +29,29 @@ document.ontouchstart = (e) => {
       screenX - secondTouch.screenX,
       screenY - secondTouch.screenY
     );
-  } else {
-    clearInterval(touchPos.interval);
-    touchPos.x = screenX;
-    touchPos.y = screenY;
-
-    touchPos.interval = setInterval(() => {
-      const finalX = screenX - touchPos.x;
-      const finalY = screenY - touchPos.y;
-
-      let code = null;
-      let useDiagonal = false;
-      if (Math.abs(finalY) > MOBILE_CONFIG.touchThreshold) {
-        useDiagonal = finalY > 0;
-        code = useDiagonal ? MOVEMENT.DOWN : MOVEMENT.UP;
-      }
-      if (Math.abs(finalX) > MOBILE_CONFIG.touchThreshold) {
-        code = finalX < 0 ? MOVEMENT.LEFT : MOVEMENT.RIGHT;
-      }
-
-      if (code) moveBaseOnCode(code, useDiagonal);
-    }, 100);
+    return;
   }
+
+  clearInterval(touchPos.interval);
+  touchPos.x = screenX;
+  touchPos.y = screenY;
+
+  touchPos.interval = setInterval(() => {
+    const finalX = screenX - touchPos.x;
+    const finalY = screenY - touchPos.y;
+
+    let code = null;
+    let useDiagonal = false;
+    if (Math.abs(finalY) > MOBILE_CONFIG.touchThreshold) {
+      useDiagonal = finalY > 0;
+      code = useDiagonal ? MOVEMENT.DOWN : MOVEMENT.UP;
+    }
+    if (Math.abs(finalX) > MOBILE_CONFIG.touchThreshold) {
+      code = finalX < 0 ? MOVEMENT.LEFT : MOVEMENT.RIGHT;
+    }
+
+    if (code) moveBaseOnCode(code, useDiagonal);
+  }, 100);
 };
 
 document.ontouchmove = (e) => {

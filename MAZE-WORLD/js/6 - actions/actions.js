@@ -2,7 +2,7 @@ import { KNOWN_POLYGONS_VALUES, MENU_CONFIG } from "../0 - configs/configs.js";
 import { POLY_INFO } from "../0 - configs/infos.js";
 import { getMod } from "../1 - utils/utils.js";
 import { GRID_INFO } from "../2 - grid/infos.js";
-import { GRID } from "../2 - grid/grid.js";
+import { getCell } from "../2 - grid/grid.js";
 import { MOVEMENT } from "../3 - entities/infos.js";
 import {
   PLAYER_ENTITY,
@@ -118,7 +118,7 @@ export const moveBaseOnCode = (code, useDiagonal) => {
 
   if (!nextPos) return;
 
-  const nextCell = GRID[nextPos.i]?.[nextPos.j];
+  const nextCell = getCell(nextPos);
 
   if (cellIsBlocked(nextCell, PLAYER_ENTITY)) return;
 
@@ -184,14 +184,11 @@ export const resetDirection = () => {
  */
 const getSelectedCell = () => {
   updatePlayerDirection(lastSelection);
-  const nextPos =
+  return getCell(
     PLAYER_ENTITY.cell.adjacentPos[GRID_INFO.currentPoly][
       PLAYER_ENTITY.selectedCellIndex
-    ];
-
-  if (!nextPos) return;
-
-  return GRID[nextPos.i]?.[nextPos.j];
+    ]
+  );
 };
 
 export const dig = () => {

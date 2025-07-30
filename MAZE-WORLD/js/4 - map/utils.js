@@ -6,13 +6,12 @@
 const getRange = (n, range) => Math.floor(n / range) * range;
 
 /**
- * @param {number} i
- * @param {number} j
+ * @param {import("../0 - configs/infos.js").Pos} pos
  * @param {number} height
  * @param {number} width
  * @returns {number[]}
  */
-export const getChunkStart = (i, j, height, width) => [
-  getRange(i, height),
-  getRange(j, width),
+export const getChunkStart = (pos, height, width) => [
+  getRange(pos.i, height),
+  getRange(pos.j, width),
 ];

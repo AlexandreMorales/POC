@@ -27,18 +27,18 @@ export const cellIsBlocked = (cell, entity) =>
     : cell.block.isFluid);
 
 /**
- * @param {import("../0 - configs/infos.js").CellPos} pos
- * @returns {import("../0 - configs/infos.js").CellPos}
+ * @param {import("../0 - configs/infos.js").Pos} pos
+ * @returns {import("../0 - configs/infos.js").Pos}
  */
-const getCleanCellPos = (pos) => ({ i: pos?.i || 0, j: pos?.j || 0 });
+const getCleanPos = (pos) => ({ i: pos?.i || 0, j: pos?.j || 0 });
 
 /**
  * @param {import("../0 - configs/infos.js").Cell} oldCell
  * @param {import("../0 - configs/infos.js").Cell} nextCell
  */
 export const moveCurrentCell = (oldCell, nextCell) => {
-  const oldPos = getCleanCellPos(oldCell?.pos);
-  const nextPos = getCleanCellPos(nextCell?.pos);
+  const oldPos = getCleanPos(oldCell?.pos);
+  const nextPos = getCleanPos(nextCell?.pos);
   GRID_INFO.iOffset += nextPos.i - oldPos.i;
   GRID_INFO.jOffset += nextPos.j - oldPos.j;
   PLAYER_ENTITY.cell = nextCell;

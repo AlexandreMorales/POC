@@ -110,7 +110,7 @@ const applyBorders = (context, { x, y }, points, map) => {
 
 /**
  * @param {CanvasRenderingContext2D} context
- * @param {import("../0 - configs/infos.js").CellPos} pos
+ * @param {import("../0 - configs/infos.js").Pos} pos
  * @param {import("../0 - configs/infos.js").Point} point
  * @param {boolean} isInverted
  * @param {import("../0 - configs/infos.js").PolyInfoProp} polyInfo
@@ -129,7 +129,7 @@ const showPos = (context, pos, point, isInverted, polyInfo) => {
 
 /**
  * @param {CanvasRenderingContext2D} context
- * @param {import("../0 - configs/infos.js").CellPos} pos
+ * @param {import("../0 - configs/infos.js").Pos} pos
  * @param {import("../0 - configs/infos.js").Point} point
  * @param {import("../0 - configs/infos.js").Point[]} points
  */

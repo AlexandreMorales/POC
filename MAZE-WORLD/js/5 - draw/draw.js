@@ -7,7 +7,7 @@ import {
   tweakColor,
 } from "../1 - utils/utils.js";
 import { GRID_INFO } from "../2 - grid/infos.js";
-import { calculatePointBasedOnPos, GRID } from "../2 - grid/grid.js";
+import { calculatePointBasedOnPos } from "../2 - grid/grid.js";
 import { updateEntities } from "../3 - entities/entities.js";
 import { getGridCell } from "../4 - map/map.js";
 
@@ -60,14 +60,15 @@ export const updateCanvasCss = () => {
   if (MENU_CONFIG.usePerspective) {
     canvasContainer.style.transform = "perspective(50px) rotateX(1deg)";
     canvasContainer.style.marginTop = "-70px";
-  } else {
-    canvasContainer.style.transform = null;
-    canvasContainer.style.marginTop = null;
+    return;
   }
+
+  canvasContainer.style.transform = null;
+  canvasContainer.style.marginTop = null;
 };
 
 let filledThisRound =
-  /** @type {Set<import("../0 - configs/infos.js").CellPos>} */ (new Set());
+  /** @type {Set<import("../0 - configs/infos.js").Pos>} */ (new Set());
 
 /**
  * @param {import("../0 - configs/infos.js").Cell} baseCell
@@ -87,10 +88,11 @@ export const drawEveryCell = (baseCell) => {
     for (let j = -rows; j < size; j++) {
       let nI = baseI;
       const nJ = j + GRID_INFO.jOffset;
+      const pos = { i: nI, j: nJ };
 
       if (shouldIntercalate && offsetCell && nJ % 2 === 0) nI = nI + 1;
 
-      drawCell(getGridCell(nI, nJ), contextsLayers[0], baseCell);
+      drawCell(getGridCell(pos), contextsLayers[0], baseCell);
     }
   }
 
@@ -144,9 +146,7 @@ const drawCell = (cell, context, baseCell) => {
     return;
 
   const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;
-  const aCells = cell.adjacentPos[GRID_INFO.currentPoly].map(
-    ({ i, j }) => GRID[i]?.[j]
-  );
+  const aCells = cell.adjacentPos[GRID_INFO.currentPoly].map(getGridCell);
 
   const shoulApplyDark =
     cell !== baseCell && aCells.every((c) => c !== baseCell);

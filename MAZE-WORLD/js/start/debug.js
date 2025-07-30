@@ -1,7 +1,7 @@
 import { KNOWN_POLYGONS, MENU_CONFIG } from "../0 - configs/configs.js";
 import { POLY_INFO } from "../0 - configs/infos.js";
 import { GRID_INFO } from "../2 - grid/infos.js";
-import { GRID } from "../2 - grid/grid.js";
+import { getCell } from "../2 - grid/grid.js";
 import { PLAYER_ENTITY } from "../3 - entities/player.js";
 import { BLOCKS } from "../4 - map/biomes.js";
 import { drawEveryCell } from "../5 - draw/draw.js";
@@ -19,16 +19,12 @@ canvasContainer.onclick = (e) => {
     x -= 175;
     y += 60;
   }
-  const { i, j } = calculatePosBasedOnPoint({ x, y });
-  const cell = GRID[i]?.[j];
+  const cell = getCell(calculatePosBasedOnPoint({ x, y }));
 
   const block = BLOCKS.ROCK;
 
-  if (cell.wall) {
-    cell.wall = null;
-  } else {
-    placeBlock(cell, block, block.colorRGB);
-  }
+  if (cell.wall) cell.wall = null;
+  else placeBlock(cell, block, block.color);
 
   drawEveryCell(PLAYER_ENTITY.cell);
 };
@@ -74,7 +70,7 @@ const calcI = (y, ySide, shouldIntercalate, evenJ) => {
 
 /**
  * @param {import("../0 - configs/infos.js").Point} pos
- * @return {import("../0 - configs/infos.js").CellPos}
+ * @return {import("../0 - configs/infos.js").Pos}
  */
 const calculatePosBasedOnPoint = ({ x, y }) => {
   const { xSide, ySide, shouldIntercalate, polySide } =

@@ -65,7 +65,11 @@ const vectors = /** @type {{ [k: symbol]: Vector }} */ ({
  * @param {Vector} vector
  */
 const updateVector = (i, j, vector) => {
-  const [offsetI, offsetJ] = getChunkStart(i, j, vector.height, vector.width);
+  const [offsetI, offsetJ] = getChunkStart(
+    { i, j },
+    vector.height,
+    vector.width
+  );
   for (let i = 0; i <= vector.height - 1; i++) {
     const nI = i + offsetI;
     vector.vectors[nI] = vector.vectors[nI] || [];

@@ -193,11 +193,14 @@ export const start = () => {
   updateCanvasCss();
   resetDirection();
 
-  moveCurrentCell(getCenterCell(), getGridCell(0, 0));
+  moveCurrentCell(getCenterCell(), getGridCell({ i: 0, j: 0 }));
   while (cellIsBlocked(PLAYER_ENTITY.cell, PLAYER_ENTITY)) {
     moveCurrentCell(
       PLAYER_ENTITY.cell,
-      getGridCell(PLAYER_ENTITY.cell.pos.i + 1, PLAYER_ENTITY.cell.pos.j)
+      getGridCell({
+        i: PLAYER_ENTITY.cell.pos.i + 1,
+        j: PLAYER_ENTITY.cell.pos.j,
+      })
     );
   }
   drawEveryCell(PLAYER_ENTITY.cell);

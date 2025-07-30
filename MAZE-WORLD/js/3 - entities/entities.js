@@ -1,7 +1,7 @@
 import { POLY_INFO } from "../0 - configs/infos.js";
 import { getMod, isPointOutsideCanvas } from "../1 - utils/utils.js";
 import { GRID_INFO } from "../2 - grid/infos.js";
-import { calculatePointBasedOnPos, GRID } from "../2 - grid/grid.js";
+import { calculatePointBasedOnPos, getCell } from "../2 - grid/grid.js";
 
 import { MOVEMENT } from "./infos.js";
 import { PLAYER_ENTITY } from "./player.js";
@@ -150,7 +150,7 @@ export const verifyEntityHeight = (entity) => {
   if (hasInverted && entity.cell.isInverted) downI = GRID_INFO.rotationTurns;
   downI = getMod(downI, GRID_INFO.currentPoly);
   const downPos = entity.cell.adjacentPos[GRID_INFO.currentPoly][downI];
-  const downCell = GRID[downPos.i]?.[downPos.j];
+  const downCell = getCell(downPos);
 
   let height = ySide * ENTITIES_CONFIG.defaultSizeRatio;
   entity.img.style.clipPath = null;
@@ -164,7 +164,7 @@ export const verifyEntityHeight = (entity) => {
     let leftI = GRID_INFO.rotationTurns + GRID_INFO.currentPoly - 1;
     leftI = getMod(leftI, GRID_INFO.currentPoly);
     const leftPos = entity.cell.adjacentPos[GRID_INFO.currentPoly][leftI];
-    const leftCell = GRID[leftPos.i]?.[leftPos.j];
+    const leftCell = getCell(leftPos);
 
     let clipPath = null;
 

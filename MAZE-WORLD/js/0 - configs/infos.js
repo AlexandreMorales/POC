@@ -6,7 +6,7 @@
  */
 
 /**
- * @typedef {Object} CellPos
+ * @typedef {Object} Pos
  * @property {number} i
  * @property {number} j
  */
@@ -19,9 +19,8 @@
 
 /**
  * @typedef {Object} Block
- * @property {string} color
+ * @property {Color} color
  * @property {number} layer
- * @property {Color} [colorRGB]
  * @property {boolean} [isFluid]
  */
 
@@ -34,9 +33,9 @@
 /**
  * @typedef {Object} CellProps
  * @property {number} layer
- * @property {CellPos} pos
+ * @property {Pos} pos
  * @property {CellBlock} wall The block above this one
- * @property {{ [k: number]: CellPos[] }} adjacentPos Pos of adjacent cells
+ * @property {{ [k: number]: Pos[] }} adjacentPos Pos of adjacent cells
  * @property {boolean} isInverted Only used for triangles
  * @property {string} entityName The name of the entity on top of the cell
  */
