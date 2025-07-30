@@ -12,6 +12,13 @@ import { GRID } from "../2 - grid/grid.js";
 import { getChunkStart } from "./utils.js";
 import { getValue, VECTORS } from "./perlin.js";
 import { BIOMES } from "./biomes.js";
+import { PLAYER_ENTITY } from "../3 - entities/player.js";
+
+/**
+ * @param {import("../0 - configs/infos").CellPos} param
+ * @returns {boolean}
+ */
+export const isCellInverted = ({ i, j }) => (i + j) % 2 !== 0;
 
 /**
  * @param {import("../0 - configs/infos.js").CellPos} pos
@@ -79,10 +86,28 @@ const createCell = (i, j, block) => {
     }
   }
 
-  cell.isInverted = (i + j) % 2 !== 0;
+  cell.isInverted = isCellInverted(cell.pos);
   cell.adjacentPos = getAdjacentPos(cell.pos, cell.isInverted);
 
-  return cell;
+  return new Proxy(cell, {
+    get(target, prop, receiver) {
+      if (
+        MENU_CONFIG.keepTrianglePosition &&
+        GRID_INFO.currentPoly % 2 &&
+        PLAYER_ENTITY.cell &&
+        (prop === "isInverted" || prop === "adjacentPos")
+      ) {
+        const isPlayerInverted = isCellInverted(PLAYER_ENTITY.cell.pos);
+        const newIsInverted = isPlayerInverted
+          ? !cell.isInverted
+          : cell.isInverted;
+        if (prop === "isInverted") return newIsInverted;
+        if (prop === "adjacentPos")
+          return getAdjacentPos(cell.pos, newIsInverted);
+      }
+      return Reflect.get(target, prop, receiver);
+    },
+  });
 };
 
 /**

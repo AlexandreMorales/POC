@@ -145,10 +145,9 @@ export const verifyEntityHeight = (entity) => {
   if (!entity?.cell || !entity?.img) return;
 
   const { ySide, hasInverted } = POLY_INFO[GRID_INFO.currentPoly];
+
   let downI = GRID_INFO.rotationTurns + Math.floor(GRID_INFO.currentPoly / 2);
-
   if (hasInverted && entity.cell.isInverted) downI = GRID_INFO.rotationTurns;
-
   downI = getMod(downI, GRID_INFO.currentPoly);
   const downPos = entity.cell.adjacentPos[GRID_INFO.currentPoly][downI];
   const downCell = GRID[downPos.i]?.[downPos.j];

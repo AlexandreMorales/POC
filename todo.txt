@@ -1,3 +1,5 @@
+ADD MENUS TO MAZE-CANVAS, NUMBER MERGE, CAM
+
 SNAKE https://www.youtube.com/watch?v=AaGK-fj-BAM
 HURDLE https://hurdle.iancanderson.com/
 REAL TIME CHAT
