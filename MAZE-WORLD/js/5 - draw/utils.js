@@ -1,26 +1,34 @@
-import { CANVAS_CONFIG, CONFIG, MENU_CONFIG } from "../configs/configs.js";
-import { POLY_INFO } from "../configs/infos.js";
-import { MAP_INFO } from "../grid/infos.js";
+import { CONFIG, MENU_CONFIG } from "../0 - configs/configs.js";
+import { POLY_INFO } from "../0 - configs/infos.js";
+import { GRID_INFO } from "../2 - grid/infos.js";
+import { DRAW_INFO } from "./infos.js";
+
+const DRAW_CONFIG = {
+  strokeColor: "black",
+  emptyColor: "black",
+  lineWidth: 1,
+  wallDarkness: 0.5,
+};
 
 /**
- * @param {Wall} wall
+ * @param {import("./infos.js").Wall} wall
  * @param {CanvasRenderingContext2D} context
  */
 export const drawWall = (wall, context) => {
   // Only draw if there is a gap, if is sorrounded by walls it doesnt need
   if (wall.borderMap.find((b) => !!b))
-    drawItem(context, wall, CANVAS_CONFIG.wallDarkness);
+    drawItem(context, wall, DRAW_CONFIG.wallDarkness);
 };
 
 /**
- * @param {Wall} wall
+ * @param {import("./infos.js").Wall} wall
  * @param {CanvasRenderingContext2D} context
  */
 export const drawWallTop = (wall, context) => {
   drawItem(context, wall.topInfo);
 
-  context.strokeStyle = CANVAS_CONFIG.strokeColor;
-  context.lineWidth = CANVAS_CONFIG.lineWidth;
+  context.strokeStyle = DRAW_CONFIG.strokeColor;
+  context.lineWidth = DRAW_CONFIG.lineWidth;
   applyBorders(
     context,
     wall.topInfo.point,
@@ -31,7 +39,7 @@ export const drawWallTop = (wall, context) => {
 
 /**
  * @param {CanvasRenderingContext2D} context
- * @param {Drawable} drawable
+ * @param {import("./infos.js").Drawable} drawable
  * @param {number} [modifier]
  */
 export const drawItem = (
@@ -41,33 +49,33 @@ export const drawItem = (
 ) => {
   context.fillStyle = color
     ? getFillStyle(color, shoulApplyDark, modifier)
-    : CANVAS_CONFIG.emptyColor;
+    : DRAW_CONFIG.emptyColor;
 
   fillPolygon(context, point, points);
 
   if (MENU_CONFIG.showPos)
-    showPos(context, pos, point, isInverted, POLY_INFO[MAP_INFO.currentPoly]);
+    showPos(context, pos, point, isInverted, POLY_INFO[GRID_INFO.currentPoly]);
 
   if (MENU_CONFIG.showChunks) showChunks(context, pos, point, points);
 };
 
 /**
- * @param {import("../configs/infos.js").Color} color
+ * @param {import("../0 - configs/infos.js").Color} color
  * @param {boolean} shoulApplyDark
  * @param {number} modifier
  * @return {string}
  */
 const getFillStyle = ({ r, g, b }, shoulApplyDark, modifier = 1) => {
-  if (MAP_INFO.timeOfDay && shoulApplyDark)
-    modifier = (1 - MAP_INFO.timeOfDay / 100) * modifier;
+  if (DRAW_INFO.timeOfDay && shoulApplyDark)
+    modifier = (1 - DRAW_INFO.timeOfDay / 100) * modifier;
 
   return `rgb(${r * modifier}, ${g * modifier}, ${b * modifier})`;
 };
 
 /**
  * @param {CanvasRenderingContext2D} context
- * @param {import("../configs/infos.js").Point} point
- * @param {import("../configs/infos.js").Point[]} points
+ * @param {import("../0 - configs/infos.js").Point} point
+ * @param {import("../0 - configs/infos.js").Point[]} points
  */
 const fillPolygon = (context, { x, y }, points) => {
   context.beginPath();
@@ -82,8 +90,8 @@ const fillPolygon = (context, { x, y }, points) => {
 
 /**
  * @param {CanvasRenderingContext2D} context
- * @param {import("../configs/infos.js").Point} point
- * @param {import("../configs/infos.js").Point[]} points
+ * @param {import("../0 - configs/infos.js").Point} point
+ * @param {import("../0 - configs/infos.js").Point[]} points
  * @param {boolean[]} [map]
  */
 const applyBorders = (context, { x, y }, points, map) => {
@@ -102,14 +110,14 @@ const applyBorders = (context, { x, y }, points, map) => {
 
 /**
  * @param {CanvasRenderingContext2D} context
- * @param {import("../configs/infos.js").CellPos} pos
- * @param {import("../configs/infos.js").Point} point
+ * @param {import("../0 - configs/infos.js").CellPos} pos
+ * @param {import("../0 - configs/infos.js").Point} point
  * @param {boolean} isInverted
- * @param {import("../configs/infos.js").PolyInfoProp} polyInfo
+ * @param {import("../0 - configs/infos.js").PolyInfoProp} polyInfo
  */
 const showPos = (context, pos, point, isInverted, polyInfo) => {
   context.fillStyle = "black";
-  context.font = `bold ${CONFIG.cellHeight / 5}px Arial`;
+  context.font = `bold ${DRAW_INFO.cellHeight / 5}px Arial`;
   context.textAlign = "center";
   context.textBaseline = "middle";
   context.fillText(
@@ -121,14 +129,14 @@ const showPos = (context, pos, point, isInverted, polyInfo) => {
 
 /**
  * @param {CanvasRenderingContext2D} context
- * @param {import("../configs/infos.js").CellPos} pos
- * @param {import("../configs/infos.js").Point} point
- * @param {import("../configs/infos.js").Point[]} points
+ * @param {import("../0 - configs/infos.js").CellPos} pos
+ * @param {import("../0 - configs/infos.js").Point} point
+ * @param {import("../0 - configs/infos.js").Point[]} points
  */
 const showChunks = (context, pos, point, points) => {
   if (pos.i % CONFIG.chunkRows === 0 || pos.j % CONFIG.chunkColumns === 0) {
-    context.strokeStyle = CANVAS_CONFIG.strokeColor;
-    context.lineWidth = CANVAS_CONFIG.lineWidth;
+    context.strokeStyle = DRAW_CONFIG.strokeColor;
+    context.lineWidth = DRAW_CONFIG.lineWidth;
     applyBorders(context, point, points);
   }
 };

@@ -1,28 +1,29 @@
+import { KNOWN_POLYGONS_VALUES, MENU_CONFIG } from "../0 - configs/configs.js";
+import { POLY_INFO } from "../0 - configs/infos.js";
+import { getMod } from "../1 - utils/utils.js";
+import { GRID_INFO } from "../2 - grid/infos.js";
+import { GRID } from "../2 - grid/grid.js";
+import { MOVEMENT } from "../3 - entities/infos.js";
 import {
-  KNOWN_POLYGONS_VALUES,
-  MAP_CONFIG,
-  MENU_CONFIG,
-  GRID,
-} from "../configs/configs.js";
-import { POLY_INFO } from "../configs/infos.js";
-import { getCenterCell } from "../grid/grid.js";
+  PLAYER_ENTITY,
+  startRunning,
+  updatePlayerDirection,
+} from "../3 - entities/player.js";
+import { resetEntities } from "../3 - entities/entities.js";
+import { addBoat, BOAT_NAME, toggleBoat } from "../3 - entities/boat.js";
+import { getCenterCell } from "../4 - map/map.js";
 import {
   resetCanvasSize,
   drawEveryCell,
   resetRotateCanvas,
   rotateCanvas,
-} from "../draw/draw.js";
-import { getMod } from "../utils.js";
-import { resetEntities } from "../entities/entities.js";
+} from "../5 - draw/draw.js";
+
 import { cellIsBlocked, move, moveCurrentCell } from "./movement.js";
-import { MOVEMENT } from "../entities/infos.js";
-import { MAP_INFO } from "../grid/infos.js";
-import { addBoat, BOAT_NAME, toggleBoat } from "../entities/boat.js";
-import {
-  PLAYER_ENTITY,
-  startRunning,
-  updatePlayerDirection,
-} from "../entities/player.js";
+
+const ACTIONS_CONFIG = {
+  rotateDelay: 500,
+};
 
 let canRotate = true;
 /**
@@ -31,13 +32,16 @@ let canRotate = true;
 export const rotate = (orientation) => {
   if (canRotate) {
     canRotate = false;
-    MAP_INFO.rotationTurns = PLAYER_ENTITY.selectedCellIndex = getMod(
-      MAP_INFO.rotationTurns + orientation,
-      MAP_INFO.currentPoly
+    GRID_INFO.rotationTurns = PLAYER_ENTITY.selectedCellIndex = getMod(
+      GRID_INFO.rotationTurns + orientation,
+      GRID_INFO.currentPoly
     );
 
     if (MENU_CONFIG.rotationAnimation)
-      rotateCanvas((360 / MAP_INFO.currentPoly) * -orientation);
+      rotateCanvas(
+        (360 / GRID_INFO.currentPoly) * -orientation,
+        ACTIONS_CONFIG.rotateDelay
+      );
 
     resetDirection();
 
@@ -45,26 +49,26 @@ export const rotate = (orientation) => {
       if (MENU_CONFIG.rotationAnimation) resetRotateCanvas();
       drawEveryCell(PLAYER_ENTITY.cell);
       canRotate = true;
-    }, MAP_CONFIG.rotateDelay);
+    }, ACTIONS_CONFIG.rotateDelay);
   }
 };
 
 /**
  * @param {boolean} [useDiagonal]
- * @param {import("../configs/infos.js").Cell} [cell]
+ * @param {import("../0 - configs/infos.js").Cell} [cell]
  * @returns {{ [k: symbol]: number }}
  */
 const getMovementMap = (useDiagonal, cell = PLAYER_ENTITY.cell) => {
-  let topI = MAP_INFO.rotationTurns;
-  let bottomI = topI + Math.floor(MAP_INFO.currentPoly / 2);
+  let topI = GRID_INFO.rotationTurns;
+  let bottomI = topI + Math.floor(GRID_INFO.currentPoly / 2);
 
-  let topLeftI = topI + MAP_INFO.currentPoly - 1;
+  let topLeftI = topI + GRID_INFO.currentPoly - 1;
   let topRightI = topI + 1;
 
   let bottomLeftI = bottomI + 1;
   let bottomRightI = bottomI - 1;
 
-  if (POLY_INFO[MAP_INFO.currentPoly].hasInverted) {
+  if (POLY_INFO[GRID_INFO.currentPoly].hasInverted) {
     const isInverted = cell.isInverted;
     topLeftI = bottomLeftI = topI + (isInverted ? 1 : 2);
     topRightI = bottomRightI = topI + (isInverted ? 2 : 1);
@@ -90,7 +94,7 @@ const getNextCellIndexBasedOnCode = (code, useDiagonal) => {
 
   if (aIndex === undefined) return;
 
-  return getMod(aIndex, MAP_INFO.currentPoly);
+  return getMod(aIndex, GRID_INFO.currentPoly);
 };
 
 let lastMovement = /** @type {symbol} */ (null);
@@ -110,7 +114,7 @@ export const moveBaseOnCode = (code, useDiagonal) => {
 
   const aModI = getNextCellIndexBasedOnCode(code, useDiagonal);
   if (aModI === undefined) return;
-  const nextPos = PLAYER_ENTITY.cell.adjacentPos[MAP_INFO.currentPoly][aModI];
+  const nextPos = PLAYER_ENTITY.cell.adjacentPos[GRID_INFO.currentPoly][aModI];
 
   if (!nextPos) return;
 
@@ -124,7 +128,7 @@ export const moveBaseOnCode = (code, useDiagonal) => {
 export const MOVEMENT_VALUES = Object.values(MOVEMENT);
 export const stopMoving = () => {
   if (lastMovement) {
-    if (POLY_INFO[MAP_INFO.currentPoly].hasInverted) {
+    if (POLY_INFO[GRID_INFO.currentPoly].hasInverted) {
       const movementMap = getMovementMap();
 
       for (const movement of MOVEMENT_VALUES) {
@@ -154,13 +158,13 @@ export const changeSelectedOnCode = (code) => {
 };
 
 export const changePolySides = () => {
-  MAP_INFO.currentPoly =
+  GRID_INFO.currentPoly =
     KNOWN_POLYGONS_VALUES[
-      (KNOWN_POLYGONS_VALUES.indexOf(MAP_INFO.currentPoly) + 1) %
+      (KNOWN_POLYGONS_VALUES.indexOf(GRID_INFO.currentPoly) + 1) %
         KNOWN_POLYGONS_VALUES.length
     ];
 
-  MAP_INFO.rotationTurns = 0;
+  GRID_INFO.rotationTurns = 0;
   PLAYER_ENTITY.selectedCellIndex = 0;
 
   resetDirection();
@@ -176,12 +180,12 @@ export const resetDirection = () => {
 };
 
 /**
- * @returns {import("../configs/infos.js").Cell}
+ * @returns {import("../0 - configs/infos.js").Cell}
  */
 const getSelectedCell = () => {
   updatePlayerDirection(lastSelection);
   const nextPos =
-    PLAYER_ENTITY.cell.adjacentPos[MAP_INFO.currentPoly][
+    PLAYER_ENTITY.cell.adjacentPos[GRID_INFO.currentPoly][
       PLAYER_ENTITY.selectedCellIndex
     ];
 
@@ -223,9 +227,9 @@ export const place = () => {
 };
 
 /**
- * @param {import("../configs/infos.js").Cell} cell
- * @param {import("../configs/infos.js").Block} [block]
- * @param {import("../configs/infos.js").Color} [color]
+ * @param {import("../0 - configs/infos.js").Cell} cell
+ * @param {import("../0 - configs/infos.js").Block} [block]
+ * @param {import("../0 - configs/infos.js").Color} [color]
  */
 export const placeBlock = (cell, block, color) => {
   if (!cell || !!cell.entityName) return;

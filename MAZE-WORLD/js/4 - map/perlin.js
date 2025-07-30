@@ -1,4 +1,5 @@
-import { CONFIG, MAP_CONFIG } from "../configs/configs.js";
+import { CONFIG } from "../0 - configs/configs.js";
+
 import { getChunkStart } from "./utils.js";
 
 export const VECTORS = {
@@ -6,9 +7,14 @@ export const VECTORS = {
   BLOCK: Symbol("BLOCK"),
 };
 
+const PERLIN_CONFIG = {
+  noiseResolutionBiome: 75,
+  noiseResolution: 20,
+};
+
 /**
  * @typedef {Object} Vector
- * @property {import("../configs/infos.js").Point[][]} vectors
+ * @property {import("../0 - configs/infos.js").Point[][]} vectors
  * @property {number} width
  * @property {number} height
  * @property {number} resolution
@@ -43,13 +49,13 @@ const vectors = /** @type {{ [k: symbol]: Vector }} */ ({
     width: CONFIG.chunkColumns,
     height: CONFIG.chunkRows,
     vectors: [],
-    resolution: MAP_CONFIG.noiseResolutionBiome,
+    resolution: PERLIN_CONFIG.noiseResolutionBiome,
   }),
   [VECTORS.BLOCK]: initializeVector({
     width: CONFIG.chunkColumns,
     height: CONFIG.chunkRows,
     vectors: [],
-    resolution: MAP_CONFIG.noiseResolution,
+    resolution: PERLIN_CONFIG.noiseResolution,
   }),
 });
 
@@ -116,8 +122,8 @@ const dotProduct = (vector, x, y, vx, vy) => {
 };
 
 /**
- * @param {import("../configs/infos.js").Point} v1
- * @param {import("../configs/infos.js").Point} v2
+ * @param {import("../0 - configs/infos.js").Point} v1
+ * @param {import("../0 - configs/infos.js").Point} v2
  */
 const dot = (v1, v2) => v1.x * v2.x + v1.y * v2.y;
 

@@ -1,15 +1,16 @@
-import { drawEveryCell } from "./draw/draw.js";
-import { BLOCKS } from "./grid/biomes.js";
-import { KNOWN_POLYGONS, MENU_CONFIG, GRID } from "./configs/configs.js";
-import { POLY_INFO } from "./configs/infos.js";
-import { MAP_INFO } from "./grid/infos.js";
-import { placeBlock } from "./actions/actions.js";
-import { PLAYER_ENTITY } from "./entities/player.js";
+import { KNOWN_POLYGONS, MENU_CONFIG } from "../0 - configs/configs.js";
+import { POLY_INFO } from "../0 - configs/infos.js";
+import { GRID_INFO } from "../2 - grid/infos.js";
+import { GRID } from "../2 - grid/grid.js";
+import { PLAYER_ENTITY } from "../3 - entities/player.js";
+import { BLOCKS } from "../4 - map/biomes.js";
+import { drawEveryCell } from "../5 - draw/draw.js";
+import { placeBlock } from "../6 - actions/actions.js";
 
 const canvasContainer = document.getElementById("canvas-container");
 
 canvasContainer.onclick = (e) => {
-  if (!MENU_CONFIG.debugMode || MAP_INFO.rotationTurns) return;
+  if (!MENU_CONFIG.debugMode || GRID_INFO.rotationTurns) return;
   e = e || /** @type {Event} */ (window.event);
   const { left, top } = canvasContainer.getBoundingClientRect();
   let x = e.clientX - left;
@@ -72,17 +73,17 @@ const calcI = (y, ySide, shouldIntercalate, evenJ) => {
 };
 
 /**
- * @param {import("./configs/infos.js").Point} pos
- * @return {import("./configs/infos.js").CellPos}
+ * @param {import("../0 - configs/infos.js").Point} pos
+ * @return {import("../0 - configs/infos.js").CellPos}
  */
 const calculatePosBasedOnPoint = ({ x, y }) => {
   const { xSide, ySide, shouldIntercalate, polySide } =
-    POLY_INFO[MAP_INFO.currentPoly];
+    POLY_INFO[GRID_INFO.currentPoly];
 
-  let j = getJFn(MAP_INFO.currentPoly, polySide, xSide)(x);
-  j = Math.round(j + (MAP_INFO.jOffset || 0));
+  let j = getJFn(GRID_INFO.currentPoly, polySide, xSide)(x);
+  j = Math.round(j + (GRID_INFO.jOffset || 0));
   let i = calcI(y, ySide, shouldIntercalate, !!(j % 2));
-  i += MAP_INFO.iOffset || 0;
+  i += GRID_INFO.iOffset || 0;
 
   return { i: Math.round(i), j: j };
 };

@@ -1,3 +1,5 @@
+import { MOVEMENT } from "../3 - entities/infos.js";
+import { DRAW_INFO } from "../5 - draw/infos.js";
 import {
   changePolySides,
   dig,
@@ -6,13 +8,16 @@ import {
   rotate,
   stopMoving,
   useBoat,
-} from "../actions/actions.js";
+} from "../6 - actions/actions.js";
+
 import { resetSize } from "../start/boot.js";
-import { CONFIG, MAP_CONFIG } from "../configs/configs.js";
-import { MOVEMENT } from "../entities/infos.js";
+import { CONTROLS_CONFIG } from "./configs.js";
 
 let zoomDist = 0;
 let touchPos = { x: 0, y: 0, interval: null };
+const MOBILE_CONFIG = {
+  touchThreshold: 25,
+};
 
 document.ontouchstart = (e) => {
   e = e || /** @type {TouchEvent} */ (window.event);
@@ -35,11 +40,11 @@ document.ontouchstart = (e) => {
 
       let code = null;
       let useDiagonal = false;
-      if (Math.abs(finalY) > MAP_CONFIG.touchThreshold) {
+      if (Math.abs(finalY) > MOBILE_CONFIG.touchThreshold) {
         useDiagonal = finalY > 0;
         code = useDiagonal ? MOVEMENT.DOWN : MOVEMENT.UP;
       }
-      if (Math.abs(finalX) > MAP_CONFIG.touchThreshold) {
+      if (Math.abs(finalX) > MOBILE_CONFIG.touchThreshold) {
         code = finalX < 0 ? MOVEMENT.LEFT : MOVEMENT.RIGHT;
       }
 
@@ -59,10 +64,16 @@ document.ontouchmove = (e) => {
       screenY - secondTouch.screenY
     );
 
-    if (nZoomDist > zoomDist && CONFIG.cellHeight < CONFIG.maxZoom) {
-      resetSize(CONFIG.cellHeight + 1);
-    } else if (nZoomDist < zoomDist && CONFIG.cellHeight > CONFIG.minZoom) {
-      resetSize(CONFIG.cellHeight - 1);
+    if (
+      nZoomDist > zoomDist &&
+      DRAW_INFO.cellHeight < CONTROLS_CONFIG.maxZoom
+    ) {
+      resetSize(DRAW_INFO.cellHeight + 1);
+    } else if (
+      nZoomDist < zoomDist &&
+      DRAW_INFO.cellHeight > CONTROLS_CONFIG.minZoom
+    ) {
+      resetSize(DRAW_INFO.cellHeight - 1);
     }
 
     zoomDist = nZoomDist;

@@ -1,5 +1,6 @@
-import { POLY_INFO } from "../configs/infos.js";
-import { MAP_INFO } from "../grid/infos.js";
+import { POLY_INFO } from "../0 - configs/infos.js";
+import { GRID_INFO } from "../2 - grid/infos.js";
+
 import { MOVEMENT } from "./infos.js";
 
 const MOVEMENT_IMG_MAP = /** @type {import("./infos.js").ImageMap} */ ({
@@ -65,7 +66,7 @@ export const startRunning = (direction) => {
 
       if (entity.movementsToCut?.length) {
         if (entity.movementsToCut.includes(direction)) {
-          const { ySide } = POLY_INFO[MAP_INFO.currentPoly];
+          const { ySide } = POLY_INFO[GRID_INFO.currentPoly];
           entity.img.style[CUT_MOVEMENTS_MAP[direction]] = `${ySide}px`;
         } else {
           entity.img.style.marginTop = null;

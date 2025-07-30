@@ -1,22 +1,23 @@
-import { resetDirection } from "../actions/actions.js";
 import {
-  CONFIG,
   KNOWN_POLYGONS,
   KNOWN_POLYGONS_VALUES,
-} from "../configs/configs.js";
+} from "../0 - configs/configs.js";
+import { POLY_INFO } from "../0 - configs/infos.js";
+import { correctRoundError, debounce } from "../1 - utils/utils.js";
+import { GRID_INFO } from "../2 - grid/infos.js";
+import { resetGrid } from "../2 - grid/grid.js";
+import { PLAYER_ENTITY } from "../3 - entities/player.js";
+import { resetEntities } from "../3 - entities/entities.js";
+import { getGridCell, getCenterCell } from "../4 - map/map.js";
+import { DRAW_INFO } from "../5 - draw/infos.js";
 import {
   resetCanvasSize,
   drawEveryCell,
   setCanvasSize,
   updateCanvasCss,
-} from "../draw/draw.js";
-import { resetEntities } from "../entities/entities.js";
-import { PLAYER_ENTITY } from "../entities/player.js";
-import { getGridCell, getCenterCell, resetGrid } from "../grid/grid.js";
-import { POLY_INFO } from "../configs/infos.js";
-import { cellIsBlocked, moveCurrentCell } from "../actions/movement.js";
-import { correctRoundError, debounce } from "../utils.js";
-import { MAP_INFO } from "../grid/infos.js";
+} from "../5 - draw/draw.js";
+import { cellIsBlocked, moveCurrentCell } from "../6 - actions/movement.js";
+import { resetDirection } from "../6 - actions/actions.js";
 
 const configPolys = () => {
   for (const p of KNOWN_POLYGONS_VALUES) {
@@ -25,9 +26,9 @@ const configPolys = () => {
 };
 
 /**
- * @param {import("../configs/infos.js").Point[]} points
+ * @param {import("../0 - configs/infos.js").Point[]} points
  * @param {number} height
- * @returns {import("../configs/infos.js").Point[]}
+ * @returns {import("../0 - configs/infos.js").Point[]}
  */
 const createWallPoints = (points, height) => {
   let bottomPoints = points.filter((p) => p.y >= 0);
@@ -63,7 +64,7 @@ const getXFn = (polySides, polySide, xSide) => {
 
 /**
  * @param {number} polySides
- * @returns {import("../configs/infos.js").PolyInfoProp}
+ * @returns {import("../0 - configs/infos.js").PolyInfoProp}
  */
 const configPoly = (polySides) => {
   let radiusFromSide = 0;
@@ -74,12 +75,12 @@ const configPoly = (polySides) => {
   let polySide = 0;
   const hasInverted = polySides % 2 === 1;
 
-  const ySide = correctRoundError(CONFIG.cellHeight / 2);
+  const ySide = correctRoundError(DRAW_INFO.cellHeight / 2);
 
   if (hasInverted) {
     // Pythagoras of (height² + (side/2)² = side²)
     polySide = correctRoundError(
-      Math.sqrt(CONFIG.cellHeight ** 2 / (1 - 1 / 4))
+      Math.sqrt(DRAW_INFO.cellHeight ** 2 / (1 - 1 / 4))
     );
     // (1/2)a cot(π/n);
     radiusFromSide = correctRoundError(
@@ -101,7 +102,7 @@ const configPoly = (polySides) => {
   const shouldIntercalate = polySides > KNOWN_POLYGONS.SQUARE;
 
   const yCoeficient = hasInverted
-    ? correctRoundError(-CONFIG.cellHeight / 6)
+    ? correctRoundError(-DRAW_INFO.cellHeight / 6)
     : 0;
   const coeficient = (polySides / 2 + 1) / 2;
   const points = [];
@@ -137,7 +138,7 @@ const configPoly = (polySides) => {
   let rows = canvasHeight;
   // To always have the same height because of the shouldIntercalate polys
   rows -= ySide;
-  rows = rows / CONFIG.cellHeight;
+  rows = rows / DRAW_INFO.cellHeight;
   rows = Math.floor(rows);
 
   let columns = canvasWidth / (xSide * 2);
@@ -152,7 +153,7 @@ const configPoly = (polySides) => {
   // When itercalating the first and last column should be an up column
   if (shouldIntercalate && ((columns + 1) / 2) % 2 === 0) columns -= 2;
 
-  canvasHeight = rows * CONFIG.cellHeight;
+  canvasHeight = rows * DRAW_INFO.cellHeight;
   // To always have the same height because of the shouldIntercalate polys
   canvasHeight += ySide;
   canvasHeight = Math.round(canvasHeight);
@@ -206,10 +207,10 @@ export const start = () => {
  * @param {number} newSize
  */
 export const resetSize = debounce((newSize) => {
-  CONFIG.cellHeight = newSize || CONFIG.cellHeight;
+  DRAW_INFO.cellHeight = newSize || DRAW_INFO.cellHeight;
   configPolys();
   resetEntities();
-  setCanvasSize(null, POLY_INFO[MAP_INFO.currentPoly].canvasWidth);
+  setCanvasSize(null, POLY_INFO[GRID_INFO.currentPoly].canvasWidth);
   moveCurrentCell(getCenterCell(), PLAYER_ENTITY.cell);
   drawEveryCell(PLAYER_ENTITY.cell);
 });

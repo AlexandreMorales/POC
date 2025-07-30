@@ -1,17 +1,15 @@
-import { KNOWN_POLYGONS } from "../configs/configs.js";
+import { KNOWN_POLYGONS } from "../0 - configs/configs.js";
 
 /**
- * @typedef {Object} MapInfo
+ * @typedef {Object} GridInfo
  * @property {number} currentPoly The number of sides of the current polygon
  * @property {number} iOffset
  * @property {number} jOffset
  * @property {number} rotationTurns
- * @property {number} timeOfDay
  */
-export const MAP_INFO = /** @type {MapInfo} */ ({
+export const GRID_INFO = /** @type {GridInfo} */ ({
   currentPoly: KNOWN_POLYGONS.HEXAGON,
   iOffset: 0,
   jOffset: 0,
   rotationTurns: 0,
-  timeOfDay: 0,
 });

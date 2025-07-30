@@ -1,6 +1,7 @@
-import { MAP_GENERATION, MENU_CONFIG } from "../configs/configs.js";
-import { drawEveryCell, updateCanvasCss } from "../draw/draw.js";
-import { PLAYER_ENTITY } from "../entities/player.js";
+import { MAP_GENERATION, MENU_CONFIG } from "../0 - configs/configs.js";
+import { PLAYER_ENTITY } from "../3 - entities/player.js";
+import { drawEveryCell, updateCanvasCss } from "../5 - draw/draw.js";
+
 import { start } from "../start/boot.js";
 
 const SELECT_OPTIONS = {

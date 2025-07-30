@@ -4,7 +4,7 @@
  */
 
 /**
- * @typedef {import("../configs/infos").Block & BlockProps} BlockEntity
+ * @typedef {import("../0 - configs/infos").Block & BlockProps} BlockEntity
  */
 
 /**
@@ -12,12 +12,12 @@
  * @property {BlockEntity[]} ranges
  * @property {number} maxDistance The max distance from 0,0 for this biome to appear
  * @property {number} maxValue The max value from perlin noise for this biome to appear
- * @property {import("../configs/infos").Block} higherGroundBlock
+ * @property {import("../0 - configs/infos").Block} higherGroundBlock
  */
 
 /**
- * @param {import("../configs/infos").Block} block
- * @returns {import("../configs/infos").Block}
+ * @param {import("../0 - configs/infos").Block} block
+ * @returns {import("../0 - configs/infos").Block}
  */
 const addRgbToBlock = (block) => {
   block.colorRGB = hexToRgb(block.color);
@@ -26,7 +26,7 @@ const addRgbToBlock = (block) => {
 
 /**
  * @param {string} hexColor
- * @returns {import("../configs/infos").Color}
+ * @returns {import("../0 - configs/infos").Color}
  */
 const hexToRgb = (hexColor) => {
   let hex = hexColor.slice(1);
@@ -37,14 +37,14 @@ const hexToRgb = (hexColor) => {
 };
 
 /**
- * @param {import("../configs/infos").Block} block
+ * @param {import("../0 - configs/infos").Block} block
  * @param {BlockProps} props
  * @returns {BlockEntity}
  */
 const addPropsToBlock = (block, props) => ({ ...block, ...props });
 
 export const BLOCKS =
-  /** @type {{ [k: string]: import("../configs/infos").Block }} */ ({
+  /** @type {{ [k: string]: import("../0 - configs/infos").Block }} */ ({
     DEEP_WATER: addRgbToBlock({ color: "#256299", layer: 0, isFluid: true }),
     MEDIUM_WATER: addRgbToBlock({ color: "#2375b4", layer: 0, isFluid: true }),
     SEA_SHORE: addRgbToBlock({ color: "#4699de", layer: 0, isFluid: true }),

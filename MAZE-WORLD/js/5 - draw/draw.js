@@ -1,21 +1,23 @@
-import { POLY_INFO } from "../configs/infos.js";
-import {
-  CONFIG,
-  CANVAS_CONFIG,
-  MAP_CONFIG,
-  MENU_CONFIG,
-  GRID,
-} from "../configs/configs.js";
-import { calculatePointBasedOnPos, getGridCell } from "../grid/grid.js";
+import { MENU_CONFIG } from "../0 - configs/configs.js";
+import { POLY_INFO } from "../0 - configs/infos.js";
 import {
   debounce,
   getMod,
   isPointOutsideCanvas,
   tweakColor,
-} from "../utils.js";
-import { updateEntities } from "../entities/entities.js";
-import { MAP_INFO } from "../grid/infos.js";
+} from "../1 - utils/utils.js";
+import { GRID_INFO } from "../2 - grid/infos.js";
+import { calculatePointBasedOnPos, GRID } from "../2 - grid/grid.js";
+import { updateEntities } from "../3 - entities/entities.js";
+import { getGridCell } from "../4 - map/map.js";
+
 import { drawItem, drawWall, drawWallTop } from "./utils.js";
+import { DRAW_INFO } from "./infos.js";
+
+const CANVAS_CONFIG = {
+  fluidSpeed: 500,
+  maxLayer: 2,
+};
 
 const spinContainer = document.getElementById("spin-container");
 const container = document.getElementById("draw-container");
@@ -26,7 +28,7 @@ const containers = [spinContainer, container, canvasContainer];
 const canvasLayers = /** @type {HTMLCanvasElement[]} */ ([]);
 const contextsLayers = /** @type {CanvasRenderingContext2D[]} */ ([]);
 
-for (let i = 0; i < CONFIG.maxLayer; i++) {
+for (let i = 0; i < CANVAS_CONFIG.maxLayer; i++) {
   const canvas = document.createElement("canvas");
   canvas.style.zIndex = `${i}`;
   canvasContainer.appendChild(canvas);
@@ -50,7 +52,7 @@ export const setCanvasSize = (height, width) => {
 };
 
 export const resetCanvasSize = () => {
-  const polyInfo = POLY_INFO[MAP_INFO.currentPoly];
+  const polyInfo = POLY_INFO[GRID_INFO.currentPoly];
   setCanvasSize(polyInfo.canvasHeight, polyInfo.canvasWidth);
 };
 
@@ -65,10 +67,10 @@ export const updateCanvasCss = () => {
 };
 
 let filledThisRound =
-  /** @type {Set<import("../configs/infos.js").CellPos>} */ (new Set());
+  /** @type {Set<import("../0 - configs/infos.js").CellPos>} */ (new Set());
 
 /**
- * @param {import("../configs/infos.js").Cell} baseCell
+ * @param {import("../0 - configs/infos.js").Cell} baseCell
  */
 export const drawEveryCell = (baseCell) => {
   wallLayers = [];
@@ -76,15 +78,15 @@ export const drawEveryCell = (baseCell) => {
   filledThisRound = new Set();
 
   const offsetCell = baseCell.pos.j % 2;
-  const { rows, columns, shouldIntercalate } = POLY_INFO[MAP_INFO.currentPoly];
+  const { rows, columns, shouldIntercalate } = POLY_INFO[GRID_INFO.currentPoly];
   // More range to encapsulate rotation
   const size = rows + columns;
 
   for (let i = -columns; i < size; i++) {
-    const baseI = i + MAP_INFO.iOffset;
+    const baseI = i + GRID_INFO.iOffset;
     for (let j = -rows; j < size; j++) {
       let nI = baseI;
-      const nJ = j + MAP_INFO.jOffset;
+      const nJ = j + GRID_INFO.jOffset;
 
       if (shouldIntercalate && offsetCell && nJ % 2 === 0) nI = nI + 1;
 
@@ -97,12 +99,12 @@ export const drawEveryCell = (baseCell) => {
   tweakFluids();
 };
 
-let wallLayers = /** @type {Wall[][]} */ ([]);
+let wallLayers = /** @type {import("./infos.js").Wall[][]} */ ([]);
 const drawWalls = () => {
-  for (let i = 1; i < CONFIG.maxLayer; i++) {
+  for (let i = 1; i < CANVAS_CONFIG.maxLayer; i++) {
     const walls = wallLayers[i];
     // reset canvas
-    canvasLayers[i].width = POLY_INFO[MAP_INFO.currentPoly].canvasWidth;
+    canvasLayers[i].width = POLY_INFO[GRID_INFO.currentPoly].canvasWidth;
     if (!walls) continue;
     walls.forEach((w) => drawWall(w, contextsLayers[i]));
     walls.forEach((w) => drawWallTop(w, contextsLayers[i]));
@@ -111,7 +113,7 @@ const drawWalls = () => {
 };
 
 let fluidInterval = null;
-let fluids = /** @type {Drawable[]} */ ([]);
+let fluids = /** @type {import("./infos.js").Drawable[]} */ ([]);
 const tweakFluids = debounce(() => {
   clearInterval(fluidInterval);
   if (!fluids.length) return;
@@ -128,12 +130,12 @@ const tweakFluids = debounce(() => {
 }, CANVAS_CONFIG.fluidSpeed);
 
 /**
- * @param {import("../configs/infos.js").Cell} cell
+ * @param {import("../0 - configs/infos.js").Cell} cell
  * @param {CanvasRenderingContext2D} context
- * @param {import("../configs/infos.js").Cell} baseCell
+ * @param {import("../0 - configs/infos.js").Cell} baseCell
  */
 const drawCell = (cell, context, baseCell) => {
-  const polyInfo = POLY_INFO[MAP_INFO.currentPoly];
+  const polyInfo = POLY_INFO[GRID_INFO.currentPoly];
   const isInverted = polyInfo.hasInverted && cell.isInverted;
 
   const point = calculatePointBasedOnPos(cell.pos, isInverted, baseCell);
@@ -142,7 +144,7 @@ const drawCell = (cell, context, baseCell) => {
     return;
 
   const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;
-  const aCells = cell.adjacentPos[MAP_INFO.currentPoly].map(
+  const aCells = cell.adjacentPos[GRID_INFO.currentPoly].map(
     ({ i, j }) => GRID[i]?.[j]
   );
 
@@ -175,9 +177,9 @@ const drawCell = (cell, context, baseCell) => {
         points,
       },
       borderMap: aCells.reduce((acc, c, i) => {
-        let index = i - MAP_INFO.rotationTurns;
-        if (shouldOffset) index = MAP_INFO.currentPoly - 1 - index;
-        acc[getMod(index, MAP_INFO.currentPoly)] = !c?.wall;
+        let index = i - GRID_INFO.rotationTurns;
+        if (shouldOffset) index = GRID_INFO.currentPoly - 1 - index;
+        acc[getMod(index, GRID_INFO.currentPoly)] = !c?.wall;
         return acc;
       }, []),
     });
@@ -195,7 +197,7 @@ const drawCell = (cell, context, baseCell) => {
     }
   }
 
-  const drawable = /** @type {Drawable} */ ({
+  const drawable = /** @type {import("./infos.js").Drawable} */ ({
     point,
     points,
     isInverted,
@@ -211,10 +213,11 @@ const drawCell = (cell, context, baseCell) => {
 
 /**
  * @param {number} deg
+ * @param {number} rotateDelay
  */
-export const rotateCanvas = (deg) => {
-  updateHtmlEntities((img) => rotateElement(img, -deg));
-  rotateElement(container, deg);
+export const rotateCanvas = (deg, rotateDelay) => {
+  updateHtmlEntities((img) => rotateElement(img, -deg, rotateDelay));
+  rotateElement(container, deg, rotateDelay);
   spinContainer.style.background = canvasLayers
     .map((c) => `url(${c.toDataURL()})`)
     .join(", ");
@@ -242,10 +245,11 @@ const updateHtmlEntities = (callback) => {
 /**
  * @param {HTMLElement} element
  * @param {number} [deg]
+ * @param {number} [rotateDelay]
  */
-const rotateElement = (element, deg) => {
+const rotateElement = (element, deg, rotateDelay) => {
   element.style.transitionDuration = deg
-    ? `${MAP_CONFIG.rotateDelay + 6000 / CONFIG.cellHeight}ms`
+    ? `${rotateDelay + 6000 / DRAW_INFO.cellHeight}ms`
     : null;
   element.style.transitionProperty = deg ? "transform" : null;
   element.style.transform = deg ? `rotate(${deg}deg)` : null;

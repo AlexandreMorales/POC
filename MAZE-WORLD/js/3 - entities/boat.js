@@ -1,10 +1,10 @@
+import { MOVEMENT } from "./infos.js";
 import {
   createEntity,
   moveEntityToCell,
   updateEntityPoint,
   verifyEntityHeight,
 } from "./entities.js";
-import { MOVEMENT } from "./infos.js";
 
 const BOAT_IMG_MAP = /** @type {import("./infos.js").ImageMap} */ ({
   [MOVEMENT.UP]: "images/boat/up.png",
@@ -31,7 +31,7 @@ export const toggleBoat = (entity) => {
 };
 
 /**
- * @param {import("../configs/infos.js").Cell} cell
+ * @param {import("../0 - configs/infos.js").Cell} cell
  * @param {import("./infos.js").Entity} entity
  */
 export const addBoat = (cell, entity) => {

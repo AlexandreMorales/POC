@@ -7,8 +7,8 @@ export const correctRoundError = (num, estimation = 4) =>
   Math.round(num * 10 ** estimation) / 10 ** estimation;
 
 /**
- * @param {import("./configs/infos").Color} color
- * @returns {import("./configs/infos").Color}
+ * @param {import("../0 - configs/infos").Color} color
+ * @returns {import("../0 - configs/infos").Color}
  */
 export const tweakColor = ({ r, g, b }) => {
   const randSaturation = Math.random() * 0.1 + 0.95;
@@ -44,7 +44,7 @@ export const debounce = (fn, timeout = 10) => {
 };
 
 /**
- * @param {import("./configs/infos").Point} point
+ * @param {import("../0 - configs/infos").Point} point
  * @param {number} canvasHeight
  * @param {number} canvasWidth
  * @returns {boolean}

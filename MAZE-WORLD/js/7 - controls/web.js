@@ -1,4 +1,6 @@
-import { CONFIG } from "../configs/configs.js";
+import { MOVEMENT } from "../3 - entities/infos.js";
+import { DRAW_INFO } from "../5 - draw/infos.js";
+import { move } from "../6 - actions/movement.js";
 import {
   changePolySides,
   changeSelectedOnCode,
@@ -8,10 +10,10 @@ import {
   place,
   stopMoving,
   useBoat,
-} from "../actions/actions.js";
+} from "../6 - actions/actions.js";
+
 import { resetSize } from "../start/boot.js";
-import { move } from "../actions/movement.js";
-import { MOVEMENT } from "../entities/infos.js";
+import { CONTROLS_CONFIG } from "./configs.js";
 
 const KEY_MOVEMENT_MAP = {
   ["KeyW"]: MOVEMENT.UP,
@@ -55,9 +57,9 @@ document.onkeyup = () => {
 const heightSlider = /** @type {HTMLInputElement} */ (
   document.getElementById("zoom")
 );
-heightSlider.value = `${CONFIG.cellHeight}`;
-heightSlider.min = `${CONFIG.minZoom}`;
-heightSlider.max = `${CONFIG.maxZoom}`;
+heightSlider.value = `${DRAW_INFO.cellHeight}`;
+heightSlider.min = `${CONTROLS_CONFIG.minZoom}`;
+heightSlider.max = `${CONTROLS_CONFIG.maxZoom}`;
 heightSlider.oninput = () => {
   resetSize(+heightSlider.value);
   heightSlider.blur();

@@ -13,11 +13,11 @@ export const MOVEMENT = {
  * @typedef {Object} Entity
  * @property {string} name
  * @property {HTMLImageElement} img
- * @property {import("../configs/infos.js").Cell} cell
+ * @property {import("../0 - configs/infos.js").Cell} cell
  * @property {ImageMap} imageMap
  * @property {{ [k: symbol]: import("./infos.js").Entity }} [connectedEntities]
  * @property {symbol[]} [movementsToCut]
  *
  * @property {number} [selectedCellIndex] Cell in which the player can interact
- * @property {import("../configs/infos").CellBlock[]} [pickedCells] Cells that the play dug
+ * @property {import("../0 - configs/infos.js").CellBlock[]} [pickedCells] Cells that the play dug
  */

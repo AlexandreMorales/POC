@@ -1,12 +1,13 @@
 ------------------------------------- NEXT -------------------------------------
 
-USE INDEX ON FOLDERS
-
-------------------------------------- BACKLOG -------------------------------------
-
 ADD MENU ITEM TO INVERT WORLD INSTEAD OF PLAYER CELL 
 ADD MENU ITEM TO ENABLE SELECT CELL BORDER
 ADD MENU ITEM TO ZOOM IN WHEN ANIMATING
+
+
+
+
+------------------------------------- BACKLOG -------------------------------------
 
 ADD TREES (ENTITY) (ALLOW TO BREAK TREE) (TREE ON BOAT?)
 MORE WATER ON OCEAN BIOME
@@ -99,10 +100,8 @@ README
     ORDER:
         0 - config
         1 - utils
-        2 - grid (should know entities to add trees?)
-        3 - entities (should care about grid to make clippath?)
+        2 - entities 
+        3 - grid
         4 - draw
         5 - actions
         6 - controls
-        7 - debug
-        8 - start

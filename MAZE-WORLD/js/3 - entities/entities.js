@@ -1,10 +1,10 @@
-import { calculatePointBasedOnPos } from "../grid/grid.js";
-import { POLY_INFO } from "../configs/infos.js";
-import { getMod, isPointOutsideCanvas } from "../utils.js";
+import { POLY_INFO } from "../0 - configs/infos.js";
+import { getMod, isPointOutsideCanvas } from "../1 - utils/utils.js";
+import { GRID_INFO } from "../2 - grid/infos.js";
+import { calculatePointBasedOnPos, GRID } from "../2 - grid/grid.js";
+
 import { MOVEMENT } from "./infos.js";
-import { MAP_INFO } from "../grid/infos.js";
 import { PLAYER_ENTITY } from "./player.js";
-import { GRID } from "../configs/configs.js";
 
 const ENTITIES_CONFIG = {
   notInvertedBothClipPath: "polygon(0 0, 50% 75%, 100% 0)",
@@ -36,7 +36,7 @@ const createEntityImage = (name, imageMap) => {
 
 /**
  * @param {import("./infos.js").Entity} entity
- * @param {import("../configs/infos.js").Cell} cell
+ * @param {import("../0 - configs/infos.js").Cell} cell
  */
 export const moveEntityToCell = (entity, cell) => {
   if (entity.cell) entity.cell.entityName = null;
@@ -45,7 +45,7 @@ export const moveEntityToCell = (entity, cell) => {
 };
 
 /**
- * @param {import("../configs/infos.js").Cell} cell
+ * @param {import("../0 - configs/infos.js").Cell} cell
  * @param {string} name
  * @param {import("./infos.js").ImageMap} imageMap
  * @param {Partial<import("./infos.js").Entity>} entityParams
@@ -69,7 +69,7 @@ export const createEntity = (cell, name, imageMap, entityParams = {}) => {
  */
 export const updateEntityPoint = (entity) => {
   const { hasInverted, canvasHeight, canvasWidth } =
-    POLY_INFO[MAP_INFO.currentPoly];
+    POLY_INFO[GRID_INFO.currentPoly];
   const point = calculatePointBasedOnPos(
     entity.cell.pos,
     hasInverted && entity.cell.isInverted,
@@ -93,7 +93,7 @@ export const updateEntityPoint = (entity) => {
  */
 const setImgSize = (img) => {
   if (!img) return;
-  const { ySide } = POLY_INFO[MAP_INFO.currentPoly];
+  const { ySide } = POLY_INFO[GRID_INFO.currentPoly];
   img.style.height = img.style.width = `${Math.round(
     ySide * ENTITIES_CONFIG.defaultSizeRatio
   )}px`;
@@ -103,16 +103,16 @@ const setImgSize = (img) => {
  * @param {import("./infos.js").Entity} entity
  */
 const setEntityToCenter = (entity) => {
-  const { cx, cy } = POLY_INFO[MAP_INFO.currentPoly];
+  const { cx, cy } = POLY_INFO[GRID_INFO.currentPoly];
   setEntityPoint(entity, { x: cx, y: cy });
 };
 
 /**
  * @param {import("./infos.js").Entity} entity
- * @param {import("../configs/infos.js").Point} point
+ * @param {import("../0 - configs/infos.js").Point} point
  */
 const setEntityPoint = (entity, point) => {
-  const { ySide } = POLY_INFO[MAP_INFO.currentPoly];
+  const { ySide } = POLY_INFO[GRID_INFO.currentPoly];
   entity.img.style.top = `${point.y - ySide * 2}px`;
   entity.img.style.left = `${point.x - ySide * 1.25}px`;
 };
@@ -144,13 +144,13 @@ export const updateEntities = () => {
 export const verifyEntityHeight = (entity) => {
   if (!entity?.cell || !entity?.img) return;
 
-  const { ySide, hasInverted } = POLY_INFO[MAP_INFO.currentPoly];
-  let downI = MAP_INFO.rotationTurns + Math.floor(MAP_INFO.currentPoly / 2);
+  const { ySide, hasInverted } = POLY_INFO[GRID_INFO.currentPoly];
+  let downI = GRID_INFO.rotationTurns + Math.floor(GRID_INFO.currentPoly / 2);
 
-  if (hasInverted && entity.cell.isInverted) downI = MAP_INFO.rotationTurns;
+  if (hasInverted && entity.cell.isInverted) downI = GRID_INFO.rotationTurns;
 
-  downI = getMod(downI, MAP_INFO.currentPoly);
-  const downPos = entity.cell.adjacentPos[MAP_INFO.currentPoly][downI];
+  downI = getMod(downI, GRID_INFO.currentPoly);
+  const downPos = entity.cell.adjacentPos[GRID_INFO.currentPoly][downI];
   const downCell = GRID[downPos.i]?.[downPos.j];
 
   let height = ySide * ENTITIES_CONFIG.defaultSizeRatio;
@@ -162,9 +162,9 @@ export const verifyEntityHeight = (entity) => {
   if (hasInverted && !entity.cell.isInverted) {
     const rightCell = downCell;
 
-    let leftI = MAP_INFO.rotationTurns + MAP_INFO.currentPoly - 1;
-    leftI = getMod(leftI, MAP_INFO.currentPoly);
-    const leftPos = entity.cell.adjacentPos[MAP_INFO.currentPoly][leftI];
+    let leftI = GRID_INFO.rotationTurns + GRID_INFO.currentPoly - 1;
+    leftI = getMod(leftI, GRID_INFO.currentPoly);
+    const leftPos = entity.cell.adjacentPos[GRID_INFO.currentPoly][leftI];
     const leftCell = GRID[leftPos.i]?.[leftPos.j];
 
     let clipPath = null;
