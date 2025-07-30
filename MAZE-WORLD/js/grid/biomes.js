@@ -1,38 +1,23 @@
 /**
- * @typedef {Object} Color
- * @property {number} r
- * @property {number} g
- * @property {number} b
- */
-
-/**
- * @typedef {Object} BlockEntity
- * @property {string} color
- * @property {number} layer
- * @property {Color} [colorRGB]
- * @property {boolean} [isFluid]
- */
-
-/**
  * @typedef {Object} BlockProps
  * @property {number} max
  */
 
 /**
- * @typedef {BlockEntity & BlockProps} Block
+ * @typedef {import("../configs/infos").Block & BlockProps} BlockEntity
  */
 
 /**
  * @typedef {Object} Biome
- * @property {Block[]} ranges
+ * @property {BlockEntity[]} ranges
  * @property {number} maxDistance The max distance from 0,0 for this biome to appear
  * @property {number} maxValue The max value from perlin noise for this biome to appear
- * @property {BlockEntity} higherGroundBlock
+ * @property {import("../configs/infos").Block} higherGroundBlock
  */
 
 /**
- * @param {BlockEntity} block
- * @returns {BlockEntity}
+ * @param {import("../configs/infos").Block} block
+ * @returns {import("../configs/infos").Block}
  */
 const addRgbToBlock = (block) => {
   block.colorRGB = hexToRgb(block.color);
@@ -41,7 +26,7 @@ const addRgbToBlock = (block) => {
 
 /**
  * @param {string} hexColor
- * @returns {Color}
+ * @returns {import("../configs/infos").Color}
  */
 const hexToRgb = (hexColor) => {
   let hex = hexColor.slice(1);
@@ -52,23 +37,24 @@ const hexToRgb = (hexColor) => {
 };
 
 /**
- * @param {BlockEntity} block
+ * @param {import("../configs/infos").Block} block
  * @param {BlockProps} props
- * @returns {Block}
+ * @returns {BlockEntity}
  */
 const addPropsToBlock = (block, props) => ({ ...block, ...props });
 
-export const BLOCKS = /** @type {{ [k: string]: BlockEntity }} */ ({
-  DEEP_WATER: addRgbToBlock({ color: "#256299", layer: 0, isFluid: true }),
-  MEDIUM_WATER: addRgbToBlock({ color: "#2375b4", layer: 0, isFluid: true }),
-  SEA_SHORE: addRgbToBlock({ color: "#4699de", layer: 0, isFluid: true }),
-  BEACH_SAND: addRgbToBlock({ color: "#ab976a", layer: 0 }),
-  LOW_GRASS: addRgbToBlock({ color: "#457950", layer: 0 }),
-  MID_GRASS: addRgbToBlock({ color: "#2d673e", layer: 0 }),
-  HIGH_GRASS: addRgbToBlock({ color: "#2d673e", layer: 1 }),
-  DIRT: addRgbToBlock({ color: "#3F573A", layer: 1 }),
-  ROCK: addRgbToBlock({ color: "#CBC0BB", layer: 1 }),
-});
+export const BLOCKS =
+  /** @type {{ [k: string]: import("../configs/infos").Block }} */ ({
+    DEEP_WATER: addRgbToBlock({ color: "#256299", layer: 0, isFluid: true }),
+    MEDIUM_WATER: addRgbToBlock({ color: "#2375b4", layer: 0, isFluid: true }),
+    SEA_SHORE: addRgbToBlock({ color: "#4699de", layer: 0, isFluid: true }),
+    BEACH_SAND: addRgbToBlock({ color: "#ab976a", layer: 0 }),
+    LOW_GRASS: addRgbToBlock({ color: "#457950", layer: 0 }),
+    MID_GRASS: addRgbToBlock({ color: "#2d673e", layer: 0 }),
+    HIGH_GRASS: addRgbToBlock({ color: "#2d673e", layer: 1 }),
+    DIRT: addRgbToBlock({ color: "#3F573A", layer: 1 }),
+    ROCK: addRgbToBlock({ color: "#CBC0BB", layer: 1 }),
+  });
 
 const BIOMES_RAW = /** @type {{ [k: string]: Biome }} */ ({
   FOREST: {

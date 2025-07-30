@@ -1,4 +1,9 @@
-import { KNOWN_POLYGONS } from "./configs.js";
+/**
+ * @typedef {Object} Color
+ * @property {number} r
+ * @property {number} g
+ * @property {number} b
+ */
 
 /**
  * @typedef {Object} CellPos
@@ -13,9 +18,17 @@ import { KNOWN_POLYGONS } from "./configs.js";
  */
 
 /**
+ * @typedef {Object} Block
+ * @property {string} color
+ * @property {number} layer
+ * @property {Color} [colorRGB]
+ * @property {boolean} [isFluid]
+ */
+
+/**
  * @typedef {Object} CellBlock
- * @property {import("./biomes").BlockEntity} block
- * @property {import("./biomes").Color} color
+ * @property {Block} block
+ * @property {Color} color
  * @property {number} layer
  */
 
@@ -30,28 +43,6 @@ import { KNOWN_POLYGONS } from "./configs.js";
 /**
  * @typedef {CellBlock & CellProps} Cell
  */
-
-/**
- * @typedef {Object} MapInfo
- * @property {number} currentPoly The number of sides of the current polygon
- * @property {Cell} currentCell
- * @property {number} selectedCellIndex Cell in which the player can interact
- * @property {CellBlock[]} pickedCells Cells that the play dug
- * @property {number} iOffset
- * @property {number} jOffset
- * @property {number} rotationTurns
- * @property {number} timeOfDay
- */
-export const MAP_INFO = /** @type {MapInfo} */ ({
-  currentPoly: KNOWN_POLYGONS.HEXAGON,
-  currentCell: null,
-  selectedCellIndex: 0,
-  pickedCells: [],
-  iOffset: 0,
-  jOffset: 0,
-  rotationTurns: 0,
-  timeOfDay: 0,
-});
 
 /**
  * @typedef {Object} PolyInfoProp

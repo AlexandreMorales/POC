@@ -1,5 +1,5 @@
-import { CONFIG, MAP_CONFIG } from "./configs/configs.js";
-import { getRange } from "./utils.js";
+import { CONFIG, MAP_CONFIG } from "../configs/configs.js";
+import { getChunkStart } from "./utils.js";
 
 export const VECTORS = {
   BIOME: Symbol("BIOME"),
@@ -8,7 +8,7 @@ export const VECTORS = {
 
 /**
  * @typedef {Object} Vector
- * @property {import("./configs/infos.js").Point[][]} vectors
+ * @property {import("../configs/infos.js").Point[][]} vectors
  * @property {number} width
  * @property {number} height
  * @property {number} resolution
@@ -58,18 +58,8 @@ const vectors = /** @type {{ [k: symbol]: Vector }} */ ({
  * @param {number} j
  * @param {Vector} vector
  */
-const getChunkStart = (i, j, vector) => [
-  getRange(i, vector.height),
-  getRange(j, vector.width),
-];
-
-/**
- * @param {number} i
- * @param {number} j
- * @param {Vector} vector
- */
 const updateVector = (i, j, vector) => {
-  const [offsetI, offsetJ] = getChunkStart(i, j, vector);
+  const [offsetI, offsetJ] = getChunkStart(i, j, vector.height, vector.width);
   for (let i = 0; i <= vector.height - 1; i++) {
     const nI = i + offsetI;
     vector.vectors[nI] = vector.vectors[nI] || [];
@@ -126,8 +116,8 @@ const dotProduct = (vector, x, y, vx, vy) => {
 };
 
 /**
- * @param {import("./configs/infos.js").Point} v1
- * @param {import("./configs/infos.js").Point} v2
+ * @param {import("../configs/infos.js").Point} v1
+ * @param {import("../configs/infos.js").Point} v2
  */
 const dot = (v1, v2) => v1.x * v2.x + v1.y * v2.y;
 

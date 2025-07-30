@@ -1,15 +1,22 @@
-import { resetDirection } from "../actions.js";
+import { resetDirection } from "../actions/actions.js";
 import {
   CONFIG,
   KNOWN_POLYGONS,
   KNOWN_POLYGONS_VALUES,
 } from "../configs/configs.js";
-import { resetCanvasSize, drawEveryCell, setCanvasSize } from "../draw/draw.js";
-import { resetEntities } from "../entities.js";
-import { getGridCell, getCenterCell, resetGrid } from "../grid.js";
-import { MAP_INFO, POLY_INFO } from "../configs/infos.js";
-import { cellIsBlocked, moveCurrentCell } from "../movement.js";
+import {
+  resetCanvasSize,
+  drawEveryCell,
+  setCanvasSize,
+  updateCanvasCss,
+} from "../draw/draw.js";
+import { resetEntities } from "../entities/entities.js";
+import { PLAYER_ENTITY } from "../entities/player.js";
+import { getGridCell, getCenterCell, resetGrid } from "../grid/grid.js";
+import { POLY_INFO } from "../configs/infos.js";
+import { cellIsBlocked, moveCurrentCell } from "../actions/movement.js";
 import { correctRoundError, debounce } from "../utils.js";
+import { MAP_INFO } from "../grid/infos.js";
 
 const configPolys = () => {
   for (const p of KNOWN_POLYGONS_VALUES) {
@@ -182,13 +189,14 @@ export const start = () => {
   resetGrid();
   resetEntities();
   resetCanvasSize();
+  updateCanvasCss();
   resetDirection();
 
   moveCurrentCell(getCenterCell(), getGridCell(0, 0));
-  while (cellIsBlocked(MAP_INFO.currentCell)) {
+  while (cellIsBlocked(PLAYER_ENTITY.cell, PLAYER_ENTITY)) {
     moveCurrentCell(
-      MAP_INFO.currentCell,
-      getGridCell(MAP_INFO.currentCell.pos.i + 1, MAP_INFO.currentCell.pos.j)
+      PLAYER_ENTITY.cell,
+      getGridCell(PLAYER_ENTITY.cell.pos.i + 1, PLAYER_ENTITY.cell.pos.j)
     );
   }
   drawEveryCell();
@@ -202,6 +210,6 @@ export const resetSize = debounce((newSize) => {
   configPolys();
   resetEntities();
   setCanvasSize(null, POLY_INFO[MAP_INFO.currentPoly].canvasWidth);
-  moveCurrentCell(getCenterCell(), MAP_INFO.currentCell);
+  moveCurrentCell(getCenterCell(), PLAYER_ENTITY.cell);
   drawEveryCell();
 });

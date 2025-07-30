@@ -1,28 +1,32 @@
 import {
-  MOVEMENT,
   KNOWN_POLYGONS_VALUES,
-  MOVEMENT_VALUES,
   MAP_CONFIG,
   MENU_CONFIG,
-} from "./configs/configs.js";
-import { MAP_INFO, POLY_INFO } from "./configs/infos.js";
-import { GRID, getCenterCell, placeBlock } from "./grid.js";
+} from "../configs/configs.js";
+import { POLY_INFO } from "../configs/infos.js";
+import { GRID, getCenterCell } from "../grid/grid.js";
 import {
   resetCanvasSize,
   drawEveryCell,
   resetRotateCanvas,
   rotateCanvas,
-} from "./draw/draw.js";
-import { getMod } from "./utils.js";
-import {
-  startRunning,
-  resetEntities,
-  updatePlayerDirection,
-  addBoat,
-  PLAYER_INFO,
-  BOAT_INFO,
-} from "./entities.js";
+} from "../draw/draw.js";
+import { getMod } from "../utils.js";
+import { resetEntities, getEntities } from "../entities/entities.js";
 import { cellIsBlocked, move, moveCurrentCell } from "./movement.js";
+import { MOVEMENT } from "../entities/infos.js";
+import { MAP_INFO } from "../grid/infos.js";
+import {
+  addBoat,
+  BOAT_NAME,
+  toggleBoat,
+  isBoatInCell,
+} from "../entities/boat.js";
+import {
+  PLAYER_ENTITY,
+  startRunning,
+  updatePlayerDirection,
+} from "../entities/player.js";
 
 let canRotate = true;
 /**
@@ -31,7 +35,7 @@ let canRotate = true;
 export const rotate = (orientation) => {
   if (canRotate) {
     canRotate = false;
-    MAP_INFO.rotationTurns = MAP_INFO.selectedCellIndex = getMod(
+    MAP_INFO.rotationTurns = PLAYER_ENTITY.selectedCellIndex = getMod(
       MAP_INFO.rotationTurns + orientation,
       MAP_INFO.currentPoly
     );
@@ -51,10 +55,10 @@ export const rotate = (orientation) => {
 
 /**
  * @param {boolean} [useDiagonal]
- * @param {import("./configs/infos.js").Cell} [cell]
+ * @param {import("../configs/infos.js").Cell} [cell]
  * @returns {{ [k: symbol]: number }}
  */
-const getMovementMap = (useDiagonal, cell = MAP_INFO.currentCell) => {
+const getMovementMap = (useDiagonal, cell = PLAYER_ENTITY.cell) => {
   let topI = MAP_INFO.rotationTurns;
   let bottomI = topI + Math.floor(MAP_INFO.currentPoly / 2);
 
@@ -110,24 +114,25 @@ export const moveBaseOnCode = (code, useDiagonal) => {
 
   const aModI = getNextCellIndexBasedOnCode(code, useDiagonal);
   if (aModI === undefined) return;
-  const nextPos = MAP_INFO.currentCell.adjacentPos[MAP_INFO.currentPoly][aModI];
+  const nextPos = PLAYER_ENTITY.cell.adjacentPos[MAP_INFO.currentPoly][aModI];
 
   if (!nextPos) return;
 
   const nextCell = GRID[nextPos.i]?.[nextPos.j];
 
-  if (cellIsBlocked(nextCell)) return;
+  if (cellIsBlocked(nextCell, PLAYER_ENTITY)) return;
 
   move(nextCell);
 };
 
+export const MOVEMENT_VALUES = Object.values(MOVEMENT);
 export const stopMoving = () => {
   if (lastMovement) {
     if (POLY_INFO[MAP_INFO.currentPoly].hasInverted) {
       const movementMap = getMovementMap();
 
       for (const movement of MOVEMENT_VALUES) {
-        if (movementMap[movement] === MAP_INFO.selectedCellIndex) {
+        if (movementMap[movement] === PLAYER_ENTITY.selectedCellIndex) {
           lastSelection = movement;
           break;
         }
@@ -146,9 +151,9 @@ export const changeSelectedOnCode = (code) => {
 
   lastSelection = code;
   const aModI = getNextCellIndexBasedOnCode(code);
-  if (aModI === undefined || aModI === MAP_INFO.selectedCellIndex) return;
+  if (aModI === undefined || aModI === PLAYER_ENTITY.selectedCellIndex) return;
 
-  MAP_INFO.selectedCellIndex = aModI;
+  PLAYER_ENTITY.selectedCellIndex = aModI;
   updatePlayerDirection(lastSelection);
 };
 
@@ -160,12 +165,12 @@ export const changePolySides = () => {
     ];
 
   MAP_INFO.rotationTurns = 0;
-  MAP_INFO.selectedCellIndex = 0;
+  PLAYER_ENTITY.selectedCellIndex = 0;
 
   resetDirection();
   resetEntities();
   resetCanvasSize();
-  moveCurrentCell(getCenterCell(), MAP_INFO.currentCell);
+  moveCurrentCell(getCenterCell(), PLAYER_ENTITY.cell);
   drawEveryCell();
 };
 
@@ -175,13 +180,13 @@ export const resetDirection = () => {
 };
 
 /**
- * @returns {import("./configs/infos.js").Cell}
+ * @returns {import("../configs/infos.js").Cell}
  */
 const getSelectedCell = () => {
   updatePlayerDirection(lastSelection);
   const nextPos =
-    MAP_INFO.currentCell.adjacentPos[MAP_INFO.currentPoly][
-      MAP_INFO.selectedCellIndex
+    PLAYER_ENTITY.cell.adjacentPos[MAP_INFO.currentPoly][
+      PLAYER_ENTITY.selectedCellIndex
     ];
 
   if (!nextPos) return;
@@ -192,9 +197,14 @@ const getSelectedCell = () => {
 export const dig = () => {
   const selectedCell = getSelectedCell();
 
-  if (!selectedCell?.block || selectedCell.block.isFluid) return;
+  if (
+    !selectedCell?.block ||
+    selectedCell.block.isFluid ||
+    !!getEntities().find((e) => e.cell === selectedCell)
+  )
+    return;
 
-  MAP_INFO.pickedCells.push({ ...(selectedCell.wall || selectedCell) });
+  PLAYER_ENTITY.pickedCells.push({ ...(selectedCell.wall || selectedCell) });
 
   if (selectedCell.wall) {
     selectedCell.wall = null;
@@ -207,36 +217,57 @@ export const dig = () => {
 };
 
 export const place = () => {
-  if (!MAP_INFO.pickedCells.length) return;
+  if (!PLAYER_ENTITY.pickedCells.length) return;
 
   const selectedCell = getSelectedCell();
-
-  if (!selectedCell || selectedCell.wall) return;
-
-  const nextBlock = MAP_INFO.pickedCells.pop();
-
-  placeBlock(selectedCell, nextBlock.block, nextBlock.color);
+  if (selectedCell?.wall) return;
+  placeBlock(selectedCell);
 
   move();
+};
+
+/**
+ * @param {import("../configs/infos.js").Cell} cell
+ * @param {import("../configs/infos.js").Block} [block]
+ * @param {import("../configs/infos.js").Color} [color]
+ */
+export const placeBlock = (cell, block, color) => {
+  if (!cell || !!getEntities().find((e) => e?.cell === cell)) return;
+
+  if (!block) {
+    const cellBlock = PLAYER_ENTITY.pickedCells.pop();
+    block = cellBlock.block;
+    color = cellBlock.color;
+  }
+
+  if (cell.block && !cell.block.isFluid) {
+    cell.wall = {
+      block: block,
+      color: color,
+      layer: (cell.layer || 0) + 1,
+    };
+  } else {
+    cell.block = block;
+    cell.color = color;
+  }
 };
 
 export const useBoat = () => {
   const selectedCell = getSelectedCell();
   const canMove = !selectedCell.wall && selectedCell.block;
 
-  if (PLAYER_INFO.isInBoat) {
+  if (PLAYER_ENTITY.connectedEntities[BOAT_NAME]) {
     if (!selectedCell?.block?.isFluid && canMove) {
-      PLAYER_INFO.isInBoat = false;
-      addBoat(MAP_INFO.currentCell);
+      toggleBoat(PLAYER_ENTITY);
       move(selectedCell);
     }
     return;
   }
 
-  if (BOAT_INFO.cell === selectedCell) {
-    PLAYER_INFO.isInBoat = true;
+  if (isBoatInCell(selectedCell)) {
+    toggleBoat(PLAYER_ENTITY);
     move(selectedCell);
   } else if (canMove) {
-    addBoat(selectedCell);
+    addBoat(selectedCell, PLAYER_ENTITY);
   }
 };

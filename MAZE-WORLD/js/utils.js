@@ -1,10 +1,4 @@
 /**
- * @param {import("./configs/infos").CellPos} param
- * @returns {boolean}
- */
-export const isCellInverted = ({ i, j }) => (i + j) % 2 !== 0;
-
-/**
  * @param {number} num
  * @param {number} estimation
  * @returns {number}
@@ -13,8 +7,8 @@ export const correctRoundError = (num, estimation = 4) =>
   Math.round(num * 10 ** estimation) / 10 ** estimation;
 
 /**
- * @param {import("./configs/biomes").Color} color
- * @returns {import("./configs/biomes").Color}
+ * @param {import("./configs/infos").Color} color
+ * @returns {import("./configs/infos").Color}
  */
 export const tweakColor = ({ r, g, b }) => {
   const randSaturation = Math.random() * 0.1 + 0.95;
@@ -26,14 +20,6 @@ export const tweakColor = ({ r, g, b }) => {
 
   return { r, g, b };
 };
-
-/**
- * @param {import("./configs/biomes.js").Color} color
- * @param {number} modifier
- * @returns {string}
- */
-export const colorToRGB = ({ r, g, b }, modifier = 1) =>
-  `rgb(${r * modifier}, ${g * modifier}, ${b * modifier})`;
 
 /**
  * @param {number} number
@@ -58,16 +44,12 @@ export const debounce = (fn, timeout = 10) => {
 };
 
 /**
- * @param {number} n
- * @param {number} range
- */
-export const getRange = (n, range) => Math.floor(n / range) * range;
-
-/**
  * @param {import("./configs/infos").Point} point
- * @param {{ canvasHeight: number, canvasWidth: number }} range
+ * @param {number} canvasHeight
+ * @param {number} canvasWidth
+ * @returns {boolean}
  */
-export const isPointOutsideCanvas = (point, { canvasHeight, canvasWidth }) =>
+export const isPointOutsideCanvas = (point, canvasHeight, canvasWidth) =>
   point.x < 1 ||
   point.y < 1 ||
   point.x > canvasWidth - 1 ||

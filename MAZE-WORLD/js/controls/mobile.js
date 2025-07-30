@@ -6,9 +6,10 @@ import {
   rotate,
   stopMoving,
   useBoat,
-} from "../actions.js";
+} from "../actions/actions.js";
 import { resetSize } from "../start/boot.js";
-import { CONFIG, MAP_CONFIG, MOVEMENT } from "../configs/configs.js";
+import { CONFIG, MAP_CONFIG } from "../configs/configs.js";
+import { MOVEMENT } from "../entities/infos.js";
 
 let zoomDist = 0;
 let touchPos = { x: 0, y: 0, interval: null };

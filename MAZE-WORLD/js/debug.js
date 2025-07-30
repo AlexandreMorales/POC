@@ -1,8 +1,11 @@
-import { drawEveryCell } from "../draw/draw.js";
-import { GRID, placeBlock } from "../grid.js";
-import { BLOCKS } from "./biomes.js";
-import { KNOWN_POLYGONS, MENU_CONFIG } from "./configs.js";
-import { MAP_INFO, POLY_INFO } from "./infos.js";
+import { drawEveryCell } from "./draw/draw.js";
+import { GRID } from "./grid/grid.js";
+import { BLOCKS } from "./grid/biomes.js";
+import { KNOWN_POLYGONS, MENU_CONFIG } from "./configs/configs.js";
+import { POLY_INFO } from "./configs/infos.js";
+import { MAP_INFO } from "./grid/infos.js";
+import { placeBlock } from "./actions/actions.js";
+import { PLAYER_ENTITY } from "./entities/player.js";
 
 const canvasContainer = document.getElementById("canvas-container");
 
@@ -13,8 +16,8 @@ canvasContainer.onclick = (e) => {
   let x = e.clientX - rect.left;
   let y = e.clientY - rect.top;
   if (MENU_CONFIG.usePerspective) {
-    x += 125;
-    y += 70;
+    x -= 175;
+    y += 60;
   }
   const { i, j } = calculatePosBasedOnPoint({ x, y });
   const cell = GRID[i]?.[j];
@@ -60,9 +63,9 @@ const getJFn = (polySides, polySide, xSide) => {
 const calcI = (y, ySide, shouldIntercalate, evenJ) => {
   let dividend = y - ySide;
   if (shouldIntercalate) {
-    if (MAP_INFO.currentCell.pos.j % 2 && !evenJ) {
+    if (PLAYER_ENTITY.cell.pos.j % 2 && !evenJ) {
       dividend += ySide;
-    } else if (!(MAP_INFO.currentCell.pos.j % 2) && evenJ) {
+    } else if (!(PLAYER_ENTITY.cell.pos.j % 2) && evenJ) {
       dividend -= ySide;
     }
   }
@@ -70,8 +73,8 @@ const calcI = (y, ySide, shouldIntercalate, evenJ) => {
 };
 
 /**
- * @param {import("infos.js").Point} pos
- * @return {import("infos.js").CellPos}
+ * @param {import("./configs/infos.js").Point} pos
+ * @return {import("./configs/infos.js").CellPos}
  */
 const calculatePosBasedOnPoint = ({ x, y }) => {
   const { xSide, ySide, shouldIntercalate, polySide } =

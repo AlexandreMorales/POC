@@ -1,4 +1,4 @@
-import { CONFIG, MOVEMENT } from "../configs/configs.js";
+import { CONFIG } from "../configs/configs.js";
 import {
   changePolySides,
   changeSelectedOnCode,
@@ -8,9 +8,10 @@ import {
   place,
   stopMoving,
   useBoat,
-} from "../actions.js";
+} from "../actions/actions.js";
 import { resetSize } from "../start/boot.js";
-import { move } from "../movement.js";
+import { move } from "../actions/movement.js";
+import { MOVEMENT } from "../entities/infos.js";
 
 const KEY_MOVEMENT_MAP = {
   ["KeyW"]: MOVEMENT.UP,

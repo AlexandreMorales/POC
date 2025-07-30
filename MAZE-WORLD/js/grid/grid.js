@@ -3,29 +3,32 @@ import {
   KNOWN_POLYGONS,
   MAP_GENERATION,
   MENU_CONFIG,
-} from "./configs/configs.js";
-import { POLY_INFO, MAP_INFO } from "./configs/infos.js";
-import { BIOMES } from "./configs/biomes.js";
-import {
-  tweakColor,
-  isCellInverted,
-  correctRoundError,
-  getRange,
-} from "./utils.js";
+} from "../configs/configs.js";
+import { POLY_INFO } from "../configs/infos.js";
+import { BIOMES } from "./biomes.js";
+import { tweakColor, correctRoundError } from "../utils.js";
 import { getValue, VECTORS } from "./perlin.js";
+import { MAP_INFO } from "./infos.js";
+import { getChunkStart } from "./utils.js";
 
-export let GRID = /** @type {import("./configs/infos.js").Cell[][]} */ ([]);
+export let GRID = /** @type {import("../configs/infos.js").Cell[][]} */ ([]);
+
+/**
+ * @param {import("../configs/infos").CellPos} param
+ * @returns {boolean}
+ */
+export const isCellInverted = ({ i, j }) => (i + j) % 2 !== 0;
 
 /**
  * @param {number} i
  * @param {number} j
- * @param {import("./configs/biomes.js").BlockEntity} block
- * @returns {import("./configs/infos.js").Cell}
+ * @param {import("../configs/infos.js").Block} block
+ * @returns {import("../configs/infos.js").Cell}
  */
 const createCell = (i, j, block) => {
   let cell = GRID[i]?.[j];
   if (!cell) {
-    cell = /** @type {import("./configs/infos.js").Cell} */ ({});
+    cell = /** @type {import("../configs/infos.js").Cell} */ ({});
 
     cell.pos = { i, j };
 
@@ -43,20 +46,16 @@ const createCell = (i, j, block) => {
 };
 
 /**
- * @param {number} i
- * @param {number} j
- */
-const getChunkStart = (i, j) => [
-  getRange(i, CONFIG.chunkRows),
-  getRange(j, CONFIG.chunkColumns),
-];
-
-/**
  * @param {number} initialI
  * @param {number} initialJ
  */
 export const loadChunk = (initialI, initialJ) => {
-  const [offsetI, offsetJ] = getChunkStart(initialI, initialJ);
+  const [offsetI, offsetJ] = getChunkStart(
+    initialI,
+    initialJ,
+    CONFIG.chunkRows,
+    CONFIG.chunkColumns
+  );
 
   const { mapGeneration } = MENU_CONFIG;
 
@@ -66,7 +65,7 @@ export const loadChunk = (initialI, initialJ) => {
     for (let j = 0; j < CONFIG.chunkColumns; j++) {
       const nJ = j + offsetJ;
 
-      let biome = /** @type {import("./configs/biomes.js").Biome} */ (null);
+      let biome = /** @type {import("./biomes.js").Biome} */ (null);
       switch (mapGeneration) {
         case MAP_GENERATION.MIX:
           const biomeValue = getValue(nI, nJ, VECTORS.BIOME);
@@ -98,9 +97,9 @@ export const loadChunk = (initialI, initialJ) => {
 };
 
 /**
- * @param {import("./configs/infos.js").CellPos} pos
+ * @param {import("../configs/infos.js").CellPos} pos
  * @param {boolean} isInverted
- * @returns {{ [k: number]: import("./configs/infos.js").CellPos[] }}
+ * @returns {{ [k: number]: import("../configs/infos.js").CellPos[] }}
  */
 const getAdjacentPos = ({ i, j }, isInverted) => {
   return {
@@ -143,11 +142,12 @@ const getAdjacentPos = ({ i, j }, isInverted) => {
 };
 
 /**
- * @param {import("./configs/infos.js").CellPos} pos
+ * @param {import("../configs/infos.js").CellPos} pos
  * @param {boolean} isInverted
- * @return {import("./configs/infos.js").Point}
+ * @param {import("../entities/infos.js").Entity} baseEntity
+ * @return {import("../configs/infos.js").Point}
  */
-export const calculatePointBasedOnPos = ({ i, j }, isInverted) => {
+export const calculatePointBasedOnPos = ({ i, j }, isInverted, baseEntity) => {
   const { calcX, calcY, ySide, shouldIntercalate } =
     POLY_INFO[MAP_INFO.currentPoly];
   i -= MAP_INFO.iOffset || 0;
@@ -157,17 +157,18 @@ export const calculatePointBasedOnPos = ({ i, j }, isInverted) => {
   let y = calcY(i);
 
   if (shouldIntercalate && j % 2)
-    y += MAP_INFO.currentCell.pos.j % 2 ? -ySide : ySide;
+    y += baseEntity?.cell?.pos.j % 2 ? -ySide : ySide;
 
-  return applyRotation({ x, y }, isInverted);
+  return applyRotation({ x, y }, isInverted, baseEntity);
 };
 
 /**
- * @param {import("./configs/infos.js").Point} points
+ * @param {import("../configs/infos.js").Point} points
  * @param {boolean} isInverted
- * @return {import("./configs/infos.js").Point}
+ * @param {import("../entities/infos.js").Entity} baseEntity
+ * @return {import("../configs/infos.js").Point}
  */
-const applyRotation = ({ x, y }, isInverted) => {
+const applyRotation = ({ x, y }, isInverted, baseEntity) => {
   if (!MAP_INFO.rotationTurns) return { x, y };
 
   const { cx, cy, ySide, xSide, hasInverted } = POLY_INFO[MAP_INFO.currentPoly];
@@ -176,13 +177,15 @@ const applyRotation = ({ x, y }, isInverted) => {
   const radians = (Math.PI / 180) * angle;
   const cos = Math.cos(radians);
   const sin = Math.sin(radians);
+  // x' = x * cos(θ) - y * sin(θ)
   let nx = correctRoundError(cos * (x - cx) + sin * (y - cy) + cx);
+  // y' = x * sin(θ) + y * cos(θ)
   let ny = correctRoundError(cos * (y - cy) - sin * (x - cx) + cy);
 
-  if (hasInverted && isInverted !== MAP_INFO.currentCell.isInverted && angle) {
+  if (hasInverted && isInverted !== baseEntity?.cell?.isInverted && angle) {
     const oddTurn = !!(MAP_INFO.rotationTurns % 2);
-    ny += ySide * (MAP_INFO.currentCell.isInverted ? 1 : -1);
-    nx += (xSide / 2) * (MAP_INFO.currentCell.isInverted === oddTurn ? -1 : 1);
+    ny += ySide * (baseEntity?.cell?.isInverted ? 1 : -1);
+    nx += (xSide / 2) * (baseEntity?.cell?.isInverted === oddTurn ? -1 : 1);
   }
 
   return { x: nx, y: ny };
@@ -191,7 +194,7 @@ const applyRotation = ({ x, y }, isInverted) => {
 /**
  * @param {number} i
  * @param {number} j
- * @returns {import("./configs/infos.js").Cell}
+ * @returns {import("../configs/infos.js").Cell}
  */
 export const getGridCell = (i, j) => {
   if (!GRID[i]?.[j]) loadChunk(i, j);
@@ -199,7 +202,7 @@ export const getGridCell = (i, j) => {
 };
 
 /**
- * @returns {import("./configs/infos.js").Cell}
+ * @returns {import("../configs/infos.js").Cell}
  */
 export const getCenterCell = () => {
   const { rows, columns } = POLY_INFO[MAP_INFO.currentPoly];
@@ -213,22 +216,4 @@ export const getCenterCell = () => {
 
 export const resetGrid = () => {
   GRID = [];
-};
-
-/**
- * @param {import("./configs/infos.js").Cell} cell
- * @param {import("./configs/biomes.js").BlockEntity} block
- * @param {import("./configs/biomes.js").Color} color
- */
-export const placeBlock = (cell, block, color) => {
-  if (cell.block && !cell.block.isFluid) {
-    cell.wall = {
-      block: block,
-      color: color,
-      layer: (cell.layer || 0) + 1,
-    };
-  } else {
-    cell.block = block;
-    cell.color = color;
-  }
 };
