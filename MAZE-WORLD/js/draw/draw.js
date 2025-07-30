@@ -4,17 +4,18 @@ import {
   CANVAS_CONFIG,
   MAP_CONFIG,
   MENU_CONFIG,
+  GRID,
 } from "../configs/configs.js";
-import { GRID, calculatePointBasedOnPos, getGridCell } from "../grid/grid.js";
+import { calculatePointBasedOnPos, getGridCell } from "../grid/grid.js";
 import {
   debounce,
   getMod,
   isPointOutsideCanvas,
   tweakColor,
 } from "../utils.js";
-import { getAllEntities, updateEntities } from "../entities/entities.js";
-import { PLAYER_ENTITY } from "../entities/player.js";
+import { updateEntities } from "../entities/entities.js";
 import { MAP_INFO } from "../grid/infos.js";
+import { drawItem, drawWall, drawWallTop } from "./utils.js";
 
 const spinContainer = document.getElementById("spin-container");
 const container = document.getElementById("draw-container");
@@ -63,27 +64,31 @@ export const updateCanvasCss = () => {
   }
 };
 
-let wallLayers = /** @type {Wall[][]} */ ([]);
 let filledThisRound =
   /** @type {Set<import("../configs/infos.js").CellPos>} */ (new Set());
-export const drawEveryCell = () => {
+
+/**
+ * @param {import("../configs/infos.js").Cell} baseCell
+ */
+export const drawEveryCell = (baseCell) => {
   wallLayers = [];
   fluids = [];
   filledThisRound = new Set();
 
-  const offsetCell = PLAYER_ENTITY.cell.pos.j % 2;
+  const offsetCell = baseCell.pos.j % 2;
   const { rows, columns, shouldIntercalate } = POLY_INFO[MAP_INFO.currentPoly];
-
   // More range to encapsulate rotation
-  for (let i = -columns; i < rows + columns; i++) {
+  const size = rows + columns;
+
+  for (let i = -columns; i < size; i++) {
     const baseI = i + MAP_INFO.iOffset;
-    for (let j = -rows; j < rows + columns; j++) {
+    for (let j = -rows; j < size; j++) {
       let nI = baseI;
       const nJ = j + MAP_INFO.jOffset;
 
       if (shouldIntercalate && offsetCell && nJ % 2 === 0) nI = nI + 1;
 
-      drawCell(getGridCell(nI, nJ), contextsLayers[0]);
+      drawCell(getGridCell(nI, nJ), contextsLayers[0], baseCell);
     }
   }
 
@@ -92,45 +97,17 @@ export const drawEveryCell = () => {
   tweakFluids();
 };
 
+let wallLayers = /** @type {Wall[][]} */ ([]);
 const drawWalls = () => {
   for (let i = 1; i < CONFIG.maxLayer; i++) {
-    const canvas = canvasLayers[i];
-    const context = contextsLayers[i];
     const walls = wallLayers[i];
     // reset canvas
-    canvas.width = POLY_INFO[MAP_INFO.currentPoly].canvasWidth;
-    if (!walls || !canvas || !context) continue;
-    walls.forEach((w) => drawWall(w, context));
-    walls.forEach((w) => drawWallTop(w, context));
+    canvasLayers[i].width = POLY_INFO[MAP_INFO.currentPoly].canvasWidth;
+    if (!walls) continue;
+    walls.forEach((w) => drawWall(w, contextsLayers[i]));
+    walls.forEach((w) => drawWallTop(w, contextsLayers[i]));
   }
   wallLayers = [];
-};
-
-/**
- * @param {Wall} wall
- * @param {CanvasRenderingContext2D} context
- */
-const drawWall = (wall, context) => {
-  // Only draw if there is a gap, if is sorrounded by walls it doesnt need
-  if (wall.borderMap.find((b) => !!b))
-    drawItem(context, wall, CANVAS_CONFIG.wallDarkness);
-};
-
-/**
- * @param {Wall} wall
- * @param {CanvasRenderingContext2D} context
- */
-const drawWallTop = (wall, context) => {
-  drawItem(context, wall.topInfo);
-
-  context.strokeStyle = CANVAS_CONFIG.strokeColor;
-  context.lineWidth = CANVAS_CONFIG.lineWidth;
-  applyBorders(
-    context,
-    wall.topInfo.point,
-    wall.topInfo.points,
-    wall.borderMap
-  );
 };
 
 let fluidInterval = null;
@@ -153,12 +130,13 @@ const tweakFluids = debounce(() => {
 /**
  * @param {import("../configs/infos.js").Cell} cell
  * @param {CanvasRenderingContext2D} context
+ * @param {import("../configs/infos.js").Cell} baseCell
  */
-const drawCell = (cell, context) => {
+const drawCell = (cell, context, baseCell) => {
   const polyInfo = POLY_INFO[MAP_INFO.currentPoly];
   const isInverted = polyInfo.hasInverted && cell.isInverted;
 
-  const point = calculatePointBasedOnPos(cell.pos, isInverted, PLAYER_ENTITY);
+  const point = calculatePointBasedOnPos(cell.pos, isInverted, baseCell);
 
   if (isPointOutsideCanvas(point, polyInfo.canvasHeight, polyInfo.canvasWidth))
     return;
@@ -169,18 +147,17 @@ const drawCell = (cell, context) => {
   );
 
   const shoulApplyDark =
-    cell !== PLAYER_ENTITY.cell &&
-    aCells.every((c) => c !== PLAYER_ENTITY.cell);
+    cell !== baseCell && aCells.every((c) => c !== baseCell);
 
   if (cell.wall) {
     const wallPoints = isInverted
       ? polyInfo.wallInvertedPoints
       : polyInfo.wallPoints;
-    const { layer } = cell.wall;
+    const wallLayer = cell.layer + 1;
 
     const shouldOffset = polyInfo.hasInverted && !cell.isInverted;
 
-    if (!wallLayers[layer]) wallLayers[layer] = [];
+    if (!wallLayers[wallLayer]) wallLayers[wallLayer] = [];
     const commonInfos = {
       shoulApplyDark,
       color: cell.wall.color,
@@ -188,19 +165,19 @@ const drawCell = (cell, context) => {
       isInverted,
     };
 
-    wallLayers[layer].push({
+    wallLayers[wallLayer].push({
       ...commonInfos,
-      point: { x: point.x, y: point.y - polyInfo.ySide * (layer - 1) },
+      point: { x: point.x, y: point.y - polyInfo.ySide * cell.layer },
       points: wallPoints,
       topInfo: {
         ...commonInfos,
-        point: { x: point.x, y: point.y - polyInfo.ySide * layer },
+        point: { x: point.x, y: point.y - polyInfo.ySide * wallLayer },
         points,
       },
       borderMap: aCells.reduce((acc, c, i) => {
         let index = i - MAP_INFO.rotationTurns;
         if (shouldOffset) index = MAP_INFO.currentPoly - 1 - index;
-        acc[getMod(index, MAP_INFO.currentPoly)] = c?.wall?.layer !== layer;
+        acc[getMod(index, MAP_INFO.currentPoly)] = !c?.wall;
         return acc;
       }, []),
     });
@@ -227,154 +204,49 @@ const drawCell = (cell, context) => {
     shoulApplyDark,
   });
 
-  if (cell.block?.isFluid) {
-    drawable.color = tweakColor(drawable.color);
-    fluids.push(drawable);
-  }
+  if (cell.block?.isFluid) fluids.push(drawable);
 
   drawItem(context, drawable);
-};
-
-/**
- * @param {CanvasRenderingContext2D} context
- * @param {Drawable} drawable
- * @param {number} [modifier]
- */
-const drawItem = (
-  context,
-  { point, points, pos, isInverted, color, shoulApplyDark },
-  modifier
-) => {
-  context.fillStyle = color
-    ? getFillStyle(color, shoulApplyDark, modifier)
-    : CANVAS_CONFIG.emptyColor;
-
-  fillPolygon(context, point, points);
-
-  if (MENU_CONFIG.showPos)
-    showPos(context, pos, point, isInverted, POLY_INFO[MAP_INFO.currentPoly]);
-
-  if (MENU_CONFIG.showChunks) showChunks(context, pos, point, points);
-};
-
-/**
- * @param {import("../configs/infos.js").Color} color
- * @param {boolean} shoulApplyDark
- * @param {number} modifier
- * @return {string}
- */
-const getFillStyle = ({ r, g, b }, shoulApplyDark, modifier = 1) => {
-  if (MAP_INFO.timeOfDay && shoulApplyDark)
-    modifier = (1 - MAP_INFO.timeOfDay / 100) * modifier;
-
-  return `rgb(${r * modifier}, ${g * modifier}, ${b * modifier})`;
-};
-
-/**
- * @param {CanvasRenderingContext2D} context
- * @param {import("../configs/infos.js").Point} point
- * @param {import("../configs/infos.js").Point[]} points
- */
-const fillPolygon = (context, { x, y }, points) => {
-  context.beginPath();
-
-  for (const point of points) {
-    context.lineTo(x + point.x, y + point.y);
-  }
-
-  context.closePath();
-  context.fill();
-};
-
-/**
- * @param {CanvasRenderingContext2D} context
- * @param {import("../configs/infos.js").Point} point
- * @param {import("../configs/infos.js").Point[]} points
- * @param {boolean[]} [map]
- */
-const applyBorders = (context, { x, y }, points, map) => {
-  for (let i = 0; i < points.length; i++) {
-    if (!map || map[i]) {
-      let point = points[i];
-      let nextPoint = points[i + 1] || points[0];
-
-      context.beginPath();
-      context.moveTo(x + point.x, y + point.y);
-      context.lineTo(x + nextPoint.x, y + nextPoint.y);
-      context.stroke();
-    }
-  }
-};
-
-/**
- * @param {CanvasRenderingContext2D} context
- * @param {import("../configs/infos.js").CellPos} pos
- * @param {import("../configs/infos.js").Point} point
- * @param {boolean} isInverted
- * @param {import("../configs/infos.js").PolyInfoProp} polyInfo
- */
-const showPos = (context, pos, point, isInverted, polyInfo) => {
-  context.fillStyle = "black";
-  context.font = `bold ${CONFIG.cellHeight / 5}px Arial`;
-  context.textAlign = "center";
-  context.textBaseline = "middle";
-  context.fillText(
-    `${pos.i},${pos.j}`,
-    point.x,
-    isInverted ? point.y + polyInfo.ySide / 2 : point.y
-  );
-};
-
-/**
- * @param {CanvasRenderingContext2D} context
- * @param {import("../configs/infos.js").CellPos} pos
- * @param {import("../configs/infos.js").Point} point
- * @param {import("../configs/infos.js").Point[]} points
- */
-const showChunks = (context, pos, point, points) => {
-  if (pos.i % CONFIG.chunkRows === 0 || pos.j % CONFIG.chunkColumns === 0) {
-    context.strokeStyle = CANVAS_CONFIG.strokeColor;
-    context.lineWidth = CANVAS_CONFIG.lineWidth;
-    applyBorders(context, point, points);
-  }
 };
 
 /**
  * @param {number} deg
  */
 export const rotateCanvas = (deg) => {
-  const transitionDuration = `${
-    MAP_CONFIG.rotateDelay + 6000 / CONFIG.cellHeight
-  }ms`;
-  const transitionProperty = "transform";
-
-  getAllEntities().forEach((e) => {
-    if (e.img) {
-      e.img.style.transitionDuration = transitionDuration;
-      e.img.style.transitionProperty = transitionProperty;
-      e.img.style.transform = `rotate(${-deg}deg)`;
-    }
-  });
-
-  container.style.transitionDuration = transitionDuration;
-  container.style.transitionProperty = transitionProperty;
-  container.style.transform = `rotate(${deg}deg)`;
+  updateHtmlEntities((img) => rotateElement(img, -deg));
+  rotateElement(container, deg);
   spinContainer.style.background = canvasLayers
     .map((c) => `url(${c.toDataURL()})`)
     .join(", ");
 };
 
 export const resetRotateCanvas = () => {
-  getAllEntities().forEach((e) => {
-    if (e.img) {
-      e.img.style.transitionDuration = null;
-      e.img.style.transitionProperty = null;
-      e.img.style.transform = null;
-    }
-  });
-
-  container.style.transitionDuration = null;
-  container.style.transitionProperty = null;
-  container.style.transform = null;
+  updateHtmlEntities((img) => rotateElement(img));
+  rotateElement(container);
   spinContainer.style.background = null;
+};
+
+/**
+ * @param {(entity: HTMLElement) => void} callback
+ */
+const updateHtmlEntities = (callback) => {
+  const entities = /** @type {HTMLElement[]} */ ([
+    ...document.getElementById("entities").childNodes,
+  ]);
+
+  entities.forEach((entity) => {
+    if (entity.style) callback(entity);
+  });
+};
+
+/**
+ * @param {HTMLElement} element
+ * @param {number} [deg]
+ */
+const rotateElement = (element, deg) => {
+  element.style.transitionDuration = deg
+    ? `${MAP_CONFIG.rotateDelay + 6000 / CONFIG.cellHeight}ms`
+    : null;
+  element.style.transitionProperty = deg ? "transform" : null;
+  element.style.transform = deg ? `rotate(${deg}deg)` : null;
 };
