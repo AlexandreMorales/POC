@@ -1,5 +1,6 @@
 import { MAP_GENERATION, MENU_CONFIG } from "../configs/configs.js";
 import { drawEveryCell, updateCanvasCss } from "../draw/draw.js";
+import { PLAYER_ENTITY } from "../entities/player.js";
 import { start } from "../start/boot.js";
 
 const SELECT_OPTIONS = {
@@ -21,7 +22,7 @@ menuLabels.map((l) => {
     check.onchange = () => {
       MENU_CONFIG[config] = check.checked;
       updateCanvasCss();
-      drawEveryCell();
+      drawEveryCell(PLAYER_ENTITY.cell);
     };
   } else if (element.tagName === "SELECT") {
     const select = /** @type {HTMLSelectElement} */ (element);

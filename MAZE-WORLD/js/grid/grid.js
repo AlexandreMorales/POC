@@ -1,5 +1,6 @@
 import {
   CONFIG,
+  GRID,
   KNOWN_POLYGONS,
   MAP_GENERATION,
   MENU_CONFIG,
@@ -10,14 +11,6 @@ import { tweakColor, correctRoundError } from "../utils.js";
 import { getValue, VECTORS } from "./perlin.js";
 import { MAP_INFO } from "./infos.js";
 import { getChunkStart } from "./utils.js";
-
-export let GRID = /** @type {import("../configs/infos.js").Cell[][]} */ ([]);
-
-/**
- * @param {import("../configs/infos").CellPos} param
- * @returns {boolean}
- */
-export const isCellInverted = ({ i, j }) => (i + j) % 2 !== 0;
 
 /**
  * @param {number} i
@@ -31,6 +24,7 @@ const createCell = (i, j, block) => {
     cell = /** @type {import("../configs/infos.js").Cell} */ ({});
 
     cell.pos = { i, j };
+    cell.entityName = null;
 
     if (block) {
       cell.block = block;
@@ -39,7 +33,7 @@ const createCell = (i, j, block) => {
     }
   }
 
-  cell.isInverted = isCellInverted(cell.pos);
+  cell.isInverted = (i + j) % 2 !== 0;
   cell.adjacentPos = getAdjacentPos(cell.pos, cell.isInverted);
 
   return cell;
@@ -90,7 +84,6 @@ export const loadChunk = (initialI, initialJ) => {
         cell.wall = {
           block: originalBlock,
           color: tweakColor(originalBlock.colorRGB),
-          layer: originalBlock.layer,
         };
     }
   }
@@ -144,10 +137,10 @@ const getAdjacentPos = ({ i, j }, isInverted) => {
 /**
  * @param {import("../configs/infos.js").CellPos} pos
  * @param {boolean} isInverted
- * @param {import("../entities/infos.js").Entity} baseEntity
+ * @param {import("../configs/infos.js").Cell} baseCell
  * @return {import("../configs/infos.js").Point}
  */
-export const calculatePointBasedOnPos = ({ i, j }, isInverted, baseEntity) => {
+export const calculatePointBasedOnPos = ({ i, j }, isInverted, baseCell) => {
   const { calcX, calcY, ySide, shouldIntercalate } =
     POLY_INFO[MAP_INFO.currentPoly];
   i -= MAP_INFO.iOffset || 0;
@@ -156,19 +149,18 @@ export const calculatePointBasedOnPos = ({ i, j }, isInverted, baseEntity) => {
   let x = calcX(j);
   let y = calcY(i);
 
-  if (shouldIntercalate && j % 2)
-    y += baseEntity?.cell?.pos.j % 2 ? -ySide : ySide;
+  if (shouldIntercalate && j % 2) y += baseCell?.pos.j % 2 ? -ySide : ySide;
 
-  return applyRotation({ x, y }, isInverted, baseEntity);
+  return applyRotation({ x, y }, isInverted, baseCell);
 };
 
 /**
  * @param {import("../configs/infos.js").Point} points
  * @param {boolean} isInverted
- * @param {import("../entities/infos.js").Entity} baseEntity
+ * @param {import("../configs/infos.js").Cell} baseCell
  * @return {import("../configs/infos.js").Point}
  */
-const applyRotation = ({ x, y }, isInverted, baseEntity) => {
+const applyRotation = ({ x, y }, isInverted, baseCell) => {
   if (!MAP_INFO.rotationTurns) return { x, y };
 
   const { cx, cy, ySide, xSide, hasInverted } = POLY_INFO[MAP_INFO.currentPoly];
@@ -182,10 +174,10 @@ const applyRotation = ({ x, y }, isInverted, baseEntity) => {
   // y' = x * sin(θ) + y * cos(θ)
   let ny = correctRoundError(cos * (y - cy) - sin * (x - cx) + cy);
 
-  if (hasInverted && isInverted !== baseEntity?.cell?.isInverted && angle) {
+  if (hasInverted && isInverted !== baseCell?.isInverted && angle) {
     const oddTurn = !!(MAP_INFO.rotationTurns % 2);
-    ny += ySide * (baseEntity?.cell?.isInverted ? 1 : -1);
-    nx += (xSide / 2) * (baseEntity?.cell?.isInverted === oddTurn ? -1 : 1);
+    ny += ySide * (baseCell?.isInverted ? 1 : -1);
+    nx += (xSide / 2) * (baseCell?.isInverted === oddTurn ? -1 : 1);
   }
 
   return { x: nx, y: ny };
@@ -215,5 +207,7 @@ export const getCenterCell = () => {
 };
 
 export const resetGrid = () => {
-  GRID = [];
+  for (let i = 0; i < GRID.length; i++) {
+    GRID[i] = [];
+  }
 };

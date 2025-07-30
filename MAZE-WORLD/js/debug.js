@@ -1,7 +1,6 @@
 import { drawEveryCell } from "./draw/draw.js";
-import { GRID } from "./grid/grid.js";
 import { BLOCKS } from "./grid/biomes.js";
-import { KNOWN_POLYGONS, MENU_CONFIG } from "./configs/configs.js";
+import { KNOWN_POLYGONS, MENU_CONFIG, GRID } from "./configs/configs.js";
 import { POLY_INFO } from "./configs/infos.js";
 import { MAP_INFO } from "./grid/infos.js";
 import { placeBlock } from "./actions/actions.js";
@@ -12,9 +11,9 @@ const canvasContainer = document.getElementById("canvas-container");
 canvasContainer.onclick = (e) => {
   if (!MENU_CONFIG.debugMode || MAP_INFO.rotationTurns) return;
   e = e || /** @type {Event} */ (window.event);
-  const rect = canvasContainer.getBoundingClientRect(); // Get canvas position and size
-  let x = e.clientX - rect.left;
-  let y = e.clientY - rect.top;
+  const { left, top } = canvasContainer.getBoundingClientRect();
+  let x = e.clientX - left;
+  let y = e.clientY - top;
   if (MENU_CONFIG.usePerspective) {
     x -= 175;
     y += 60;
@@ -30,7 +29,7 @@ canvasContainer.onclick = (e) => {
     placeBlock(cell, block, block.colorRGB);
   }
 
-  drawEveryCell();
+  drawEveryCell(PLAYER_ENTITY.cell);
 };
 
 /**

@@ -49,3 +49,5 @@ export const CANVAS_CONFIG = {
   wallDarkness: 0.5,
   fluidSpeed: 500,
 };
+
+export const GRID = /** @type {import("../configs/infos.js").Cell[][]} */ ([]);
