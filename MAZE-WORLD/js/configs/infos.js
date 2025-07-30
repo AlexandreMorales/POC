@@ -29,15 +29,16 @@
  * @typedef {Object} CellBlock
  * @property {Block} block
  * @property {Color} color
- * @property {number} layer
  */
 
 /**
  * @typedef {Object} CellProps
+ * @property {number} layer
  * @property {CellPos} pos
  * @property {CellBlock} wall The block above this one
  * @property {{ [k: number]: CellPos[] }} adjacentPos Pos of adjacent cells
  * @property {boolean} isInverted Only used for triangles
+ * @property {string} entityName The name of the entity on top of the cell
  */
 
 /**

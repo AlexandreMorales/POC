@@ -1,7 +1,6 @@
 import { MAP_CONFIG, MENU_CONFIG } from "../configs/configs.js";
 import { drawEveryCell } from "../draw/draw.js";
 import { BOAT_NAME } from "../entities/boat.js";
-import { getEntities } from "../entities/entities.js";
 import { PLAYER_ENTITY } from "../entities/player.js";
 import { MAP_INFO } from "../grid/infos.js";
 
@@ -14,7 +13,7 @@ export const cellIsBlocked = (cell, entity) =>
   !cell ||
   !cell.block ||
   !!cell.wall ||
-  !!getEntities().find((e) => e?.cell === cell) ||
+  !!cell.entityName ||
   (entity.connectedEntities[BOAT_NAME]
     ? !cell.block.isFluid
     : cell.block.isFluid);
@@ -48,7 +47,7 @@ export const move = (nextCell) => {
     if (MENU_CONFIG.passTime) passTime();
 
     setTimeout(() => {
-      drawEveryCell();
+      drawEveryCell(PLAYER_ENTITY.cell);
       canMove = true;
     }, 1000 / MAP_CONFIG.velocity);
   }

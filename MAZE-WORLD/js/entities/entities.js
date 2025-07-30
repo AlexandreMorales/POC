@@ -1,9 +1,10 @@
-import { calculatePointBasedOnPos, GRID } from "../grid/grid.js";
+import { calculatePointBasedOnPos } from "../grid/grid.js";
 import { POLY_INFO } from "../configs/infos.js";
 import { getMod, isPointOutsideCanvas } from "../utils.js";
 import { MOVEMENT } from "./infos.js";
 import { MAP_INFO } from "../grid/infos.js";
-import { PLAYER_ENTITY, PLAYER_NAME } from "./player.js";
+import { PLAYER_ENTITY } from "./player.js";
+import { GRID } from "../configs/configs.js";
 
 const ENTITIES_CONFIG = {
   notInvertedBothClipPath: "polygon(0 0, 50% 75%, 100% 0)",
@@ -16,8 +17,7 @@ const ENTITIES_CONFIG = {
 
 const container = document.getElementById("entities");
 
-const ENTITIES =
-  /** @type {{ [k: string]: import("./infos.js").Entity }} */ ({});
+const ENTITIES = /** @type {Set<import("./infos.js").Entity>} */ (new Set());
 
 /**
  * @param {string} name
@@ -30,7 +30,18 @@ const createEntityImage = (name, imageMap) => {
   img.style.zIndex = "1";
   img.src = imageMap[MOVEMENT.RIGHT];
   container.appendChild(img);
+  setImgSize(img);
   return img;
+};
+
+/**
+ * @param {import("./infos.js").Entity} entity
+ * @param {import("../configs/infos.js").Cell} cell
+ */
+export const moveEntityToCell = (entity, cell) => {
+  if (entity.cell) entity.cell.entityName = null;
+  entity.cell = cell;
+  entity.cell.entityName = entity.name;
 };
 
 /**
@@ -44,12 +55,12 @@ export const createEntity = (cell, name, imageMap, entityParams = {}) => {
   const entity = /** @type {import("./infos.js").Entity} */ ({
     img: createEntityImage(name, imageMap),
     name,
-    cell,
     imageMap,
     connectedEntities: {},
     ...entityParams,
   });
-  ENTITIES[entity.name] = entity;
+  moveEntityToCell(entity, cell);
+  ENTITIES.add(entity);
   return entity;
 };
 
@@ -57,61 +68,72 @@ export const createEntity = (cell, name, imageMap, entityParams = {}) => {
  * @param {import("./infos.js").Entity} entity
  */
 export const updateEntityPoint = (entity) => {
-  const { ySide, hasInverted, cx, cy, canvasHeight, canvasWidth } =
+  const { hasInverted, canvasHeight, canvasWidth } =
     POLY_INFO[MAP_INFO.currentPoly];
-  let point = { x: cx, y: cy };
-  const entityName = entity.name.replace(`${PLAYER_NAME}_`, "");
+  const point = calculatePointBasedOnPos(
+    entity.cell.pos,
+    hasInverted && entity.cell.isInverted,
+    PLAYER_ENTITY.cell
+  );
 
-  if (!PLAYER_ENTITY.connectedEntities[entityName]) {
-    point = calculatePointBasedOnPos(
-      entity.cell.pos,
-      hasInverted && entity.cell.isInverted,
-      PLAYER_ENTITY
-    );
-
-    if (isPointOutsideCanvas(point, canvasHeight, canvasWidth)) {
-      if (entity.img) {
-        container.removeChild(entity.img);
-        entity.img = null;
-      }
-    } else if (!entity.img) {
-      entity.img = createEntityImage(entity.name, entity.imageMap);
+  if (isPointOutsideCanvas(point, canvasHeight, canvasWidth)) {
+    if (entity.img) {
+      container.removeChild(entity.img);
+      entity.img = null;
     }
+  } else if (!entity.img) {
+    entity.img = createEntityImage(entity.name, entity.imageMap);
   }
 
-  if (entity.img) {
-    entity.img.style.top = `${point.y - ySide * 2}px`;
-    entity.img.style.left = `${point.x - ySide * 1.25}px`;
-  }
+  if (entity.img) setEntityPoint(entity, point);
+};
+
+/**
+ * @param {HTMLImageElement} img
+ */
+const setImgSize = (img) => {
+  if (!img) return;
+  const { ySide } = POLY_INFO[MAP_INFO.currentPoly];
+  img.style.height = img.style.width = `${Math.round(
+    ySide * ENTITIES_CONFIG.defaultSizeRatio
+  )}px`;
 };
 
 /**
  * @param {import("./infos.js").Entity} entity
  */
-export const updateEntitySize = (entity) => {
-  const { ySide, cx, cy } = POLY_INFO[MAP_INFO.currentPoly];
-  entity.img.style.height = entity.img.style.width = `${Math.round(
-    ySide * ENTITIES_CONFIG.defaultSizeRatio
-  )}px`;
-  entity.img.style.top = `${cy - ySide * 2}px`;
-  entity.img.style.left = `${cx - ySide * 1.25}px`;
+const setEntityToCenter = (entity) => {
+  const { cx, cy } = POLY_INFO[MAP_INFO.currentPoly];
+  setEntityPoint(entity, { x: cx, y: cy });
 };
 
-export const resetEntities = () => getAllEntities().forEach(updateEntitySize);
-
 /**
- * @returns {import("./infos.js").Entity[]}
+ * @param {import("./infos.js").Entity} entity
+ * @param {import("../configs/infos.js").Point} point
  */
-export const getEntities = () => Object.values(ENTITIES);
+const setEntityPoint = (entity, point) => {
+  const { ySide } = POLY_INFO[MAP_INFO.currentPoly];
+  entity.img.style.top = `${point.y - ySide * 2}px`;
+  entity.img.style.left = `${point.x - ySide * 1.25}px`;
+};
 
-/**
- * @returns {import("./infos.js").Entity[]}
- */
-export const getAllEntities = () => [PLAYER_ENTITY, ...getEntities()];
+export const resetEntities = () =>
+  [PLAYER_ENTITY, ...ENTITIES].forEach((e) => {
+    setImgSize(e.img);
+  });
 
 export const updateEntities = () => {
-  getAllEntities().forEach((e) => {
-    updateEntityPoint(e);
+  const connectedEntities = /** @type {Set<import("./infos.js").Entity>} */ (
+    new Set(Object.values(PLAYER_ENTITY.connectedEntities))
+  );
+  setEntityToCenter(PLAYER_ENTITY);
+  verifyEntityHeight(PLAYER_ENTITY);
+
+  connectedEntities.forEach((e) => {
+    setEntityToCenter(e);
+  });
+  ENTITIES.forEach((e) => {
+    if (!connectedEntities.has(e)) updateEntityPoint(e);
     verifyEntityHeight(e);
   });
 };
@@ -156,10 +178,8 @@ export const verifyEntityHeight = (entity) => {
     }
 
     entity.img.style.clipPath = clipPath;
-  } else if (
-    downCell.wall ||
-    connectedEntities.find((e) => !!e.movementsToCut?.length)
-  ) {
+    // TODO: Implement direction on entity to know where to cut
+  } else if (downCell.wall || connectedEntities.length) {
     height = ySide * ENTITIES_CONFIG.wallSizeRatio;
   }
 

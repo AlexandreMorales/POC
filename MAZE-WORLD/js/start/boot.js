@@ -199,7 +199,7 @@ export const start = () => {
       getGridCell(PLAYER_ENTITY.cell.pos.i + 1, PLAYER_ENTITY.cell.pos.j)
     );
   }
-  drawEveryCell();
+  drawEveryCell(PLAYER_ENTITY.cell);
 };
 
 /**
@@ -211,5 +211,5 @@ export const resetSize = debounce((newSize) => {
   resetEntities();
   setCanvasSize(null, POLY_INFO[MAP_INFO.currentPoly].canvasWidth);
   moveCurrentCell(getCenterCell(), PLAYER_ENTITY.cell);
-  drawEveryCell();
+  drawEveryCell(PLAYER_ENTITY.cell);
 });

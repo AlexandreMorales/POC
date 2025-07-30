@@ -2,9 +2,10 @@ import {
   KNOWN_POLYGONS_VALUES,
   MAP_CONFIG,
   MENU_CONFIG,
+  GRID,
 } from "../configs/configs.js";
 import { POLY_INFO } from "../configs/infos.js";
-import { GRID, getCenterCell } from "../grid/grid.js";
+import { getCenterCell } from "../grid/grid.js";
 import {
   resetCanvasSize,
   drawEveryCell,
@@ -12,16 +13,11 @@ import {
   rotateCanvas,
 } from "../draw/draw.js";
 import { getMod } from "../utils.js";
-import { resetEntities, getEntities } from "../entities/entities.js";
+import { resetEntities } from "../entities/entities.js";
 import { cellIsBlocked, move, moveCurrentCell } from "./movement.js";
 import { MOVEMENT } from "../entities/infos.js";
 import { MAP_INFO } from "../grid/infos.js";
-import {
-  addBoat,
-  BOAT_NAME,
-  toggleBoat,
-  isBoatInCell,
-} from "../entities/boat.js";
+import { addBoat, BOAT_NAME, toggleBoat } from "../entities/boat.js";
 import {
   PLAYER_ENTITY,
   startRunning,
@@ -47,7 +43,7 @@ export const rotate = (orientation) => {
 
     setTimeout(() => {
       if (MENU_CONFIG.rotationAnimation) resetRotateCanvas();
-      drawEveryCell();
+      drawEveryCell(PLAYER_ENTITY.cell);
       canRotate = true;
     }, MAP_CONFIG.rotateDelay);
   }
@@ -171,7 +167,7 @@ export const changePolySides = () => {
   resetEntities();
   resetCanvasSize();
   moveCurrentCell(getCenterCell(), PLAYER_ENTITY.cell);
-  drawEveryCell();
+  drawEveryCell(PLAYER_ENTITY.cell);
 };
 
 export const resetDirection = () => {
@@ -200,7 +196,7 @@ export const dig = () => {
   if (
     !selectedCell?.block ||
     selectedCell.block.isFluid ||
-    !!getEntities().find((e) => e.cell === selectedCell)
+    !!selectedCell.entityName
   )
     return;
 
@@ -232,7 +228,7 @@ export const place = () => {
  * @param {import("../configs/infos.js").Color} [color]
  */
 export const placeBlock = (cell, block, color) => {
-  if (!cell || !!getEntities().find((e) => e?.cell === cell)) return;
+  if (!cell || !!cell.entityName) return;
 
   if (!block) {
     const cellBlock = PLAYER_ENTITY.pickedCells.pop();
@@ -241,11 +237,7 @@ export const placeBlock = (cell, block, color) => {
   }
 
   if (cell.block && !cell.block.isFluid) {
-    cell.wall = {
-      block: block,
-      color: color,
-      layer: (cell.layer || 0) + 1,
-    };
+    cell.wall = { block: block, color: color };
   } else {
     cell.block = block;
     cell.color = color;
@@ -264,7 +256,7 @@ export const useBoat = () => {
     return;
   }
 
-  if (isBoatInCell(selectedCell)) {
+  if (selectedCell.entityName?.includes(BOAT_NAME)) {
     toggleBoat(PLAYER_ENTITY);
     move(selectedCell);
   } else if (canMove) {

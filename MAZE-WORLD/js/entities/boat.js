@@ -1,7 +1,7 @@
 import {
   createEntity,
+  moveEntityToCell,
   updateEntityPoint,
-  updateEntitySize,
   verifyEntityHeight,
 } from "./entities.js";
 import { MOVEMENT } from "./infos.js";
@@ -32,13 +32,6 @@ export const toggleBoat = (entity) => {
 
 /**
  * @param {import("../configs/infos.js").Cell} cell
- * @returns {boolean}
- */
-export const isBoatInCell = (cell) =>
-  !!Object.values(BOAT_ENTITIES).find((e) => e?.cell === cell);
-
-/**
- * @param {import("../configs/infos.js").Cell} cell
  * @param {import("./infos.js").Entity} entity
  */
 export const addBoat = (cell, entity) => {
@@ -53,9 +46,7 @@ export const addBoat = (cell, entity) => {
       }
     );
 
-  boatEntity.cell = cell;
-
-  updateEntitySize(boatEntity);
+  moveEntityToCell(boatEntity, cell);
   updateEntityPoint(boatEntity);
   verifyEntityHeight(boatEntity);
 };
