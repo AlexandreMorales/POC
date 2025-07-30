@@ -1,6 +1,5 @@
 ------------------------------------- NEXT -------------------------------------
 
-ADD MENU ITEM TO ENABLE SELECT CELL BORDER
 ADD MENU ITEM TO ZOOM IN WHEN ANIMATING
 
 

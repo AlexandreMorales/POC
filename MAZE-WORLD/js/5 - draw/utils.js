@@ -4,7 +4,8 @@ import { GRID_INFO } from "../2 - grid/infos.js";
 import { DRAW_INFO } from "./infos.js";
 
 const DRAW_CONFIG = {
-  strokeColor: "black",
+  selectedBorderColor: "white",
+  borderColor: "black",
   emptyColor: "black",
   lineWidth: 1,
   wallDarkness: 0.5,
@@ -27,7 +28,9 @@ export const drawWall = (wall, context) => {
 export const drawWallTop = (wall, context) => {
   drawItem(context, wall.topInfo);
 
-  context.strokeStyle = DRAW_CONFIG.strokeColor;
+  context.strokeStyle = wall.isSelectedCell
+    ? DRAW_CONFIG.selectedBorderColor
+    : DRAW_CONFIG.borderColor;
   context.lineWidth = DRAW_CONFIG.lineWidth;
   applyBorders(
     context,
@@ -44,7 +47,7 @@ export const drawWallTop = (wall, context) => {
  */
 export const drawItem = (
   context,
-  { point, points, pos, isInverted, color, shoulApplyDark },
+  { point, points, pos, isInverted, color, shoulApplyDark, isSelectedCell },
   modifier
 ) => {
   context.fillStyle = color
@@ -56,7 +59,11 @@ export const drawItem = (
   if (MENU_CONFIG.showPos)
     showPos(context, pos, point, isInverted, POLY_INFO[GRID_INFO.currentPoly]);
 
-  if (MENU_CONFIG.showChunks) showChunks(context, pos, point, points);
+  if (isSelectedCell) {
+    context.strokeStyle = DRAW_CONFIG.selectedBorderColor;
+    context.lineWidth = DRAW_CONFIG.lineWidth;
+    applyBorders(context, point, points);
+  } else if (MENU_CONFIG.showChunks) showChunks(context, pos, point, points);
 };
 
 /**
@@ -135,7 +142,7 @@ const showPos = (context, pos, point, isInverted, polyInfo) => {
  */
 const showChunks = (context, pos, point, points) => {
   if (pos.i % CONFIG.chunkRows === 0 || pos.j % CONFIG.chunkColumns === 0) {
-    context.strokeStyle = DRAW_CONFIG.strokeColor;
+    context.strokeStyle = DRAW_CONFIG.borderColor;
     context.lineWidth = DRAW_CONFIG.lineWidth;
     applyBorders(context, point, points);
   }

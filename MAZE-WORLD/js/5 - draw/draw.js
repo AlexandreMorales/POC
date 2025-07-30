@@ -13,6 +13,7 @@ import { getGridCell } from "../4 - map/map.js";
 
 import { drawItem, drawWall, drawWallTop } from "./utils.js";
 import { DRAW_INFO } from "./infos.js";
+import { getSelectedCell } from "../3 - entities/player.js";
 
 const CANVAS_CONFIG = {
   fluidSpeed: 500,
@@ -147,9 +148,10 @@ const drawCell = (cell, context, baseCell) => {
 
   const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;
   const aCells = cell.adjacentPos[GRID_INFO.currentPoly].map(getGridCell);
-
   const shoulApplyDark =
     cell !== baseCell && aCells.every((c) => c !== baseCell);
+  const isSelectedCell =
+    MENU_CONFIG.showSelectedCell && cell === getSelectedCell();
 
   if (cell.wall) {
     const wallPoints = isInverted
@@ -165,6 +167,7 @@ const drawCell = (cell, context, baseCell) => {
       color: cell.wall.color,
       pos: cell.pos,
       isInverted,
+      isSelectedCell,
     };
 
     wallLayers[wallLayer].push({
@@ -204,6 +207,7 @@ const drawCell = (cell, context, baseCell) => {
     pos: cell.pos,
     color: cell.color,
     shoulApplyDark,
+    isSelectedCell,
   });
 
   if (cell.block?.isFluid) fluids.push(drawable);

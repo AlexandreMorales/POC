@@ -1,5 +1,6 @@
 import { POLY_INFO } from "../0 - configs/infos.js";
 import { GRID_INFO } from "../2 - grid/infos.js";
+import { getCell } from "../2 - grid/grid.js";
 
 import { MOVEMENT } from "./infos.js";
 
@@ -80,4 +81,15 @@ export const startRunning = (direction) => {
       entity.img.style.marginRight = null;
     }
   });
+};
+
+/**
+ * @returns {import("../0 - configs/infos.js").Cell}
+ */
+export const getSelectedCell = () => {
+  return getCell(
+    PLAYER_ENTITY.cell.adjacentPos[GRID_INFO.currentPoly][
+      PLAYER_ENTITY.selectedCellIndex
+    ]
+  );
 };

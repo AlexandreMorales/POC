@@ -6,6 +6,7 @@
  * @property {import("../0 - configs/infos.js").Color} color
  * @property {boolean} isInverted Only used for triangles
  * @property {boolean} shoulApplyDark
+ * @property {boolean} isSelectedCell
  */
 
 /**

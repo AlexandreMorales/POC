@@ -19,6 +19,7 @@ export const MENU_CONFIG = {
   showChunks: false,
   usePerspective: false,
   keepTrianglePosition: false,
+  showSelectedCell: false,
   mapGeneration: MAP_GENERATION.DISTANCE,
 };
 

@@ -5,6 +5,7 @@ import { GRID_INFO } from "../2 - grid/infos.js";
 import { getCell } from "../2 - grid/grid.js";
 import { MOVEMENT } from "../3 - entities/infos.js";
 import {
+  getSelectedCell,
   PLAYER_ENTITY,
   startRunning,
   updatePlayerDirection,
@@ -154,6 +155,8 @@ export const changeSelectedOnCode = (code) => {
   if (aModI === undefined || aModI === PLAYER_ENTITY.selectedCellIndex) return;
 
   PLAYER_ENTITY.selectedCellIndex = aModI;
+
+  if (MENU_CONFIG.showSelectedCell) drawEveryCell(PLAYER_ENTITY.cell);
   updatePlayerDirection(lastSelection);
 };
 
@@ -182,17 +185,13 @@ export const resetDirection = () => {
 /**
  * @returns {import("../0 - configs/infos.js").Cell}
  */
-const getSelectedCell = () => {
+const updateAndGetSelectedCell = () => {
   updatePlayerDirection(lastSelection);
-  return getCell(
-    PLAYER_ENTITY.cell.adjacentPos[GRID_INFO.currentPoly][
-      PLAYER_ENTITY.selectedCellIndex
-    ]
-  );
+  return getSelectedCell();
 };
 
 export const dig = () => {
-  const selectedCell = getSelectedCell();
+  const selectedCell = updateAndGetSelectedCell();
 
   if (
     !selectedCell?.block ||
@@ -216,7 +215,7 @@ export const dig = () => {
 export const place = () => {
   if (!PLAYER_ENTITY.pickedCells.length) return;
 
-  const selectedCell = getSelectedCell();
+  const selectedCell = updateAndGetSelectedCell();
   if (selectedCell?.wall) return;
   placeBlock(selectedCell);
 
@@ -246,7 +245,7 @@ export const placeBlock = (cell, block, color) => {
 };
 
 export const useBoat = () => {
-  const selectedCell = getSelectedCell();
+  const selectedCell = updateAndGetSelectedCell();
   const canMove = !selectedCell.wall && selectedCell.block;
 
   if (PLAYER_ENTITY.connectedEntities[BOAT_NAME]) {
