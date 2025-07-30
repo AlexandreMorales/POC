@@ -1,22 +1,26 @@
-import { POLY_INFO, MAP_INFO } from "../configs/infos.js";
+import { POLY_INFO } from "../configs/infos.js";
 import {
   CONFIG,
   CANVAS_CONFIG,
   MAP_CONFIG,
   MENU_CONFIG,
 } from "../configs/configs.js";
-import { GRID, calculatePointBasedOnPos, getGridCell } from "../grid.js";
+import { GRID, calculatePointBasedOnPos, getGridCell } from "../grid/grid.js";
 import {
-  colorToRGB,
   debounce,
   getMod,
   isPointOutsideCanvas,
   tweakColor,
 } from "../utils.js";
-import { updateEntities } from "../entities.js";
+import { getAllEntities, updateEntities } from "../entities/entities.js";
+import { PLAYER_ENTITY } from "../entities/player.js";
+import { MAP_INFO } from "../grid/infos.js";
 
+const spinContainer = document.getElementById("spin-container");
 const container = document.getElementById("draw-container");
 const canvasContainer = document.getElementById("canvas-container");
+
+const containers = [spinContainer, container, canvasContainer];
 
 const canvasLayers = /** @type {HTMLCanvasElement[]} */ ([]);
 const contextsLayers = /** @type {CanvasRenderingContext2D[]} */ ([]);
@@ -35,11 +39,11 @@ for (let i = 0; i < CONFIG.maxLayer; i++) {
  */
 export const setCanvasSize = (height, width) => {
   if (height) {
-    container.style.height = canvasContainer.style.height = `${height}px`;
+    containers.forEach((c) => (c.style.height = `${height}px`));
     canvasLayers.forEach((canvas) => (canvas.height = height));
   }
   if (width) {
-    container.style.width = canvasContainer.style.width = `${width}px`;
+    containers.forEach((c) => (c.style.width = `${width}px`));
     canvasLayers.forEach((canvas) => (canvas.width = width));
   }
 };
@@ -67,7 +71,7 @@ export const drawEveryCell = () => {
   fluids = [];
   filledThisRound = new Set();
 
-  const offsetCell = MAP_INFO.currentCell.pos.j % 2;
+  const offsetCell = PLAYER_ENTITY.cell.pos.j % 2;
   const { rows, columns, shouldIntercalate } = POLY_INFO[MAP_INFO.currentPoly];
 
   // More range to encapsulate rotation
@@ -108,14 +112,8 @@ const drawWalls = () => {
  */
 const drawWall = (wall, context) => {
   // Only draw if there is a gap, if is sorrounded by walls it doesnt need
-  if (wall.borderMap.find((b) => !!b)) {
-    context.fillStyle = getFillStyle(
-      wall.color,
-      wall.shoulApplyDark,
-      CANVAS_CONFIG.wallDarkness
-    );
-    fillPolygon(context, wall.point, wall.points);
-  }
+  if (wall.borderMap.find((b) => !!b))
+    drawItem(context, wall, CANVAS_CONFIG.wallDarkness);
 };
 
 /**
@@ -123,17 +121,16 @@ const drawWall = (wall, context) => {
  * @param {CanvasRenderingContext2D} context
  */
 const drawWallTop = (wall, context) => {
-  context.fillStyle = getFillStyle(wall.color, wall.shoulApplyDark);
-  fillPolygon(context, wall.topPoint, wall.topPoints);
+  drawItem(context, wall.topInfo);
+
   context.strokeStyle = CANVAS_CONFIG.strokeColor;
   context.lineWidth = CANVAS_CONFIG.lineWidth;
-  applyBorders(context, wall.topPoint, wall.topPoints, wall.borderMap);
-
-  if (MENU_CONFIG.showPos) {
-    const polyInfo = POLY_INFO[MAP_INFO.currentPoly];
-    const isInverted = polyInfo.hasInverted && wall.isInverted;
-    showPos(context, wall.pos, wall.topPoint, isInverted, polyInfo);
-  }
+  applyBorders(
+    context,
+    wall.topInfo.point,
+    wall.topInfo.points,
+    wall.borderMap
+  );
 };
 
 let fluidInterval = null;
@@ -145,7 +142,7 @@ const tweakFluids = debounce(() => {
 
   fluidInterval = setInterval(() => {
     fluids.forEach((fluid) => {
-      drawPoint(context, {
+      drawItem(context, {
         ...fluid,
         color: tweakColor(fluid.color),
       });
@@ -161,9 +158,10 @@ const drawCell = (cell, context) => {
   const polyInfo = POLY_INFO[MAP_INFO.currentPoly];
   const isInverted = polyInfo.hasInverted && cell.isInverted;
 
-  const point = calculatePointBasedOnPos(cell.pos, isInverted);
+  const point = calculatePointBasedOnPos(cell.pos, isInverted, PLAYER_ENTITY);
 
-  if (isPointOutsideCanvas(point, polyInfo)) return;
+  if (isPointOutsideCanvas(point, polyInfo.canvasHeight, polyInfo.canvasWidth))
+    return;
 
   const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;
   const aCells = cell.adjacentPos[MAP_INFO.currentPoly].map(
@@ -171,8 +169,8 @@ const drawCell = (cell, context) => {
   );
 
   const shoulApplyDark =
-    cell !== MAP_INFO.currentCell &&
-    aCells.every((c) => c !== MAP_INFO.currentCell);
+    cell !== PLAYER_ENTITY.cell &&
+    aCells.every((c) => c !== PLAYER_ENTITY.cell);
 
   if (cell.wall) {
     const wallPoints = isInverted
@@ -183,16 +181,22 @@ const drawCell = (cell, context) => {
     const shouldOffset = polyInfo.hasInverted && !cell.isInverted;
 
     if (!wallLayers[layer]) wallLayers[layer] = [];
-
-    wallLayers[layer].push({
+    const commonInfos = {
       shoulApplyDark,
       color: cell.wall.color,
       pos: cell.pos,
-      isInverted: cell.isInverted,
+      isInverted,
+    };
+
+    wallLayers[layer].push({
+      ...commonInfos,
       point: { x: point.x, y: point.y - polyInfo.ySide * (layer - 1) },
-      topPoint: { x: point.x, y: point.y - polyInfo.ySide * layer },
       points: wallPoints,
-      topPoints: points,
+      topInfo: {
+        ...commonInfos,
+        point: { x: point.x, y: point.y - polyInfo.ySide * layer },
+        points,
+      },
       borderMap: aCells.reduce((acc, c, i) => {
         let index = i - MAP_INFO.rotationTurns;
         if (shouldOffset) index = MAP_INFO.currentPoly - 1 - index;
@@ -228,19 +232,21 @@ const drawCell = (cell, context) => {
     fluids.push(drawable);
   }
 
-  drawPoint(context, drawable);
+  drawItem(context, drawable);
 };
 
 /**
  * @param {CanvasRenderingContext2D} context
  * @param {Drawable} drawable
+ * @param {number} [modifier]
  */
-const drawPoint = (
+const drawItem = (
   context,
-  { point, points, pos, isInverted, color, shoulApplyDark }
+  { point, points, pos, isInverted, color, shoulApplyDark },
+  modifier
 ) => {
   context.fillStyle = color
-    ? getFillStyle(color, shoulApplyDark)
+    ? getFillStyle(color, shoulApplyDark, modifier)
     : CANVAS_CONFIG.emptyColor;
 
   fillPolygon(context, point, points);
@@ -252,16 +258,16 @@ const drawPoint = (
 };
 
 /**
- * @param {import("../configs/biomes.js").Color} color
+ * @param {import("../configs/infos.js").Color} color
  * @param {boolean} shoulApplyDark
  * @param {number} modifier
  * @return {string}
  */
-const getFillStyle = (color, shoulApplyDark, modifier = 1) => {
-  if (!MAP_INFO.timeOfDay || !shoulApplyDark)
-    return colorToRGB(color, modifier);
+const getFillStyle = ({ r, g, b }, shoulApplyDark, modifier = 1) => {
+  if (MAP_INFO.timeOfDay && shoulApplyDark)
+    modifier = (1 - MAP_INFO.timeOfDay / 100) * modifier;
 
-  return colorToRGB(color, (1 - MAP_INFO.timeOfDay / 100) * modifier);
+  return `rgb(${r * modifier}, ${g * modifier}, ${b * modifier})`;
 };
 
 /**
@@ -337,27 +343,38 @@ const showChunks = (context, pos, point, points) => {
  * @param {number} deg
  */
 export const rotateCanvas = (deg) => {
-  const urls = [];
   const transitionDuration = `${
     MAP_CONFIG.rotateDelay + 6000 / CONFIG.cellHeight
   }ms`;
   const transitionProperty = "transform";
-  const transform = `rotate(${deg}deg)`;
 
-  canvasLayers.forEach((canvas) => {
-    canvas.style.transitionDuration = transitionDuration;
-    canvas.style.transitionProperty = transitionProperty;
-    canvas.style.transform = transform;
-    urls.push(`url(${canvas.toDataURL()})`);
+  getAllEntities().forEach((e) => {
+    if (e.img) {
+      e.img.style.transitionDuration = transitionDuration;
+      e.img.style.transitionProperty = transitionProperty;
+      e.img.style.transform = `rotate(${-deg}deg)`;
+    }
   });
-  canvasContainer.style.background = urls.join(", ");
+
+  container.style.transitionDuration = transitionDuration;
+  container.style.transitionProperty = transitionProperty;
+  container.style.transform = `rotate(${deg}deg)`;
+  spinContainer.style.background = canvasLayers
+    .map((c) => `url(${c.toDataURL()})`)
+    .join(", ");
 };
 
 export const resetRotateCanvas = () => {
-  canvasLayers.forEach((canvas) => {
-    canvas.style.transitionDuration = null;
-    canvas.style.transitionProperty = null;
-    canvas.style.transform = null;
+  getAllEntities().forEach((e) => {
+    if (e.img) {
+      e.img.style.transitionDuration = null;
+      e.img.style.transitionProperty = null;
+      e.img.style.transform = null;
+    }
   });
-  canvasContainer.style.background = null;
+
+  container.style.transitionDuration = null;
+  container.style.transitionProperty = null;
+  container.style.transform = null;
+  spinContainer.style.background = null;
 };
