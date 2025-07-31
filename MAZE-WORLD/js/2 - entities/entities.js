@@ -231,7 +231,6 @@ export const verifyEntityHeight = (entity) => {
     height = ySide * ENTITIES_CONFIG.wallSizeRatio;
   }
 
-  // TODO: Implement direction on entity to know where to cut
   if (connectedEntities.length) height = ySide * ENTITIES_CONFIG.wallSizeRatio;
 
   entity.img.style.height = `${Math.round(height)}px`;

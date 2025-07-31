@@ -32,8 +32,6 @@ const ACTIONS_CONFIG = {
   rotateDelay: 500,
 };
 
-const BREAKABLE_ENTITIES = new Set([ENTITY_TYPES.TREE]);
-
 let canRotate = true;
 /**
  * @param {number} orientation
@@ -206,9 +204,7 @@ export const dig = () => {
   if (!selectedCell?.block) return;
 
   if (selectedCell.entityType) {
-    if (BREAKABLE_ENTITIES.has(selectedCell.entityType))
-      removeEntitiesFromCell(selectedCell);
-
+    removeEntitiesFromCell(selectedCell);
     return;
   }
 

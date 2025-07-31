@@ -89,7 +89,6 @@ const createCell = (pos, block) => {
   cell.isInverted = isCellInverted(cell.pos);
   cell.adjacentPos = getAdjacentPos(cell.pos, cell.isInverted);
 
-  // TODO: remove this and flag
   return new Proxy(cell, {
     get(target, prop, receiver) {
       if (
@@ -181,7 +180,7 @@ export const loadChunk = (initialPos) => {
  * @param {Pos} pos
  * @returns {Cell}
  */
-export const getGridCell = (pos) => {
+export const loadAndGetCell = (pos) => {
   if (!getCell(pos)) loadChunk(pos);
   return getCell(pos);
 };
@@ -194,7 +193,7 @@ export const getCenterCell = () => {
   const { iOffset, jOffset } = POLY_INFO;
   const i = Math.floor(rows / 2) + iOffset;
   const j = Math.floor(columns / 2) + jOffset;
-  return getGridCell({ i, j });
+  return loadAndGetCell({ i, j });
 };
 
 /**

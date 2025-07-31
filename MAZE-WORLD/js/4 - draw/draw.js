@@ -1,3 +1,4 @@
+import { getCell } from "../0 - grid/grid.js";
 import {
   calculatePointBasedOnPos,
   getPolyInfo,
@@ -5,7 +6,7 @@ import {
   POLY_INFO,
 } from "../1 - polygones/index.js";
 import { getSelectedCell, updateEntities } from "../2 - entities/index.js";
-import { getGridCell } from "../3 - generation/index.js";
+import { loadAndGetCell } from "../3 - generation/index.js";
 import {
   debounce,
   getMod,
@@ -92,7 +93,7 @@ export const drawEveryCell = (baseCell) => {
 
       if (shouldIntercalate && offsetCell && nJ % 2 === 0) nI = nI + 1;
 
-      drawCell(getGridCell(pos), contextsLayers[0], baseCell);
+      drawCell(loadAndGetCell(pos), contextsLayers[0], baseCell);
     }
   }
 
@@ -146,7 +147,7 @@ const drawCell = (cell, context, baseCell) => {
     return;
 
   const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;
-  const aCells = cell.adjacentPos[POLY_INFO.currentPoly].map(getGridCell);
+  const aCells = cell.adjacentPos[POLY_INFO.currentPoly].map(getCell);
   const shoulApplyDark =
     cell !== baseCell && aCells.every((c) => c !== baseCell);
   const isSelectedCell =

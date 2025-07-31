@@ -1,6 +1,10 @@
 import { MENU_CONFIG, POLY_INFO } from "../1 - polygones/index.js";
 import { ENTITY_TYPES, PLAYER_ENTITY } from "../2 - entities/index.js";
-import { MAP_INFO, spawnEntities } from "../3 - generation/index.js";
+import {
+  loadAndGetCell,
+  MAP_INFO,
+  spawnEntities,
+} from "../3 - generation/index.js";
 import { drawEveryCell } from "../4 - draw/index.js";
 
 const MOVEMENT_CONFIG = {
@@ -70,4 +74,20 @@ const passTime = () => {
   ) {
     MOVEMENT_CONFIG.passHour = -MOVEMENT_CONFIG.passHour;
   }
+};
+
+/**
+ * @param {Cell} cell
+ * @param {Entity} entity
+ * @returns {Cell}
+ */
+export const findAccessibleCell = (cell, entity) => {
+  let accessibleCell = cell;
+  while (cellIsBlocked(accessibleCell, entity)) {
+    accessibleCell = loadAndGetCell({
+      i: accessibleCell.pos.i + 1,
+      j: accessibleCell.pos.j,
+    });
+  }
+  return accessibleCell;
 };

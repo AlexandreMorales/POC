@@ -79,6 +79,9 @@ const updateVector = (i, j, vector) => {
   }
 };
 
+/**
+ * @returns {Point}
+ */
 const getRandUnitVect = () => {
   const theta = Math.random() * 2 * Math.PI;
   return { x: Math.cos(theta), y: Math.sin(theta) };
@@ -88,6 +91,7 @@ const getRandUnitVect = () => {
  * @param {number} i
  * @param {number} j
  * @param {symbol} vectorType
+ * @returns {number}
  */
 export const getValue = (i, j, vectorType) => {
   const vector = vectors[vectorType];
@@ -118,6 +122,7 @@ export const getValue = (i, j, vectorType) => {
  * @param {number} vx
  * @param {number} vy
  * @param {Vector} vector
+ * @returns {number}
  */
 const dotProduct = (vector, x, y, vx, vy) => {
   if (!vector.vectors[vy]?.[vx]) updateVector(vy, vx, vector);
@@ -127,6 +132,7 @@ const dotProduct = (vector, x, y, vx, vy) => {
 /**
  * @param {Point} v1
  * @param {Point} v2
+ * @returns {number}
  */
 const dot = (v1, v2) => v1.x * v2.x + v1.y * v2.y;
 
@@ -134,10 +140,12 @@ const dot = (v1, v2) => v1.x * v2.x + v1.y * v2.y;
  * @param {number} a
  * @param {number} b
  * @param {number} c
+ * @returns {number}
  */
 const lerp = (a, b, c) => a + smootherstep(c) * (b - a);
 
 /**
  * @param {number} x
+ * @returns {number}
  */
 const smootherstep = (x) => 6 * x ** 5 - 15 * x ** 4 + 10 * x ** 3;
