@@ -1,3 +1,14 @@
+:root {
+  --input-thumb-color: #fff;
+  --input-empty-color: #dfe1e4;
+  --input-empty-color-hover: #c9cbcd;
+  --input-select-color: #6e79d6;
+  --input-select-color-hover: #535db3;
+
+  --input-transition: all 100ms ease-out;
+  --input-border-radius: 72px;
+}
+
 label {
   display: flex;
   cursor: pointer;

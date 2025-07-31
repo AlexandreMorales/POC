@@ -129,6 +129,22 @@ const createEntitiesForBlock = (block, cell) => {
 };
 
 /**
+ * @param {import("../0 - configs/infos.js").Pos} pos
+ * @returns {import("./biomes.js").Biome}
+ */
+const getBiome = (pos) => {
+  switch (MENU_CONFIG.mapGeneration) {
+    case MAP_GENERATION.MIX:
+      const biomeValue = getValue(pos.i, pos.j, VECTORS.BIOME);
+      return BIOMES.find((b) => biomeValue <= b.maxValue);
+    default:
+    case MAP_GENERATION.DISTANCE:
+      const distance = Math.sqrt(pos.i ** 2 + pos.j ** 2);
+      return BIOMES.find((b) => distance <= b.maxDistance);
+  }
+};
+
+/**
  * @param {import("../0 - configs/infos.js").Pos} initialPos
  */
 export const loadChunk = (initialPos) => {
@@ -138,27 +154,13 @@ export const loadChunk = (initialPos) => {
     CONFIG.chunkColumns
   );
 
-  const { mapGeneration } = MENU_CONFIG;
-
   for (let i = 0; i < CONFIG.chunkRows; i++) {
     const nI = i + offsetI;
     for (let j = 0; j < CONFIG.chunkColumns; j++) {
       const nJ = j + offsetJ;
       const pos = { i: nI, j: nJ };
 
-      let biome = /** @type {import("./biomes.js").Biome} */ (null);
-      switch (mapGeneration) {
-        case MAP_GENERATION.MIX:
-          const biomeValue = getValue(nI, nJ, VECTORS.BIOME);
-          biome = BIOMES.find((b) => biomeValue <= b.maxValue);
-          break;
-        default:
-        case MAP_GENERATION.DISTANCE:
-          const distance = Math.sqrt(nI ** 2 + nJ ** 2);
-          biome = BIOMES.find((b) => distance <= b.maxDistance);
-          break;
-      }
-
+      const biome = getBiome(pos);
       const value = getValue(nI, nJ, VECTORS.BLOCK);
       const originalBlock = biome.ranges.find((r) => value <= r.max);
       const isHighBlock = originalBlock.layer > 0;
