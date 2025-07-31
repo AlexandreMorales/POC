@@ -37,7 +37,7 @@
  * @property {CellBlock} wall The block above this one
  * @property {{ [k: number]: Pos[] }} adjacentPos Pos of adjacent cells
  * @property {boolean} isInverted Only used for triangles
- * @property {string} entityName The name of the entity on top of the cell
+ * @property {string} entityType The type of the entity on top of the cell
  */
 
 /**

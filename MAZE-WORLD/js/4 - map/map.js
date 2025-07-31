@@ -8,11 +8,13 @@ import { POLY_INFO } from "../0 - configs/infos.js";
 import { tweakColor } from "../1 - utils/utils.js";
 import { GRID_INFO } from "../2 - grid/infos.js";
 import { addCell, getCell } from "../2 - grid/grid.js";
+import { ENTITY_TYPES } from "../3 - entities/infos.js";
+import { PLAYER_ENTITY } from "../3 - entities/player.js";
+import { addTree } from "../3 - entities/tree.js";
 
 import { getChunkStart } from "./utils.js";
 import { getValue, VECTORS } from "./perlin.js";
 import { BIOMES } from "./biomes.js";
-import { PLAYER_ENTITY } from "../3 - entities/player.js";
 
 /**
  * @param {import("../0 - configs/infos").Pos} param
@@ -76,7 +78,7 @@ const createCell = (pos, block) => {
     cell = /** @type {import("../0 - configs/infos.js").Cell} */ ({});
 
     cell.pos = pos;
-    cell.entityName = null;
+    cell.entityType = null;
 
     if (block) {
       cell.block = block;
@@ -107,6 +109,23 @@ const createCell = (pos, block) => {
       return Reflect.get(target, prop, receiver);
     },
   });
+};
+
+/**
+ * @param {import("./biomes.js").BlockEntity} block
+ * @param {import("../0 - configs/infos.js").Cell} cell
+ */
+const createEntitiesForBlock = (block, cell) => {
+  if (block.spawnableEntities)
+    block.spawnableEntities.forEach((sEntity) => {
+      if (Math.random() < sEntity.probability)
+        switch (sEntity.entityType) {
+          default:
+          case ENTITY_TYPES.TREE:
+            addTree(cell);
+            break;
+        }
+    });
 };
 
 /**
@@ -153,6 +172,8 @@ export const loadChunk = (initialPos) => {
           block: originalBlock,
           color: tweakColor(originalBlock.color),
         };
+
+      createEntitiesForBlock(originalBlock, cell);
     }
   }
 };

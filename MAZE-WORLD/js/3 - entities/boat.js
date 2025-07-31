@@ -1,10 +1,5 @@
-import { MOVEMENT } from "./infos.js";
-import {
-  createEntity,
-  moveEntityToCell,
-  updateEntityPoint,
-  verifyEntityHeight,
-} from "./entities.js";
+import { ENTITY_TYPES, MOVEMENT } from "./infos.js";
+import { createEntity, moveEntityToCell } from "./entities.js";
 
 const BOAT_IMG_MAP = /** @type {import("./infos.js").ImageMap} */ ({
   [MOVEMENT.UP]: "images/boat/up.png",
@@ -13,7 +8,6 @@ const BOAT_IMG_MAP = /** @type {import("./infos.js").ImageMap} */ ({
   [MOVEMENT.RIGHT]: "images/boat/right.png",
 });
 
-export const BOAT_NAME = "BOAT";
 const BOAT_ENTITIES =
   /** @type {{ [k: string]: import("./infos.js").Entity }} */ ({});
 
@@ -21,13 +15,15 @@ const BOAT_ENTITIES =
  * @param {import("./infos.js").Entity} entity
  */
 export const toggleBoat = (entity) => {
-  if (entity.connectedEntities[BOAT_NAME]) {
-    delete entity.connectedEntities[BOAT_NAME];
+  if (entity.connectedEntities[ENTITY_TYPES.BOAT]) {
+    delete entity.connectedEntities[ENTITY_TYPES.BOAT];
     addBoat(entity.cell, entity);
     return;
   }
 
-  entity.connectedEntities[BOAT_NAME] = BOAT_ENTITIES[entity.name];
+  if (!BOAT_ENTITIES[entity.id]) addBoat(entity.cell, entity);
+
+  entity.connectedEntities[ENTITY_TYPES.BOAT] = BOAT_ENTITIES[entity.id];
 };
 
 /**
@@ -35,11 +31,12 @@ export const toggleBoat = (entity) => {
  * @param {import("./infos.js").Entity} entity
  */
 export const addBoat = (cell, entity) => {
-  let boatEntity = BOAT_ENTITIES[entity.name];
+  let boatEntity = BOAT_ENTITIES[entity.id];
   if (!boatEntity?.img)
-    boatEntity = BOAT_ENTITIES[entity.name] = createEntity(
+    boatEntity = BOAT_ENTITIES[entity.id] = createEntity(
       cell,
-      `${entity.name}_${BOAT_NAME}`,
+      entity.id,
+      ENTITY_TYPES.BOAT,
       BOAT_IMG_MAP,
       {
         movementsToCut: [MOVEMENT.UP, MOVEMENT.DOWN],
@@ -47,6 +44,4 @@ export const addBoat = (cell, entity) => {
     );
 
   moveEntityToCell(boatEntity, cell);
-  updateEntityPoint(boatEntity);
-  verifyEntityHeight(boatEntity);
 };

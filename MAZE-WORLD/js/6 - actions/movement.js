@@ -1,7 +1,7 @@
 import { MENU_CONFIG } from "../0 - configs/configs.js";
 import { GRID_INFO } from "../2 - grid/infos.js";
+import { ENTITY_TYPES } from "../3 - entities/infos.js";
 import { PLAYER_ENTITY } from "../3 - entities/player.js";
-import { BOAT_NAME } from "../3 - entities/boat.js";
 import { DRAW_INFO } from "../5 - draw/infos.js";
 import { drawEveryCell } from "../5 - draw/draw.js";
 
@@ -21,8 +21,8 @@ export const cellIsBlocked = (cell, entity) =>
   !cell ||
   !cell.block ||
   !!cell.wall ||
-  !!cell.entityName ||
-  (entity.connectedEntities[BOAT_NAME]
+  !!cell.entityType ||
+  (entity.connectedEntities[ENTITY_TYPES.BOAT]
     ? !cell.block.isFluid
     : cell.block.isFluid);
 

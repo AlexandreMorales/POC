@@ -20,14 +20,15 @@ const container = document.getElementById("entities");
 const ENTITIES = /** @type {Set<import("./infos.js").Entity>} */ (new Set());
 
 /**
- * @param {string} name
+ * @param {string} id
  * @param {import("./infos.js").ImageMap} imageMap
+ * @param {Partial<import("./infos.js").Entity>} entityParams
  * @returns {HTMLImageElement}
  */
-const createEntityImage = (name, imageMap) => {
+const createEntityImage = (id, imageMap, entityParams) => {
   const img = document.createElement("img");
-  img.id = name;
-  img.style.zIndex = "1";
+  img.id = id;
+  img.style.zIndex = entityParams.movementsToCut ? "1" : "2";
   img.src = imageMap[MOVEMENT.RIGHT];
   container.appendChild(img);
   setImgSize(img);
@@ -39,27 +40,65 @@ const createEntityImage = (name, imageMap) => {
  * @param {import("../0 - configs/infos.js").Cell} cell
  */
 export const moveEntityToCell = (entity, cell) => {
-  if (entity.cell) entity.cell.entityName = null;
+  const previousType = entity.cell?.entityType || cell.entityType;
+  if (entity.cell) entity.cell.entityType = null;
   entity.cell = cell;
-  entity.cell.entityName = entity.name;
+  entity.cell.entityType = previousType || entity.type;
+};
+
+/**
+ * @param {import("./infos.js").Entity} entity
+ */
+export const removeEntityImage = (entity) => {
+  container.removeChild(entity.img);
+  entity.img = null;
+};
+
+/**
+ * @param {import("./infos.js").Entity} entity
+ */
+export const removeEntity = (entity) => {
+  entity.cell.entityType = null;
+  removeEntityImage(entity);
+  ENTITIES.delete(entity);
 };
 
 /**
  * @param {import("../0 - configs/infos.js").Cell} cell
- * @param {string} name
+ * @returns {import("./infos.js").Entity[]}
+ */
+export const removeEntitiesFromCell = (cell) => {
+  const removedEntities = /** @type {import("./infos.js").Entity[]} */ ([]);
+  ENTITIES.forEach((entity) => {
+    if (entity.cell === cell) {
+      removeEntity(entity);
+      removedEntities.push(entity);
+    }
+  });
+  return removedEntities;
+};
+
+/**
+ * @param {import("../0 - configs/infos.js").Cell} cell
+ * @param {string} id
+ * @param {string} type
  * @param {import("./infos.js").ImageMap} imageMap
  * @param {Partial<import("./infos.js").Entity>} entityParams
  * @returns {import("./infos.js").Entity}
  */
-export const createEntity = (cell, name, imageMap, entityParams = {}) => {
+export const createEntity = (cell, id, type, imageMap, entityParams = {}) => {
+  id = `${type}_${id}`;
   const entity = /** @type {import("./infos.js").Entity} */ ({
-    img: createEntityImage(name, imageMap),
-    name,
+    img: createEntityImage(id, imageMap, entityParams),
+    id,
+    type,
     imageMap,
     connectedEntities: {},
     ...entityParams,
   });
   moveEntityToCell(entity, cell);
+  updateEntityPoint(entity);
+  verifyEntityHeight(entity);
   ENTITIES.add(entity);
   return entity;
 };
@@ -77,12 +116,9 @@ export const updateEntityPoint = (entity) => {
   );
 
   if (isPointOutsideCanvas(point, canvasHeight, canvasWidth)) {
-    if (entity.img) {
-      container.removeChild(entity.img);
-      entity.img = null;
-    }
+    if (entity.img) removeEntityImage(entity);
   } else if (!entity.img) {
-    entity.img = createEntityImage(entity.name, entity.imageMap);
+    entity.img = createEntityImage(entity.id, entity.imageMap, entity);
   }
 
   if (entity.img) setEntityPoint(entity, point);
@@ -152,6 +188,8 @@ export const verifyEntityHeight = (entity) => {
   const downPos = entity.cell.adjacentPos[GRID_INFO.currentPoly][downI];
   const downCell = getCell(downPos);
 
+  if (!downCell) return;
+
   let height = ySide * ENTITIES_CONFIG.defaultSizeRatio;
   entity.img.style.clipPath = null;
 
@@ -177,10 +215,12 @@ export const verifyEntityHeight = (entity) => {
     }
 
     entity.img.style.clipPath = clipPath;
-    // TODO: Implement direction on entity to know where to cut
-  } else if (downCell.wall || connectedEntities.length) {
+  } else if (downCell.wall) {
     height = ySide * ENTITIES_CONFIG.wallSizeRatio;
   }
+
+  // TODO: Implement direction on entity to know where to cut
+  if (connectedEntities.length) height = ySide * ENTITIES_CONFIG.wallSizeRatio;
 
   entity.img.style.height = `${Math.round(height)}px`;
 };

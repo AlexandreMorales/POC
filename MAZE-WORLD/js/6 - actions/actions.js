@@ -3,15 +3,18 @@ import { POLY_INFO } from "../0 - configs/infos.js";
 import { getMod } from "../1 - utils/utils.js";
 import { GRID_INFO } from "../2 - grid/infos.js";
 import { getCell } from "../2 - grid/grid.js";
-import { MOVEMENT } from "../3 - entities/infos.js";
+import { MOVEMENT, ENTITY_TYPES } from "../3 - entities/infos.js";
 import {
   getSelectedCell,
   PLAYER_ENTITY,
   startRunning,
   updatePlayerDirection,
 } from "../3 - entities/player.js";
-import { resetEntities } from "../3 - entities/entities.js";
-import { addBoat, BOAT_NAME, toggleBoat } from "../3 - entities/boat.js";
+import {
+  removeEntitiesFromCell,
+  resetEntities,
+} from "../3 - entities/entities.js";
+import { addBoat, toggleBoat } from "../3 - entities/boat.js";
 import { getCenterCell } from "../4 - map/map.js";
 import {
   resetCanvasSize,
@@ -25,6 +28,8 @@ import { cellIsBlocked, move, moveCurrentCell } from "./movement.js";
 const ACTIONS_CONFIG = {
   rotateDelay: 500,
 };
+
+const BREAKABLE_ENTITIES = new Set([ENTITY_TYPES.TREE]);
 
 let canRotate = true;
 /**
@@ -195,12 +200,16 @@ const updateAndGetSelectedCell = () => {
 export const dig = () => {
   const selectedCell = updateAndGetSelectedCell();
 
-  if (
-    !selectedCell?.block ||
-    selectedCell.block.isFluid ||
-    !!selectedCell.entityName
-  )
+  if (!selectedCell?.block) return;
+
+  if (selectedCell.entityType) {
+    if (BREAKABLE_ENTITIES.has(selectedCell.entityType))
+      removeEntitiesFromCell(selectedCell);
+
     return;
+  }
+
+  if (selectedCell.block.isFluid) return;
 
   PLAYER_ENTITY.pickedCells.push({ ...(selectedCell.wall || selectedCell) });
 
@@ -230,7 +239,7 @@ export const place = () => {
  * @param {import("../0 - configs/infos.js").Color} [color]
  */
 export const placeBlock = (cell, block, color) => {
-  if (!cell || !!cell.entityName) return;
+  if (!cell || !!cell.entityType) return;
 
   if (!block) {
     const cellBlock = PLAYER_ENTITY.pickedCells.pop();
@@ -250,7 +259,7 @@ export const useBoat = () => {
   const selectedCell = updateAndGetSelectedCell();
   const canMove = !selectedCell.wall && selectedCell.block;
 
-  if (PLAYER_ENTITY.connectedEntities[BOAT_NAME]) {
+  if (PLAYER_ENTITY.connectedEntities[ENTITY_TYPES.BOAT]) {
     if (!selectedCell?.block?.isFluid && canMove) {
       toggleBoat(PLAYER_ENTITY);
       move(selectedCell);
@@ -258,7 +267,7 @@ export const useBoat = () => {
     return;
   }
 
-  if (selectedCell.entityName?.includes(BOAT_NAME)) {
+  if (selectedCell.entityType === ENTITY_TYPES.BOAT) {
     toggleBoat(PLAYER_ENTITY);
     move(selectedCell);
   } else if (canMove) {

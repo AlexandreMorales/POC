@@ -1,6 +1,15 @@
+import { ENTITY_TYPES } from "../3 - entities/infos.js";
+
+/**
+ * @typedef {Object} SpawnableEntities
+ * @property {number} probability
+ * @property {string} entityType
+ */
+
 /**
  * @typedef {Object} BlockProps
  * @property {number} max
+ * @property {SpawnableEntities[]} [spawnableEntities]
  */
 
 /**
@@ -56,7 +65,12 @@ const BIOMES_RAW = /** @type {{ [k: string]: Biome }} */ ({
       addPropsToBlock(BLOCKS.MEDIUM_WATER, { max: -0.5 }),
       addPropsToBlock(BLOCKS.SEA_SHORE, { max: -0.4 }),
       addPropsToBlock(BLOCKS.LOW_GRASS, { max: -0.2 }),
-      addPropsToBlock(BLOCKS.MID_GRASS, { max: 0.4 }),
+      addPropsToBlock(BLOCKS.MID_GRASS, {
+        max: 0.4,
+        spawnableEntities: [
+          { probability: 0.01, entityType: ENTITY_TYPES.TREE },
+        ],
+      }),
       addPropsToBlock(BLOCKS.HIGH_GRASS, { max: 0.5 }),
       addPropsToBlock(BLOCKS.DIRT, { max: 0.7 }),
       addPropsToBlock(BLOCKS.ROCK, { max: 1 }),
@@ -67,12 +81,17 @@ const BIOMES_RAW = /** @type {{ [k: string]: Biome }} */ ({
     maxDistance: Infinity,
     higherGroundBlock: BLOCKS.MID_GRASS,
     ranges: [
-      addPropsToBlock(BLOCKS.DEEP_WATER, { max: -0.1 }),
+      addPropsToBlock(BLOCKS.DEEP_WATER, {
+        max: -0.1,
+        spawnableEntities: [
+          { probability: 0.004, entityType: ENTITY_TYPES.TREE },
+        ],
+      }),
       addPropsToBlock(BLOCKS.MEDIUM_WATER, { max: 0.1 }),
       addPropsToBlock(BLOCKS.SEA_SHORE, { max: 0.2 }),
-      addPropsToBlock(BLOCKS.BEACH_SAND, { max: 0.35 }),
-      addPropsToBlock(BLOCKS.LOW_GRASS, { max: 0.4 }),
-      addPropsToBlock(BLOCKS.HIGH_GRASS, { max: 0.5 }),
+      addPropsToBlock(BLOCKS.BEACH_SAND, { max: 0.4 }),
+      addPropsToBlock(BLOCKS.LOW_GRASS, { max: 0.5 }),
+      addPropsToBlock(BLOCKS.HIGH_GRASS, { max: 0.7 }),
       addPropsToBlock(BLOCKS.DIRT, { max: 1 }),
     ],
   },

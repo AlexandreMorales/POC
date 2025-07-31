@@ -2,7 +2,7 @@ import { POLY_INFO } from "../0 - configs/infos.js";
 import { GRID_INFO } from "../2 - grid/infos.js";
 import { getCell } from "../2 - grid/grid.js";
 
-import { MOVEMENT } from "./infos.js";
+import { ENTITY_TYPES, MOVEMENT } from "./infos.js";
 
 const MOVEMENT_IMG_MAP = /** @type {import("./infos.js").ImageMap} */ ({
   [MOVEMENT.UP]: "images/player/up.png",
@@ -25,9 +25,9 @@ const CUT_MOVEMENTS_MAP = {
   [MOVEMENT.RIGHT]: "marginRight",
 };
 
-export const PLAYER_NAME = "PLAYER";
 export const PLAYER_ENTITY = /** @type {import("./infos.js").Entity} */ ({
-  name: PLAYER_NAME,
+  id: "PLAYER 1",
+  type: ENTITY_TYPES.PLAYER,
   imageMap: MOVEMENT_IMG_MAP,
   cell: null,
   img: document.getElementById("player"),
