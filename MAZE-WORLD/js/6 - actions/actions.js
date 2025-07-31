@@ -37,8 +37,10 @@ export const rotate = (orientation) => {
       GRID_INFO.rotationTurns + orientation,
       GRID_INFO.currentPoly
     );
+    const useAnimation =
+      MENU_CONFIG.rotationAnimation || MENU_CONFIG.rotationAnimationWithZoom;
 
-    if (MENU_CONFIG.rotationAnimation)
+    if (useAnimation)
       rotateCanvas(
         (360 / GRID_INFO.currentPoly) * -orientation,
         ACTIONS_CONFIG.rotateDelay
@@ -47,7 +49,7 @@ export const rotate = (orientation) => {
     resetDirection();
 
     setTimeout(() => {
-      if (MENU_CONFIG.rotationAnimation) resetRotateCanvas();
+      if (useAnimation) resetRotateCanvas();
       drawEveryCell(PLAYER_ENTITY.cell);
       canRotate = true;
     }, ACTIONS_CONFIG.rotateDelay);

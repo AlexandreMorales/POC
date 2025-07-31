@@ -221,16 +221,23 @@ const drawCell = (cell, context, baseCell) => {
  */
 export const rotateCanvas = (deg, rotateDelay) => {
   updateHtmlEntities((img) => rotateElement(img, -deg, rotateDelay));
-  rotateElement(container, deg, rotateDelay);
-  spinContainer.style.background = canvasLayers
-    .map((c) => `url(${c.toDataURL()})`)
-    .join(", ");
+  rotateElement(
+    container,
+    deg,
+    rotateDelay,
+    MENU_CONFIG.rotationAnimationWithZoom
+  );
+  if (!MENU_CONFIG.rotationAnimationWithZoom)
+    spinContainer.style.background = canvasLayers
+      .map((c) => `url(${c.toDataURL()})`)
+      .join(", ");
 };
 
 export const resetRotateCanvas = () => {
   updateHtmlEntities((img) => rotateElement(img));
   rotateElement(container);
-  spinContainer.style.background = null;
+  if (!MENU_CONFIG.rotationAnimationWithZoom)
+    spinContainer.style.background = null;
 };
 
 /**
@@ -250,11 +257,14 @@ const updateHtmlEntities = (callback) => {
  * @param {HTMLElement} element
  * @param {number} [deg]
  * @param {number} [rotateDelay]
+ * @param {boolean} [zoomIn]
  */
-const rotateElement = (element, deg, rotateDelay) => {
-  element.style.transitionDuration = deg
-    ? `${rotateDelay + 6000 / DRAW_INFO.cellHeight}ms`
-    : null;
-  element.style.transitionProperty = deg ? "transform" : null;
+const rotateElement = (element, deg, rotateDelay, zoomIn) => {
+  element.style.transitionDuration = `${
+    rotateDelay + 6000 / DRAW_INFO.cellHeight
+  }ms`;
+  element.style.transitionProperty = deg ? "transform, scale" : "scale";
+
+  element.style.scale = deg && zoomIn ? `2.5` : null;
   element.style.transform = deg ? `rotate(${deg}deg)` : null;
 };

@@ -15,6 +15,7 @@ export const MENU_CONFIG = {
   debugMode: false,
   passTime: false,
   rotationAnimation: true,
+  rotationAnimationWithZoom: false,
   showPos: false,
   showChunks: false,
   usePerspective: false,
