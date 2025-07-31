@@ -1,31 +1,30 @@
+import { addCell, getCell } from "../0 - grid/index.js";
 import {
-  CONFIG,
+  getPolyInfo,
   KNOWN_POLYGONS,
   MAP_GENERATION,
   MENU_CONFIG,
-} from "../0 - configs/configs.js";
-import { POLY_INFO } from "../0 - configs/infos.js";
-import { tweakColor } from "../1 - utils/utils.js";
-import { GRID_INFO } from "../2 - grid/infos.js";
-import { addCell, getCell } from "../2 - grid/grid.js";
-import { ENTITY_TYPES } from "../3 - entities/infos.js";
-import { PLAYER_ENTITY } from "../3 - entities/player.js";
-import { addTree } from "../3 - entities/tree.js";
+  POLY_INFO,
+} from "../1 - polygones/index.js";
+import { addEntity, PLAYER_ENTITY } from "../2 - entities/index.js";
+import { tweakColor } from "../utils.js";
 
+import { GENERATION_CONFIG } from "./configs.js";
+import { MAP_INFO } from "./infos.js";
 import { getChunkStart } from "./utils.js";
 import { getValue, VECTORS } from "./perlin.js";
 import { BIOMES } from "./biomes.js";
 
 /**
- * @param {import("../0 - configs/infos").Pos} param
+ * @param {Pos} param
  * @returns {boolean}
  */
-export const isCellInverted = ({ i, j }) => (i + j) % 2 !== 0;
+const isCellInverted = ({ i, j }) => (i + j) % 2 !== 0;
 
 /**
- * @param {import("../0 - configs/infos.js").Pos} pos
+ * @param {Pos} pos
  * @param {boolean} isInverted
- * @returns {{ [k: number]: import("../0 - configs/infos.js").Pos[] }}
+ * @returns {{ [k: number]: Pos[] }}
  */
 const getAdjacentPos = ({ i, j }, isInverted) => {
   return {
@@ -68,14 +67,14 @@ const getAdjacentPos = ({ i, j }, isInverted) => {
 };
 
 /**
- * @param {import("../0 - configs/infos.js").Pos} pos
- * @param {import("../0 - configs/infos.js").Block} block
- * @returns {import("../0 - configs/infos.js").Cell}
+ * @param {Pos} pos
+ * @param {Block} block
+ * @returns {Cell}
  */
 const createCell = (pos, block) => {
   let cell = getCell(pos);
   if (!cell) {
-    cell = /** @type {import("../0 - configs/infos.js").Cell} */ ({});
+    cell = /** @type {Cell} */ ({});
 
     cell.pos = pos;
     cell.entityType = null;
@@ -90,11 +89,12 @@ const createCell = (pos, block) => {
   cell.isInverted = isCellInverted(cell.pos);
   cell.adjacentPos = getAdjacentPos(cell.pos, cell.isInverted);
 
+  // TODO: remove this and flag
   return new Proxy(cell, {
     get(target, prop, receiver) {
       if (
         MENU_CONFIG.keepTrianglePosition &&
-        GRID_INFO.currentPoly % 2 &&
+        POLY_INFO.currentPoly % 2 &&
         PLAYER_ENTITY.cell &&
         (prop === "isInverted" || prop === "adjacentPos")
       ) {
@@ -112,25 +112,23 @@ const createCell = (pos, block) => {
 };
 
 /**
- * @param {import("./biomes.js").BlockEntity} block
- * @param {import("../0 - configs/infos.js").Cell} cell
+ * @param {Cell} cell
+ * @param {boolean} onMove
  */
-const createEntitiesForBlock = (block, cell) => {
-  if (block.spawnableEntities)
-    block.spawnableEntities.forEach((sEntity) => {
-      if (Math.random() < sEntity.probability)
-        switch (sEntity.entityType) {
-          default:
-          case ENTITY_TYPES.TREE:
-            addTree(cell);
-            break;
-        }
+const createEntitiesForCell = (cell, onMove = false) => {
+  if (cell.block.spawnableEntities)
+    cell.block.spawnableEntities.forEach((sEntity) => {
+      const canSpawn = onMove ? sEntity.spawnOnMove : !sEntity.spawnOnMove;
+      let probability = sEntity.probability;
+      if (sEntity.increaseWithTime) probability *= MAP_INFO.timeOfDay;
+      if (canSpawn && Math.random() < probability)
+        addEntity(sEntity.entityType, cell);
     });
 };
 
 /**
- * @param {import("../0 - configs/infos.js").Pos} pos
- * @returns {import("./biomes.js").Biome}
+ * @param {Pos} pos
+ * @returns {Biome}
  */
 const getBiome = (pos) => {
   switch (MENU_CONFIG.mapGeneration) {
@@ -145,18 +143,18 @@ const getBiome = (pos) => {
 };
 
 /**
- * @param {import("../0 - configs/infos.js").Pos} initialPos
+ * @param {Pos} initialPos
  */
 export const loadChunk = (initialPos) => {
   const [offsetI, offsetJ] = getChunkStart(
     initialPos,
-    CONFIG.chunkRows,
-    CONFIG.chunkColumns
+    GENERATION_CONFIG.chunkRows,
+    GENERATION_CONFIG.chunkColumns
   );
 
-  for (let i = 0; i < CONFIG.chunkRows; i++) {
+  for (let i = 0; i < GENERATION_CONFIG.chunkRows; i++) {
     const nI = i + offsetI;
-    for (let j = 0; j < CONFIG.chunkColumns; j++) {
+    for (let j = 0; j < GENERATION_CONFIG.chunkColumns; j++) {
       const nJ = j + offsetJ;
       const pos = { i: nI, j: nJ };
 
@@ -174,15 +172,14 @@ export const loadChunk = (initialPos) => {
           block: originalBlock,
           color: tweakColor(originalBlock.color),
         };
-
-      createEntitiesForBlock(originalBlock, cell);
+      else createEntitiesForCell(cell);
     }
   }
 };
 
 /**
- * @param {import("../0 - configs/infos.js").Pos} pos
- * @returns {import("../0 - configs/infos.js").Cell}
+ * @param {Pos} pos
+ * @returns {Cell}
  */
 export const getGridCell = (pos) => {
   if (!getCell(pos)) loadChunk(pos);
@@ -190,12 +187,46 @@ export const getGridCell = (pos) => {
 };
 
 /**
- * @returns {import("../0 - configs/infos.js").Cell}
+ * @returns {Cell}
  */
 export const getCenterCell = () => {
-  const { rows, columns } = POLY_INFO[GRID_INFO.currentPoly];
-  const { iOffset, jOffset } = GRID_INFO;
+  const { rows, columns } = getPolyInfo();
+  const { iOffset, jOffset } = POLY_INFO;
   const i = Math.floor(rows / 2) + iOffset;
   const j = Math.floor(columns / 2) + jOffset;
   return getGridCell({ i, j });
+};
+
+/**
+ * @returns {Cell[]}
+ */
+const getBorderCells = () => {
+  const { rows, columns } = getPolyInfo();
+  const halfR = Math.floor(rows / 2);
+  const halfC = Math.floor(columns / 2);
+  const { i, j } = PLAYER_ENTITY.cell.pos;
+  const tI = i - halfR;
+  const bI = i + halfR;
+  const lJ = j - halfC;
+  const rJ = j + halfC;
+
+  const positions = /** @type {Pos[]} */ ([]);
+
+  for (let index = lJ; index <= rJ; index++) {
+    positions.push({ i: tI, j: index });
+    positions.push({ i: bI, j: index });
+  }
+  for (let index = tI; index <= bI; index++) {
+    positions.push({ i: index, j: lJ });
+    positions.push({ i: index, j: rJ });
+  }
+
+  return positions.map(getCell);
+};
+
+export const spawnEntities = () => {
+  getBorderCells().forEach((cell) => {
+    if (!!cell?.block && !cell.wall && !cell.entityType)
+      createEntitiesForCell(cell, true);
+  });
 };

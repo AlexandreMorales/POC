@@ -1,9 +1,7 @@
-import { MENU_CONFIG } from "../0 - configs/configs.js";
-import { GRID_INFO } from "../2 - grid/infos.js";
-import { ENTITY_TYPES } from "../3 - entities/infos.js";
-import { PLAYER_ENTITY } from "../3 - entities/player.js";
-import { DRAW_INFO } from "../5 - draw/infos.js";
-import { drawEveryCell } from "../5 - draw/draw.js";
+import { MENU_CONFIG, POLY_INFO } from "../1 - polygones/index.js";
+import { ENTITY_TYPES, PLAYER_ENTITY } from "../2 - entities/index.js";
+import { MAP_INFO, spawnEntities } from "../3 - generation/index.js";
+import { drawEveryCell } from "../4 - draw/index.js";
 
 const MOVEMENT_CONFIG = {
   passHour: 0.5,
@@ -13,8 +11,8 @@ const MOVEMENT_CONFIG = {
 };
 
 /**
- * @param {import("../0 - configs/infos.js").Cell} cell
- * @param {import("../3 - entities/infos.js").Entity} entity
+ * @param {Cell} cell
+ * @param {Entity} entity
  * @returns {boolean}
  */
 export const cellIsBlocked = (cell, entity) =>
@@ -27,26 +25,26 @@ export const cellIsBlocked = (cell, entity) =>
     : cell.block.isFluid);
 
 /**
- * @param {import("../0 - configs/infos.js").Pos} pos
- * @returns {import("../0 - configs/infos.js").Pos}
+ * @param {Pos} pos
+ * @returns {Pos}
  */
 const getCleanPos = (pos) => ({ i: pos?.i || 0, j: pos?.j || 0 });
 
 /**
- * @param {import("../0 - configs/infos.js").Cell} oldCell
- * @param {import("../0 - configs/infos.js").Cell} nextCell
+ * @param {Cell} oldCell
+ * @param {Cell} nextCell
  */
 export const moveCurrentCell = (oldCell, nextCell) => {
   const oldPos = getCleanPos(oldCell?.pos);
   const nextPos = getCleanPos(nextCell?.pos);
-  GRID_INFO.iOffset += nextPos.i - oldPos.i;
-  GRID_INFO.jOffset += nextPos.j - oldPos.j;
+  POLY_INFO.iOffset += nextPos.i - oldPos.i;
+  POLY_INFO.jOffset += nextPos.j - oldPos.j;
   PLAYER_ENTITY.cell = nextCell;
 };
 
 let canMove = true;
 /**
- * @param {import("../0 - configs/infos.js").Cell} [nextCell]
+ * @param {Cell} [nextCell]
  */
 export const move = (nextCell) => {
   if (canMove) {
@@ -56,17 +54,19 @@ export const move = (nextCell) => {
 
     setTimeout(() => {
       drawEveryCell(PLAYER_ENTITY.cell);
+      // moveEntities
+      spawnEntities();
       canMove = true;
     }, 1000 / MOVEMENT_CONFIG.velocity);
   }
 };
 
 const passTime = () => {
-  DRAW_INFO.timeOfDay += MOVEMENT_CONFIG.passHour;
+  MAP_INFO.timeOfDay += MOVEMENT_CONFIG.passHour;
 
   if (
-    DRAW_INFO.timeOfDay >= MOVEMENT_CONFIG.midNightHour ||
-    DRAW_INFO.timeOfDay <= 0
+    MAP_INFO.timeOfDay >= MOVEMENT_CONFIG.midNightHour ||
+    MAP_INFO.timeOfDay <= 0
   ) {
     MOVEMENT_CONFIG.passHour = -MOVEMENT_CONFIG.passHour;
   }
