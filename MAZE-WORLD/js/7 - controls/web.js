@@ -1,18 +1,18 @@
-import { MOVEMENT } from "../3 - entities/infos.js";
-import { DRAW_INFO } from "../5 - draw/infos.js";
-import { move } from "../6 - actions/movement.js";
+import { POLY_INFO } from "../1 - polygones/index.js";
+import { MOVEMENT } from "../2 - entities/index.js";
 import {
   changePolySides,
   changeSelectedOnCode,
-  moveBaseOnCode,
-  rotate,
   dig,
+  move,
+  moveBaseOnCode,
   place,
+  rotate,
   stopMoving,
   useBoat,
-} from "../6 - actions/actions.js";
+} from "../5 - actions/index.js";
+import { resetSize } from "../6 - boot/index.js";
 
-import { resetSize } from "../start/boot.js";
 import { CONTROLS_CONFIG } from "./configs.js";
 
 const KEY_MOVEMENT_MAP = {
@@ -57,7 +57,7 @@ document.onkeyup = () => {
 const heightSlider = /** @type {HTMLInputElement} */ (
   document.getElementById("zoom")
 );
-heightSlider.value = `${DRAW_INFO.cellHeight}`;
+heightSlider.value = `${POLY_INFO.cellHeight}`;
 heightSlider.min = `${CONTROLS_CONFIG.minZoom}`;
 heightSlider.max = `${CONTROLS_CONFIG.maxZoom}`;
 heightSlider.oninput = () => {

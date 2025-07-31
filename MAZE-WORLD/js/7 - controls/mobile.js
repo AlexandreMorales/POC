@@ -1,5 +1,5 @@
-import { MOVEMENT } from "../3 - entities/infos.js";
-import { DRAW_INFO } from "../5 - draw/infos.js";
+import { POLY_INFO } from "../1 - polygones/index.js";
+import { MOVEMENT } from "../2 - entities/index.js";
 import {
   changePolySides,
   dig,
@@ -8,9 +8,9 @@ import {
   rotate,
   stopMoving,
   useBoat,
-} from "../6 - actions/actions.js";
+} from "../5 - actions/index.js";
+import { resetSize } from "../6 - boot/index.js";
 
-import { resetSize } from "../start/boot.js";
 import { CONTROLS_CONFIG } from "./configs.js";
 
 let zoomDist = 0;
@@ -67,14 +67,14 @@ document.ontouchmove = (e) => {
 
     if (
       nZoomDist > zoomDist &&
-      DRAW_INFO.cellHeight < CONTROLS_CONFIG.maxZoom
+      POLY_INFO.cellHeight < CONTROLS_CONFIG.maxZoom
     ) {
-      resetSize(DRAW_INFO.cellHeight + 1);
+      resetSize(POLY_INFO.cellHeight + 1);
     } else if (
       nZoomDist < zoomDist &&
-      DRAW_INFO.cellHeight > CONTROLS_CONFIG.minZoom
+      POLY_INFO.cellHeight > CONTROLS_CONFIG.minZoom
     ) {
-      resetSize(DRAW_INFO.cellHeight - 1);
+      resetSize(POLY_INFO.cellHeight - 1);
     }
 
     zoomDist = nZoomDist;

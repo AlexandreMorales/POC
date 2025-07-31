@@ -1,8 +1,7 @@
-import { MAP_GENERATION, MENU_CONFIG } from "../0 - configs/configs.js";
-import { PLAYER_ENTITY } from "../3 - entities/player.js";
-import { drawEveryCell, updateCanvasCss } from "../5 - draw/draw.js";
-
-import { start } from "../start/boot.js";
+import { MAP_GENERATION, MENU_CONFIG } from "../1 - polygones/index.js";
+import { PLAYER_ENTITY } from "../2 - entities/index.js";
+import { drawEveryCell, updateCanvasCss } from "../4 - draw/index.js";
+import { start } from "../6 - boot/index.js";
 
 const SELECT_OPTIONS = {
   mapGeneration: Object.entries(MAP_GENERATION),
