@@ -13,16 +13,19 @@ const BOAT_ENTITIES = /** @type {{ [k: string]: Entity }} */ ({});
 /**
  * @param {Entity} entity
  */
-export const toggleBoat = (entity) => {
+export const getInBoat = (entity) => {
+  if (!BOAT_ENTITIES[entity.id]) addBoat(entity.cell, entity);
+  entity.connectedEntities[ENTITY_TYPES.BOAT] = BOAT_ENTITIES[entity.id];
+};
+
+/**
+ * @param {Entity} entity
+ */
+export const getOutBoat = (entity) => {
   if (entity.connectedEntities[ENTITY_TYPES.BOAT]) {
     delete entity.connectedEntities[ENTITY_TYPES.BOAT];
-    addBoat(entity.cell, entity);
-    return;
+    moveEntityToCell(BOAT_ENTITIES[entity.id], entity.cell);
   }
-
-  if (!BOAT_ENTITIES[entity.id]) addBoat(entity.cell, entity);
-
-  entity.connectedEntities[ENTITY_TYPES.BOAT] = BOAT_ENTITIES[entity.id];
 };
 
 /**
@@ -38,6 +41,7 @@ export const addBoat = (cell, entity) => {
       ENTITY_TYPES.BOAT,
       BOAT_IMG_MAP,
       {
+        zIndex: 1,
         movementsToCut: [MOVEMENT.UP, MOVEMENT.DOWN],
       }
     );

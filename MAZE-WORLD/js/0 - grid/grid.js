@@ -1,5 +1,7 @@
 let GRID = /** @type {Cell[][]} */ ([]);
 
+export const INITIAL_POS = /** @type {Pos} */ ({ i: 0, j: 0 });
+
 /**
  * @param {Pos} pos
  * @return {Cell}

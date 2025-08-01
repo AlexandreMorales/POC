@@ -27,7 +27,7 @@ export const BLOCKS = /** @type {{ [k: string]: Block }} */ ({
     spawnableEntities: [
       { probability: 0.004, entityType: ENTITY_TYPES.TREE },
       {
-        probability: 0.0001,
+        probability: 0.00001,
         entityType: ENTITY_TYPES.ENEMY,
         spawnOnMove: true,
         increaseWithTime: true,
@@ -44,7 +44,7 @@ export const BLOCKS = /** @type {{ [k: string]: Block }} */ ({
     spawnableEntities: [
       { probability: 0.01, entityType: ENTITY_TYPES.TREE },
       {
-        probability: 0.0001,
+        probability: 0.00001,
         entityType: ENTITY_TYPES.ENEMY,
         spawnOnMove: true,
         increaseWithTime: true,
@@ -59,7 +59,7 @@ export const BLOCKS = /** @type {{ [k: string]: Block }} */ ({
 const BIOMES_RAW = /** @type {{ [k: string]: Biome }} */ ({
   FOREST: {
     maxValue: 0,
-    maxDistance: 100,
+    maxDistance: 50,
     higherGroundBlock: BLOCKS.MID_GRASS,
     ranges: [
       addPropsToBlock(BLOCKS.MEDIUM_WATER, { max: -0.5 }),

@@ -1,5 +1,5 @@
 import { POLY_INFO, POLYS_INFO } from "./infos.js";
-import { correctRoundError } from "../utils.js";
+import { correctRoundError, getMod } from "../utils.js";
 import { KNOWN_POLYGONS, KNOWN_POLYGONS_VALUES } from "./configs.js";
 
 export const getPolyInfo = () => POLYS_INFO[POLY_INFO.currentPoly];
@@ -22,6 +22,14 @@ export const calculatePointBasedOnPos = ({ i, j }, isInverted, baseCell) => {
 
   return applyRotation({ x, y }, isInverted, baseCell);
 };
+
+/**
+ * @param {Cell} cell
+ * @param {number} index
+ * @returns {Pos}
+ */
+export const getPosByIndex = (cell, index) =>
+  cell.adjacentPos[POLY_INFO.currentPoly][getMod(index, POLY_INFO.currentPoly)];
 
 /**
  * @param {Point} points

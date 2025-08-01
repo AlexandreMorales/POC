@@ -13,7 +13,7 @@ export const MAP_GENERATION = {
 
 export const MENU_CONFIG = {
   debugMode: false,
-  passTime: false,
+  passTime: true,
   rotationAnimation: true,
   rotationAnimationWithZoom: false,
   showPos: false,

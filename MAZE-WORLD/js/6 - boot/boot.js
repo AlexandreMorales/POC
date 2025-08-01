@@ -1,4 +1,4 @@
-import { resetGrid } from "../0 - grid/index.js";
+import { INITIAL_POS, resetGrid } from "../0 - grid/index.js";
 import { POLY_INFO, configPolys, getPolyInfo } from "../1 - polygones/index.js";
 import { PLAYER_ENTITY, resetEntities } from "../2 - entities/index.js";
 import { loadAndGetCell, getCenterCell } from "../3 - generation/index.js";
@@ -25,7 +25,7 @@ export const start = () => {
 
   moveCurrentCell(
     getCenterCell(),
-    findAccessibleCell(loadAndGetCell({ i: 0, j: 0 }), PLAYER_ENTITY)
+    findAccessibleCell(loadAndGetCell(INITIAL_POS), PLAYER_ENTITY)
   );
   drawEveryCell(PLAYER_ENTITY.cell);
 };

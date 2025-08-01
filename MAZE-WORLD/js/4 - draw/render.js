@@ -1,5 +1,6 @@
 import { getPolyInfo, MENU_CONFIG } from "../1 - polygones/index.js";
-import { GENERATION_CONFIG, MAP_INFO } from "../3 - generation/index.js";
+import { ENTITY_INFO } from "../2 - entities/index.js";
+import { GENERATION_CONFIG } from "../3 - generation/index.js";
 
 const DRAW_CONFIG = {
   selectedBorderColor: "white",
@@ -71,8 +72,8 @@ export const drawItem = (
  * @return {string}
  */
 const getFillStyle = ({ r, g, b }, shoulApplyDark, modifier = 1) => {
-  if (MAP_INFO.timeOfDay && shoulApplyDark)
-    modifier = (1 - MAP_INFO.timeOfDay / 100) * modifier;
+  if (ENTITY_INFO.timeOfDay && shoulApplyDark)
+    modifier = (1 - ENTITY_INFO.timeOfDay / 100) * modifier;
 
   return `rgb(${r * modifier}, ${g * modifier}, ${b * modifier})`;
 };

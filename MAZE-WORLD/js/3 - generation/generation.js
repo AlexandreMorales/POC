@@ -1,4 +1,4 @@
-import { addCell, getCell } from "../0 - grid/index.js";
+import { addCell, getCell, INITIAL_POS } from "../0 - grid/index.js";
 import {
   getPolyInfo,
   KNOWN_POLYGONS,
@@ -6,11 +6,14 @@ import {
   MENU_CONFIG,
   POLY_INFO,
 } from "../1 - polygones/index.js";
-import { addEntity, PLAYER_ENTITY } from "../2 - entities/index.js";
-import { tweakColor } from "../utils.js";
+import {
+  addEntity,
+  ENTITY_INFO,
+  PLAYER_ENTITY,
+} from "../2 - entities/index.js";
+import { getPosDistance, tweakColor } from "../utils.js";
 
 import { GENERATION_CONFIG } from "./configs.js";
-import { MAP_INFO } from "./infos.js";
 import { getChunkStart } from "./utils.js";
 import { getValue, VECTORS } from "./perlin.js";
 import { BIOMES } from "./biomes.js";
@@ -119,7 +122,7 @@ const createEntitiesForCell = (cell, onMove = false) => {
     cell.block.spawnableEntities.forEach((sEntity) => {
       const canSpawn = onMove ? sEntity.spawnOnMove : !sEntity.spawnOnMove;
       let probability = sEntity.probability;
-      if (sEntity.increaseWithTime) probability *= MAP_INFO.timeOfDay;
+      if (sEntity.increaseWithTime) probability *= ENTITY_INFO.timeOfDay / 2;
       if (canSpawn && Math.random() < probability)
         addEntity(sEntity.entityType, cell);
     });
@@ -136,7 +139,7 @@ const getBiome = (pos) => {
       return BIOMES.find((b) => biomeValue <= b.maxValue);
     default:
     case MAP_GENERATION.DISTANCE:
-      const distance = Math.sqrt(pos.i ** 2 + pos.j ** 2);
+      const distance = getPosDistance(INITIAL_POS, pos);
       return BIOMES.find((b) => distance <= b.maxDistance);
   }
 };
@@ -197,13 +200,14 @@ export const getCenterCell = () => {
 };
 
 /**
+ * @param {Cell} baseCell
  * @returns {Cell[]}
  */
-const getBorderCells = () => {
+const getBorderCells = (baseCell) => {
   const { rows, columns } = getPolyInfo();
   const halfR = Math.floor(rows / 2);
   const halfC = Math.floor(columns / 2);
-  const { i, j } = PLAYER_ENTITY.cell.pos;
+  const { i, j } = baseCell.pos;
   const tI = i - halfR;
   const bI = i + halfR;
   const lJ = j - halfC;
@@ -223,8 +227,11 @@ const getBorderCells = () => {
   return positions.map(getCell);
 };
 
-export const spawnEntities = () => {
-  getBorderCells().forEach((cell) => {
+/**
+ * @param {Cell} baseCell
+ */
+export const spawnEntities = (baseCell) => {
+  getBorderCells(baseCell).forEach((cell) => {
     if (!!cell?.block && !cell.wall && !cell.entityType)
       createEntitiesForCell(cell, true);
   });

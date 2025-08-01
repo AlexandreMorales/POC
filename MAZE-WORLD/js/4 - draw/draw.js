@@ -7,14 +7,9 @@ import {
 } from "../1 - polygones/index.js";
 import { getSelectedCell, updateEntities } from "../2 - entities/index.js";
 import { loadAndGetCell } from "../3 - generation/index.js";
-import {
-  debounce,
-  getMod,
-  isPointOutsideCanvas,
-  tweakColor,
-} from "../utils.js";
+import { debounce, getMod, isPointOutside, tweakColor } from "../utils.js";
 
-import { drawItem, drawWall, drawWallTop } from "./utils.js";
+import { drawItem, drawWall, drawWallTop } from "./render.js";
 
 const CANVAS_CONFIG = {
   fluidSpeed: 500,
@@ -143,7 +138,7 @@ const drawCell = (cell, context, baseCell) => {
 
   const point = calculatePointBasedOnPos(cell.pos, isInverted, baseCell);
 
-  if (isPointOutsideCanvas(point, polyInfo.canvasHeight, polyInfo.canvasWidth))
+  if (isPointOutside(point, polyInfo.canvasHeight, polyInfo.canvasWidth))
     return;
 
   const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;

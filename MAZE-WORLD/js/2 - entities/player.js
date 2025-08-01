@@ -1,5 +1,5 @@
 import { getCell } from "../0 - grid/index.js";
-import { getPolyInfo, POLY_INFO } from "../1 - polygones/index.js";
+import { getPolyInfo, getPosByIndex } from "../1 - polygones/index.js";
 
 import { ENTITY_TYPES, MOVEMENT } from "./configs.js";
 
@@ -85,10 +85,5 @@ export const startRunning = (direction) => {
 /**
  * @returns {Cell}
  */
-export const getSelectedCell = () => {
-  return getCell(
-    PLAYER_ENTITY.cell.adjacentPos[POLY_INFO.currentPoly][
-      PLAYER_ENTITY.selectedCellIndex
-    ]
-  );
-};
+export const getSelectedCell = () =>
+  getCell(getPosByIndex(PLAYER_ENTITY.cell, PLAYER_ENTITY.selectedCellIndex));

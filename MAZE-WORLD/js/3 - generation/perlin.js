@@ -8,7 +8,7 @@ export const VECTORS = {
 
 const PERLIN_CONFIG = {
   noiseResolutionBiome: 75,
-  noiseResolution: 20,
+  noiseResolution: 10,
 };
 
 /**

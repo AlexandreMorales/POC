@@ -1,6 +1,6 @@
 import { ENTITY_TYPES, MOVEMENT } from "../configs.js";
 import { createEntity } from "../entities.js";
-import { toggleBoat } from "./boat.js";
+import { getInBoat } from "./boat.js";
 
 const TREE_IMG_MAP = /** @type {ImageMap} */ ({
   [MOVEMENT.UP]: "images/map/tree.png",
@@ -19,5 +19,5 @@ export const addTree = (cell) => {
     ENTITY_TYPES.TREE,
     TREE_IMG_MAP
   );
-  if (cell.block.isFluid) toggleBoat(treeEntity);
+  if (cell.block.isFluid) getInBoat(treeEntity);
 };

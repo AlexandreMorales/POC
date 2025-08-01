@@ -1,32 +1,19 @@
 import { MENU_CONFIG, POLY_INFO } from "../1 - polygones/index.js";
-import { ENTITY_TYPES, PLAYER_ENTITY } from "../2 - entities/index.js";
 import {
-  loadAndGetCell,
-  MAP_INFO,
-  spawnEntities,
-} from "../3 - generation/index.js";
+  cellIsBlocked,
+  ENTITY_INFO,
+  killEntitiesByTimeOfDay,
+  moveEntities,
+  PLAYER_ENTITY,
+} from "../2 - entities/index.js";
+import { loadAndGetCell, spawnEntities } from "../3 - generation/index.js";
 import { drawEveryCell } from "../4 - draw/index.js";
 
 const MOVEMENT_CONFIG = {
-  passHour: 0.5,
+  passHour: 0.25,
   midNightHour: 70,
   velocity: 25,
-  touchThreshold: 25,
 };
-
-/**
- * @param {Cell} cell
- * @param {Entity} entity
- * @returns {boolean}
- */
-export const cellIsBlocked = (cell, entity) =>
-  !cell ||
-  !cell.block ||
-  !!cell.wall ||
-  !!cell.entityType ||
-  (entity.connectedEntities[ENTITY_TYPES.BOAT]
-    ? !cell.block.isFluid
-    : cell.block.isFluid);
 
 /**
  * @param {Pos} pos
@@ -58,19 +45,20 @@ export const move = (nextCell) => {
 
     setTimeout(() => {
       drawEveryCell(PLAYER_ENTITY.cell);
-      // moveEntities
-      spawnEntities();
+      killEntitiesByTimeOfDay();
+      moveEntities();
+      spawnEntities(PLAYER_ENTITY.cell);
       canMove = true;
     }, 1000 / MOVEMENT_CONFIG.velocity);
   }
 };
 
 const passTime = () => {
-  MAP_INFO.timeOfDay += MOVEMENT_CONFIG.passHour;
+  ENTITY_INFO.timeOfDay += MOVEMENT_CONFIG.passHour;
 
   if (
-    MAP_INFO.timeOfDay >= MOVEMENT_CONFIG.midNightHour ||
-    MAP_INFO.timeOfDay <= 0
+    ENTITY_INFO.timeOfDay >= MOVEMENT_CONFIG.midNightHour ||
+    ENTITY_INFO.timeOfDay <= 0
   ) {
     MOVEMENT_CONFIG.passHour = -MOVEMENT_CONFIG.passHour;
   }

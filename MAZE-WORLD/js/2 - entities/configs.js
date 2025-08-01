@@ -10,4 +10,5 @@ export const ENTITY_TYPES = {
   BOAT: "BOAT",
   TREE: "TREE",
   ENEMY: "ENEMY",
+  FIRE: "FIRE",
 };

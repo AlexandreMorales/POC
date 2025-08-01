@@ -1,6 +1,7 @@
 import { getCell } from "../0 - grid/index.js";
 import {
   getPolyInfo,
+  getPosByIndex,
   KNOWN_POLYGONS_VALUES,
   MENU_CONFIG,
   POLY_INFO,
@@ -15,7 +16,10 @@ import {
   removeEntitiesFromCell,
   resetEntities,
   addBoat,
-  toggleBoat,
+  cellIsBlocked,
+  getOutBoat,
+  getInBoat,
+  getMovementMap,
 } from "../2 - entities/index.js";
 import { getCenterCell } from "../3 - generation/index.js";
 import {
@@ -26,7 +30,7 @@ import {
 } from "../4 - draw/index.js";
 import { getMod } from "../utils.js";
 
-import { cellIsBlocked, move, moveCurrentCell } from "./movement.js";
+import { move, moveCurrentCell } from "./movement.js";
 
 const ACTIONS_CONFIG = {
   rotateDelay: 500,
@@ -63,43 +67,12 @@ export const rotate = (orientation) => {
 };
 
 /**
- * @param {boolean} [useDiagonal]
- * @param {Cell} [cell]
- * @returns {{ [k: symbol]: number }}
- */
-const getMovementMap = (useDiagonal, cell = PLAYER_ENTITY.cell) => {
-  let topI = POLY_INFO.rotationTurns;
-  let bottomI = topI + Math.floor(POLY_INFO.currentPoly / 2);
-
-  let topLeftI = topI + POLY_INFO.currentPoly - 1;
-  let topRightI = topI + 1;
-
-  let bottomLeftI = bottomI + 1;
-  let bottomRightI = bottomI - 1;
-
-  if (getPolyInfo().hasInverted) {
-    const isInverted = cell.isInverted;
-    topLeftI = bottomLeftI = topI + (isInverted ? 1 : 2);
-    topRightI = bottomRightI = topI + (isInverted ? 2 : 1);
-    bottomI = isInverted ? topI : undefined;
-    topI = isInverted ? undefined : topI;
-  }
-
-  return {
-    [MOVEMENT.UP]: topI,
-    [MOVEMENT.DOWN]: bottomI,
-    [MOVEMENT.LEFT]: useDiagonal ? bottomLeftI : topLeftI,
-    [MOVEMENT.RIGHT]: useDiagonal ? bottomRightI : topRightI,
-  };
-};
-
-/**
  * @param {symbol} code
  * @param {boolean} [useDiagonal]
  * @returns {number}
  */
 const getNextCellIndexBasedOnCode = (code, useDiagonal) => {
-  const aIndex = getMovementMap(useDiagonal)[code];
+  const aIndex = getMovementMap(PLAYER_ENTITY.cell, useDiagonal)[code];
 
   if (aIndex === undefined) return;
 
@@ -123,7 +96,7 @@ export const moveBaseOnCode = (code, useDiagonal) => {
 
   const aModI = getNextCellIndexBasedOnCode(code, useDiagonal);
   if (aModI === undefined) return;
-  const nextPos = PLAYER_ENTITY.cell.adjacentPos[POLY_INFO.currentPoly][aModI];
+  const nextPos = getPosByIndex(PLAYER_ENTITY.cell, aModI);
 
   if (!nextPos) return;
 
@@ -138,7 +111,7 @@ export const MOVEMENT_VALUES = Object.values(MOVEMENT);
 export const stopMoving = () => {
   if (lastMovement) {
     if (getPolyInfo().hasInverted) {
-      const movementMap = getMovementMap();
+      const movementMap = getMovementMap(PLAYER_ENTITY.cell);
 
       for (const movement of MOVEMENT_VALUES) {
         if (movementMap[movement] === PLAYER_ENTITY.selectedCellIndex) {
@@ -260,14 +233,14 @@ export const useBoat = () => {
 
   if (PLAYER_ENTITY.connectedEntities[ENTITY_TYPES.BOAT]) {
     if (!selectedCell?.block?.isFluid && canMove) {
-      toggleBoat(PLAYER_ENTITY);
+      getOutBoat(PLAYER_ENTITY);
       move(selectedCell);
     }
     return;
   }
 
   if (selectedCell.entityType === ENTITY_TYPES.BOAT) {
-    toggleBoat(PLAYER_ENTITY);
+    getInBoat(PLAYER_ENTITY);
     move(selectedCell);
   } else if (canMove) {
     addBoat(selectedCell, PLAYER_ENTITY);

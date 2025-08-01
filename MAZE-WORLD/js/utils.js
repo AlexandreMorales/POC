@@ -49,8 +49,16 @@ export const debounce = (fn, timeout = 10) => {
  * @param {number} canvasWidth
  * @returns {boolean}
  */
-export const isPointOutsideCanvas = (point, canvasHeight, canvasWidth) =>
+export const isPointOutside = (point, canvasHeight, canvasWidth) =>
   point.x < 1 ||
   point.y < 1 ||
   point.x > canvasWidth - 1 ||
   point.y > canvasHeight - 1;
+
+/**
+ * @param {Pos} pos1
+ * @param {Pos} pos2
+ * @returns {number}
+ */
+export const getPosDistance = (pos1, pos2) =>
+  Math.sqrt((pos1.i - pos2.i) ** 2 + (pos1.j - pos2.j) ** 2);
