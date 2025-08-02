@@ -1,0 +1,12 @@
+:root {
+  --widgets-position: 50px;
+}
+
+#widgets {
+  display: block;
+  position: fixed;
+  top: var(--widgets-position);
+  right: var(--widgets-position);
+
+  user-select: none;
+}

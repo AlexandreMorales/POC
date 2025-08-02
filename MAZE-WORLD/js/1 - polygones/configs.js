@@ -23,5 +23,6 @@ export const MENU_CONFIG = {
   showSelectedCell: false,
   rain: false,
   clouds: true,
+  digitalClock: false,
   mapGeneration: MAP_GENERATION.DISTANCE,
 };

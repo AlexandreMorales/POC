@@ -1,0 +1,169 @@
+:root {
+  --clock-color: var(--input-select-color);
+
+  --clock-size: 10vh;
+  --clock-pointer-height: calc(var(--clock-size) * 0.3);
+  --clock-pointer-width: calc(var(--clock-size) * 0.05);
+
+  --clock-hour-rotate: 0deg;
+  --clock-minute-rotate: 0deg;
+
+  --digital-color-bg: #000;
+  --digital-color: #efba1e;
+  --digital-width: calc(var(--clock-size) / 6);
+  --digital-height: calc(var(--clock-size) / 25);
+}
+
+#clock {
+  position: relative;
+  height: var(--clock-size);
+  width: var(--clock-size);
+  background-color: var(--background-color);
+  border-radius: 50%;
+  background-image: radial-gradient(
+      circle at center,
+      var(--clock-color) var(--clock-pointer-width),
+      transparent var(--clock-pointer-width)
+    ),
+    radial-gradient(
+      circle at center,
+      var(--background-color) 50%,
+      transparent 50%,
+      transparent 65%,
+      var(--background-color) 65%
+    ),
+    linear-gradient(
+      to right,
+      transparent 50%,
+      var(--clock-color) 50%,
+      transparent 51%
+    ),
+    linear-gradient(
+      to bottom,
+      transparent 50%,
+      var(--clock-color) 50%,
+      transparent 51%
+    ),
+    linear-gradient(
+      -30deg,
+      transparent 50%,
+      var(--clock-color) 50%,
+      transparent 51%
+    ),
+    linear-gradient(
+      30deg,
+      transparent 50%,
+      var(--clock-color) 50%,
+      transparent 51%
+    ),
+    linear-gradient(
+      60deg,
+      transparent 50%,
+      var(--clock-color) 50%,
+      transparent 51%
+    ),
+    linear-gradient(
+      -60deg,
+      transparent 50%,
+      var(--clock-color) 50%,
+      transparent 51%
+    );
+}
+#clock::before,
+#clock::after {
+  content: "";
+  position: absolute;
+  width: var(--clock-pointer-width);
+  margin: auto;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--clock-size) / 2);
+  border-radius: 4px;
+  background-color: var(--clock-color);
+  transform-origin: bottom;
+}
+#clock::before {
+  height: calc(var(--clock-pointer-height) * 0.8);
+  transform: rotate(var(--clock-hour-rotate));
+}
+#clock::after {
+  height: var(--clock-pointer-height);
+  transform: rotate(var(--clock-minute-rotate));
+}
+
+#digital-clock {
+  background-color: var(--digital-color-bg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: calc(var(--clock-size) / 25);
+}
+.digit-container {
+  display: flex;
+  justify-content: space-between;
+}
+.digit {
+  height: calc(var(--digital-width) * 2 + var(--digital-height));
+  width: calc(var(--digital-width) + var(--digital-height) * 2);
+  margin: 0 calc(var(--clock-size) / 50);
+  position: relative;
+}
+.segment {
+  width: var(--digital-width);
+  height: var(--digital-height);
+  background-color: var(--digital-color);
+  margin-left: calc(var(--digital-height));
+  opacity: 0.08;
+  position: absolute;
+
+  border-radius: calc(var(--clock-size) / 5);
+  transition: opacity 400ms;
+}
+.segment.active {
+  opacity: 1;
+}
+.segment-2 {
+  transform-origin: top left;
+  transform: rotate(90deg);
+  margin-top: calc(var(--digital-height) / 2);
+}
+.segment-3 {
+  transform-origin: top right;
+  transform: rotate(-90deg);
+  margin-top: calc(var(--digital-height) / 2);
+}
+.segment-4 {
+  margin-top: calc(var(--digital-width));
+}
+.segment-5 {
+  transform-origin: top left;
+  transform: rotate(90deg);
+  margin-top: calc(var(--digital-width) + var(--digital-height) / 2);
+}
+.segment-6 {
+  transform-origin: top right;
+  transform: rotate(-90deg);
+  margin-top: calc(var(--digital-width) + var(--digital-height) / 2);
+}
+.segment-7 {
+  margin-top: calc(var(--digital-width) * 2);
+}
+.colons {
+  display: flex;
+  justify-content: space-around;
+  height: calc(var(--clock-size) / 4);
+  flex-direction: column;
+}
+.colons::before,
+.colons::after {
+  content: "";
+  width: calc(var(--clock-size) / 16);
+  height: calc(var(--clock-size) / 16);
+  background-color: var(--digital-color);
+  border-radius: 50%;
+  opacity: 0.08;
+}
+.colons.active::before,
+.colons.active::after {
+  opacity: 1;
+}

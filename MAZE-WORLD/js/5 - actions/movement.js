@@ -1,17 +1,14 @@
 import { MENU_CONFIG, POLY_INFO } from "../1 - polygones/index.js";
 import {
   cellIsBlocked,
-  ENTITY_INFO,
   killEntitiesByTimeOfDay,
   moveEntities,
   PLAYER_ENTITY,
 } from "../2 - entities/index.js";
 import { loadAndGetCell, spawnEntities } from "../3 - generation/index.js";
-import { drawEveryCell } from "../4 - draw/index.js";
+import { drawEveryCell, passTime } from "../4 - draw/index.js";
 
 const MOVEMENT_CONFIG = {
-  passHour: 0.25,
-  midNightHour: 70,
   velocity: 25,
 };
 
@@ -50,17 +47,6 @@ export const move = (nextCell) => {
       spawnEntities(PLAYER_ENTITY.cell);
       canMove = true;
     }, 1000 / MOVEMENT_CONFIG.velocity);
-  }
-};
-
-const passTime = () => {
-  ENTITY_INFO.timeOfDay += MOVEMENT_CONFIG.passHour;
-
-  if (
-    ENTITY_INFO.timeOfDay >= MOVEMENT_CONFIG.midNightHour ||
-    ENTITY_INFO.timeOfDay <= 0
-  ) {
-    MOVEMENT_CONFIG.passHour = -MOVEMENT_CONFIG.passHour;
   }
 };
 

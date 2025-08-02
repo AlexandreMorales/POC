@@ -86,6 +86,12 @@
           </label>
         </li>
         <li>
+          <label for="digitalClock"
+            >Digital Clock
+            <input type="checkbox" class="checkbox" id="digitalClock" />
+          </label>
+        </li>
+        <li>
           <label for="mapGeneration"
             >Map Generation
             <select id="mapGeneration"></select>
@@ -143,14 +149,62 @@
           <div id="clouds-container"></div>
         </div>
       </div>
-      <div id="mobile-hud">
-        <button type="button" id="change-poly">Change Polygon</button>
-        <button type="button" id="use-boat">Use Boat</button>
-        <button type="button" id="dig">Dig</button>
-        <button type="button" id="place">Place</button>
-        <button type="button" id="rotate-left">Rotate L</button>
-        <button type="button" id="rotate-right">Rotate R</button>
+    </div>
+    <div id="widgets">
+      <div id="clock-container">
+        <div id="clock"></div>
+        <div id="digital-clock">
+          <div class="digit-container hours">
+            <div class="digit">
+              <div class="segment segment-1 n0 n2 n3 n5 n6 n7 n8 n9"></div>
+              <div class="segment segment-2 n0 n4 n5 n6 n8 n9"></div>
+              <div class="segment segment-3 n0 n1 n2 n3 n4 n7 n8 n9"></div>
+              <div class="segment segment-4 n2 n3 n4 n5 n6 n8 n9"></div>
+              <div class="segment segment-5 n0 n2 n6 n8"></div>
+              <div class="segment segment-6 n0 n1 n3 n5 n4 n6 n7 n8 n9"></div>
+              <div class="segment segment-7 n0 n2 n3 n5 n6 n8 n9"></div>
+            </div>
+            <div class="digit">
+              <div class="segment segment-1 n0 n2 n3 n5 n6 n7 n8 n9"></div>
+              <div class="segment segment-2 n0 n4 n5 n6 n8 n9"></div>
+              <div class="segment segment-3 n0 n1 n2 n3 n4 n7 n8 n9"></div>
+              <div class="segment segment-4 n2 n3 n4 n5 n6 n8 n9"></div>
+              <div class="segment segment-5 n0 n2 n6 n8"></div>
+              <div class="segment segment-6 n0 n1 n3 n5 n4 n6 n7 n8 n9"></div>
+              <div class="segment segment-7 n0 n2 n3 n5 n6 n8 n9"></div>
+            </div>
+          </div>
+          <div class="colons"></div>
+          <div class="digit-container minutes">
+            <div class="digit">
+              <div class="segment segment-1 n0 n2 n3 n5 n6 n7 n8 n9"></div>
+              <div class="segment segment-2 n0 n4 n5 n6 n8 n9"></div>
+              <div class="segment segment-3 n0 n1 n2 n3 n4 n7 n8 n9"></div>
+              <div class="segment segment-4 n2 n3 n4 n5 n6 n8 n9"></div>
+              <div class="segment segment-5 n0 n2 n6 n8"></div>
+              <div class="segment segment-6 n0 n1 n3 n5 n4 n6 n7 n8 n9"></div>
+              <div class="segment segment-7 n0 n2 n3 n5 n6 n8 n9"></div>
+            </div>
+            <div class="digit">
+              <div class="segment segment-1 n0 n2 n3 n5 n6 n7 n8 n9"></div>
+              <div class="segment segment-2 n0 n4 n5 n6 n8 n9"></div>
+              <div class="segment segment-3 n0 n1 n2 n3 n4 n7 n8 n9"></div>
+              <div class="segment segment-4 n2 n3 n4 n5 n6 n8 n9"></div>
+              <div class="segment segment-5 n0 n2 n6 n8"></div>
+              <div class="segment segment-6 n0 n1 n3 n5 n4 n6 n7 n8 n9"></div>
+              <div class="segment segment-7 n0 n2 n3 n5 n6 n8 n9"></div>
+            </div>
+          </div>
+        </div>
       </div>
+    </div>
+    <div id="mobile-hud">
+      <button type="button" id="change-poly">Change Polygon</button>
+      <button type="button" id="use-boat">Use Boat</button>
+      <button type="button" id="dig">Dig</button>
+      <button type="button" id="place">Place</button>
+      <button type="button" id="rotate-left">Rotate L</button>
+      <button type="button" id="rotate-right">Rotate R</button>
     </div>
   </body>
   <script type="module" src="js/start.js"></script>
