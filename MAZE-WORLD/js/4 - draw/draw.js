@@ -10,6 +10,7 @@ import { loadAndGetCell } from "../3 - generation/index.js";
 import { debounce, getMod, isPointOutside, tweakColor } from "../utils.js";
 
 import { drawItem, drawWall, drawWallTop } from "./render.js";
+import { updateClouds, updateWeather } from "./weather/index.js";
 
 const CANVAS_CONFIG = {
   fluidSpeed: 500,
@@ -46,6 +47,7 @@ export const setCanvasSize = (height, width) => {
     containers.forEach((c) => (c.style.width = `${width}px`));
     canvasLayers.forEach((canvas) => (canvas.width = width));
   }
+  updateWeather();
 };
 
 export const resetCanvasSize = () => {
@@ -62,6 +64,7 @@ export const updateCanvasCss = () => {
 
   canvasContainer.style.transform = null;
   canvasContainer.style.marginTop = null;
+  updateWeather();
 };
 
 let filledThisRound = /** @type {Set<Pos>} */ (new Set());
@@ -95,6 +98,7 @@ export const drawEveryCell = (baseCell) => {
   drawWalls();
   updateEntities();
   tweakFluids();
+  updateClouds();
 };
 
 let wallLayers = /** @type {Wall[][]} */ ([]);

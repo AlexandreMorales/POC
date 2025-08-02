@@ -1,3 +1,5 @@
+import { MENU_CONFIG } from "../1 - polygones/configs.js";
+
 import { ENTITY_TYPES } from "./configs.js";
 import { PLAYER_ENTITY } from "./player.js";
 import {
@@ -108,10 +110,11 @@ export const updateEntities = () => {
  * @returns {boolean}
  */
 export const cellIsBlocked = (cell, entity) =>
-  !cell ||
-  !cell.block ||
-  !!cell.wall ||
-  !!cell.entityType ||
-  (entity.connectedEntities[ENTITY_TYPES.BOAT]
-    ? !cell.block.isFluid
-    : cell.block.isFluid);
+  !MENU_CONFIG.debugMode &&
+  (!cell ||
+    !cell.block ||
+    !!cell.wall ||
+    !!cell.entityType ||
+    (entity.connectedEntities[ENTITY_TYPES.BOAT]
+      ? !cell.block.isFluid
+      : cell.block.isFluid));

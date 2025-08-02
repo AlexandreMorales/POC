@@ -62,3 +62,10 @@ export const isPointOutside = (point, canvasHeight, canvasWidth) =>
  */
 export const getPosDistance = (pos1, pos2) =>
   Math.sqrt((pos1.i - pos2.i) ** 2 + (pos1.j - pos2.j) ** 2);
+
+/**
+ * @param {number} min
+ * @param {number} max
+ * @returns {number}
+ */
+export const getRandomFloat = (min, max) => Math.random() * (max - min) + min;

@@ -1,0 +1,27 @@
+:root {
+  --rain-size: 200px;
+  --rain-animation: none;
+}
+
+#rain-container {
+  background-image: url("../../images/weather/rain.gif");
+  background-repeat: repeat;
+  background-size: var(--rain-size) var(--rain-size);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+
+  animation: var(--rain-animation) 0.1s linear 0s 2,
+    var(--rain-animation) 0.15s ease-out 0.25s 1;
+}
+
+@keyframes lightning {
+  50% {
+    background: radial-gradient(
+        circle at calc(50% - 10vw) -20%,
+        #fff4,
+        #fff0 20%
+      ),
+      linear-gradient(180deg, #fff9, #fff3);
+  }
+}

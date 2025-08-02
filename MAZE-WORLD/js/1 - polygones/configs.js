@@ -21,5 +21,7 @@ export const MENU_CONFIG = {
   usePerspective: false,
   keepTrianglePosition: false,
   showSelectedCell: false,
+  rain: false,
+  clouds: true,
   mapGeneration: MAP_GENERATION.DISTANCE,
 };

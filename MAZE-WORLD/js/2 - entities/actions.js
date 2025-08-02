@@ -1,5 +1,5 @@
 import { getCell } from "../0 - grid/index.js";
-import { getPolyInfo, POLY_INFO } from "../1 - polygones/index.js";
+import { getPolyInfo, MENU_CONFIG, POLY_INFO } from "../1 - polygones/index.js";
 
 import { getMod, getPosDistance } from "../utils.js";
 import { ENTITY_TYPES, MOVEMENT } from "./configs.js";
@@ -18,10 +18,10 @@ const ENTITY_ACTIONS_CONFIG = {
 };
 
 const FIRE_IMG_MAP = /** @type {ImageMap} */ ({
-  [MOVEMENT.UP]: "images/fire.png",
-  [MOVEMENT.DOWN]: "images/fire.png",
-  [MOVEMENT.LEFT]: "images/fire.png",
-  [MOVEMENT.RIGHT]: "images/fire.png",
+  [MOVEMENT.UP]: "images/enemies/fire.png",
+  [MOVEMENT.DOWN]: "images/enemies/fire.png",
+  [MOVEMENT.LEFT]: "images/enemies/fire.png",
+  [MOVEMENT.RIGHT]: "images/enemies/fire.png",
 });
 
 /**
@@ -108,6 +108,8 @@ export const moveEntities = () => {
 };
 
 export const killEntitiesByTimeOfDay = () => {
+  if (MENU_CONFIG.rain) return;
+
   const entitiesToKill = /** @type {Entity[]} */ ([]);
   ENTITIES.forEach((e) => {
     if (

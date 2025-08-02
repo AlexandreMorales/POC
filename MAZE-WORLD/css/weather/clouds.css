@@ -1,0 +1,121 @@
+:root {
+  --clouds-shadow-color: rgba(0, 0, 0, 0.3);
+
+  --clouds-default-size: 100px;
+  --clouds-offset-left: 0;
+  --clouds-order: 0;
+  --clouds-scale: 0;
+  --clouds-animation-duration: 0;
+}
+
+@keyframes animateCloud {
+  0% {
+    margin-top: -50vh;
+  }
+  100% {
+    margin-top: 100vh;
+  }
+}
+
+#clouds-container {
+  position: fixed;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  width: 150%;
+
+  margin-left: var(--clouds-offset-left);
+  min-width: calc(var(--clouds-default-size) * 20);
+}
+
+.cloud-row {
+  clear: left;
+  position: relative;
+  display: flex;
+}
+.cloud {
+  height: 100%;
+  animation: animateCloud linear infinite;
+
+  order: var(--clouds-order);
+  transform: scale(var(--clouds-scale));
+  animation-duration: var(--clouds-animation-duration);
+}
+.cloud:nth-child(even) {
+  rotate: 180deg;
+}
+
+.cloud-shape {
+  float: left;
+  background-color: var(--clouds-shadow-color);
+  position: relative;
+}
+
+.triangle {
+  width: 0;
+  height: 0;
+  background-color: transparent;
+  border: solid transparent;
+  border-top: 0;
+  border-bottom: solid var(--clouds-shadow-color);
+  margin-right: -16%;
+
+  border-width: calc(var(--clouds-default-size) / 2);
+  border-bottom-width: var(--clouds-default-size);
+}
+.triangle:nth-child(even) {
+  transform: rotate(180deg);
+  margin-top: 0.5%;
+}
+.cloud-row:nth-child(even) .triangle {
+  transform: rotate(180deg);
+}
+.cloud-row:nth-child(even) .triangle:nth-child(even) {
+  transform: none;
+}
+
+.square {
+  margin-right: 1%;
+  margin-top: 1%;
+
+  width: var(--clouds-default-size);
+  height: var(--clouds-default-size);
+}
+
+.hex {
+  width: calc(var(--clouds-default-size) * 0.6);
+  height: var(--clouds-default-size);
+
+  margin-right: calc(var(--clouds-default-size) * 0.32);
+  margin-bottom: -18%;
+}
+.hex::before {
+  content: " ";
+  width: 0;
+  height: 0;
+  position: absolute;
+  left: -50%;
+
+  border-right: solid var(--clouds-shadow-color);
+  border-top: solid transparent;
+  border-bottom: solid transparent;
+
+  border-width: calc(var(--clouds-default-size) / 2);
+  border-right-width: calc(var(--clouds-default-size) * 0.3);
+}
+.hex::after {
+  content: "";
+  width: 0;
+  position: absolute;
+  right: -50%;
+
+  border-left: solid var(--clouds-shadow-color);
+  border-top: solid transparent;
+  border-bottom: solid transparent;
+
+  border-width: calc(var(--clouds-default-size) / 2);
+  border-left-width: calc(var(--clouds-default-size) * 0.3);
+}
+.hex:nth-child(even) {
+  margin-top: 19%;
+}

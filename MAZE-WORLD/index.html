@@ -35,7 +35,11 @@
         <li>
           <label for="rotationAnimationWithZoom"
             >Animate on Rotate With Zoom
-            <input type="checkbox" class="checkbox" id="rotationAnimationWithZoom" />
+            <input
+              type="checkbox"
+              class="checkbox"
+              id="rotationAnimationWithZoom"
+            />
           </label>
         </li>
         <li>
@@ -63,11 +67,22 @@
             <input type="checkbox" class="checkbox" id="keepTrianglePosition" />
           </label>
         </li>
-        </li>
         <li>
           <label for="showSelectedCell"
             >Show Selected Cell
             <input type="checkbox" class="checkbox" id="showSelectedCell" />
+          </label>
+        </li>
+        <li>
+          <label for="rain"
+            >Rain
+            <input type="checkbox" class="checkbox" id="rain" />
+          </label>
+        </li>
+        <li>
+          <label for="clouds"
+            >Clouds
+            <input type="checkbox" class="checkbox" id="clouds" />
           </label>
         </li>
         <li>
@@ -122,6 +137,10 @@
           <div id="entities">
             <img id="player" src="images/player/up.png" />
           </div>
+        </div>
+        <div id="weather">
+          <div id="rain-container"></div>
+          <div id="clouds-container"></div>
         </div>
       </div>
       <div id="mobile-hud">
