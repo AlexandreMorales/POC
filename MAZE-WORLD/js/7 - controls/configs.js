@@ -1,4 +1,4 @@
 export const CONTROLS_CONFIG = {
-  minZoom: 6,
+  minZoom: 12,
   maxZoom: 120,
 };

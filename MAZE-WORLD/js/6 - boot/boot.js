@@ -1,11 +1,14 @@
 import { INITIAL_POS, resetGrid } from "../0 - grid/index.js";
 import { POLY_INFO, configPolys, getPolyInfo } from "../1 - polygones/index.js";
-import { PLAYER_ENTITY, resetEntities } from "../2 - entities/index.js";
+import {
+  PLAYER_ENTITY,
+  removeGeneratedEntities,
+  resetEntities,
+} from "../2 - entities/index.js";
 import { loadAndGetCell, getCenterCell } from "../3 - generation/index.js";
 import {
   resetCanvasSize,
   drawEveryCell,
-  setCanvasSize,
   updateCanvasCss,
 } from "../4 - draw/index.js";
 import {
@@ -18,6 +21,7 @@ import { debounce } from "../utils.js";
 export const start = () => {
   configPolys();
   resetGrid();
+  removeGeneratedEntities();
   resetEntities();
   resetCanvasSize();
   updateCanvasCss();
@@ -34,7 +38,7 @@ export const resetSize = debounce((newSize) => {
   POLY_INFO.cellHeight = newSize || POLY_INFO.cellHeight;
   configPolys();
   resetEntities();
-  setCanvasSize(null, getPolyInfo().canvasWidth);
+  resetCanvasSize();
   moveCurrentCell(getCenterCell(), PLAYER_ENTITY.cell);
   drawEveryCell(PLAYER_ENTITY.cell);
 });

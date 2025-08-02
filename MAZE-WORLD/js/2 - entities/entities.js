@@ -88,6 +88,12 @@ export const resetEntities = () => {
   });
 };
 
+export const removeGeneratedEntities = () => {
+  ENTITIES.forEach((e) => {
+    if (e.type === ENTITY_TYPES.TREE) removeEntity(e);
+  });
+};
+
 export const updateEntities = () => {
   const connectedEntities = /** @type {Set<Entity>} */ (
     new Set(Object.values(PLAYER_ENTITY.connectedEntities))
