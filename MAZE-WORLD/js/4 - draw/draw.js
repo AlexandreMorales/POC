@@ -18,18 +18,14 @@ const CANVAS_CONFIG = {
   maxLayer: 2,
 };
 
-const spinContainer = document.getElementById("spin-container");
-const container = document.getElementById("draw-container");
+const drawContainer = document.getElementById("draw-container");
 const canvasContainer = document.getElementById("canvas-container");
-
-const containers = [spinContainer, container, canvasContainer];
 
 const canvasLayers = /** @type {HTMLCanvasElement[]} */ ([]);
 const contextsLayers = /** @type {CanvasRenderingContext2D[]} */ ([]);
 
 for (let i = 0; i < CANVAS_CONFIG.maxLayer; i++) {
   const canvas = document.createElement("canvas");
-  canvas.style.zIndex = `${i}`;
   canvasContainer.appendChild(canvas);
   canvasLayers.push(canvas);
   contextsLayers.push(canvas.getContext("2d"));
@@ -41,11 +37,11 @@ for (let i = 0; i < CANVAS_CONFIG.maxLayer; i++) {
  */
 export const setCanvasSize = (height, width) => {
   if (height) {
-    containers.forEach((c) => (c.style.height = `${height}px`));
+    drawContainer.style.setProperty("--canvas-height", `${height}px`);
     canvasLayers.forEach((canvas) => (canvas.height = height));
   }
   if (width) {
-    containers.forEach((c) => (c.style.width = `${width}px`));
+    drawContainer.style.setProperty("--canvas-width", `${width}px`);
     canvasLayers.forEach((canvas) => (canvas.width = width));
   }
   updateRain();
@@ -70,14 +66,14 @@ export const updateCanvasCss = () => {
 let filledThisRound = /** @type {Set<Pos>} */ (new Set());
 
 /**
- * @param {Cell} baseCell
+ * @param {Entity} baseEntity
  */
-export const drawEveryCell = (baseCell) => {
+export const drawEveryCell = (baseEntity) => {
   wallLayers = [];
   fluids = [];
   filledThisRound = new Set();
 
-  const offsetCell = baseCell.pos.j % 2;
+  const offsetCell = baseEntity.cell.pos.j % 2;
   const { rows, columns, shouldIntercalate } = getPolyInfo();
   // More range to encapsulate rotation
   const size = rows + columns;
@@ -91,7 +87,7 @@ export const drawEveryCell = (baseCell) => {
 
       if (shouldIntercalate && offsetCell && nJ % 2 === 0) nI = nI + 1;
 
-      drawCell(loadAndGetCell(pos), contextsLayers[0], baseCell);
+      drawCell(loadAndGetCell(pos), contextsLayers[0], baseEntity);
     }
   }
 
@@ -134,13 +130,13 @@ const tweakFluids = debounce(() => {
 /**
  * @param {Cell} cell
  * @param {CanvasRenderingContext2D} context
- * @param {Cell} baseCell
+ * @param {Entity} baseEntity
  */
-const drawCell = (cell, context, baseCell) => {
+const drawCell = (cell, context, baseEntity) => {
   const polyInfo = getPolyInfo();
   const isInverted = polyInfo.hasInverted && cell.isInverted;
 
-  const point = calculatePointBasedOnPos(cell.pos, isInverted, baseCell);
+  const point = calculatePointBasedOnPos(cell.pos, isInverted, baseEntity.cell);
 
   if (isPointOutside(point, polyInfo.canvasHeight, polyInfo.canvasWidth))
     return;
@@ -148,9 +144,9 @@ const drawCell = (cell, context, baseCell) => {
   const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;
   const aCells = cell.adjacentPos[POLY_INFO.currentPoly].map(getCell);
   const shoulApplyDark =
-    cell !== baseCell && aCells.every((c) => c !== baseCell);
+    cell !== baseEntity.cell && aCells.every((c) => c !== baseEntity.cell);
   const isSelectedCell =
-    MENU_CONFIG.showSelectedCell && cell === getSelectedCell();
+    MENU_CONFIG.showSelectedCell && cell === getSelectedCell(baseEntity);
 
   if (cell.wall) {
     const wallPoints = isInverted
@@ -214,42 +210,33 @@ const drawCell = (cell, context, baseCell) => {
   drawItem(context, drawable);
 };
 
+const masterContainer = document.getElementById("container");
+const entitiesContainer = document.getElementById("entities");
 /**
  * @param {number} deg
  * @param {number} rotateDelay
  */
 export const rotateCanvas = (deg, rotateDelay) => {
-  updateHtmlEntities((img) => rotateElement(img, -deg, rotateDelay));
+  rotateElement(entitiesContainer, -deg, rotateDelay);
   rotateElement(
-    container,
+    drawContainer,
     deg,
     rotateDelay,
     MENU_CONFIG.rotationAnimationWithZoom
   );
+
   if (!MENU_CONFIG.rotationAnimationWithZoom)
-    spinContainer.style.background = canvasLayers
+    masterContainer.style.background = canvasLayers
       .map((c) => `url(${c.toDataURL()})`)
       .join(", ");
 };
 
 export const resetRotateCanvas = () => {
-  updateHtmlEntities((img) => rotateElement(img));
-  rotateElement(container);
+  rotateElement(entitiesContainer);
+  rotateElement(drawContainer);
+
   if (!MENU_CONFIG.rotationAnimationWithZoom)
-    spinContainer.style.background = null;
-};
-
-/**
- * @param {(entity: HTMLElement) => void} callback
- */
-const updateHtmlEntities = (callback) => {
-  const entities = /** @type {HTMLElement[]} */ ([
-    ...document.getElementById("entities").childNodes,
-  ]);
-
-  entities.forEach((entity) => {
-    if (entity.style) callback(entity);
-  });
+    masterContainer.style.background = null;
 };
 
 /**
@@ -259,9 +246,9 @@ const updateHtmlEntities = (callback) => {
  * @param {boolean} [zoomIn]
  */
 const rotateElement = (element, deg, rotateDelay, zoomIn) => {
-  element.style.transitionDuration = `${rotateDelay}ms`;
-  element.style.transitionProperty = deg ? "transform, scale" : "scale";
+  element.style.setProperty("--transition-duration", `${rotateDelay}ms`);
+  element.style.setProperty("--rotate-deg", `${deg}deg`);
 
-  element.style.scale = deg && zoomIn ? `2.5` : null;
-  element.style.transform = deg ? `rotate(${deg}deg)` : null;
+  element.classList[deg ? "add" : "remove"]("rotate");
+  element.classList[deg && zoomIn ? "add" : "remove"]("zoom-in");
 };

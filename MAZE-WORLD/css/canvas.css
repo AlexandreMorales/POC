@@ -1,8 +1,25 @@
+:root {
+  --canvas-height: 100%;
+  --canvas-width: 100%;
+
+  --transition-duration: 500ms;
+  --transition-duration: 500ms;
+
+  --rotate-deg: 0;
+}
+
 #draw-container,
-#spin-container {
+#canvas-container {
   z-index: 0;
   margin: 0 auto;
   position: relative;
+  width: var(--canvas-width);
+  height: var(--canvas-height);
+}
+
+#canvas-container.perspective {
+  transform: perspective(50px) rotateX(1deg);
+  margin-top: -70px;
 }
 
 #canvas-container canvas {
@@ -10,119 +27,28 @@
   width: 100%;
   height: 100%;
 }
-#canvas-container.perspective {
-  transform: perspective(50px) rotateX(1deg);
-  margin-top: -70px;
+
+#canvas-container canvas:nth-child(1) {
+  z-index: 1;
+}
+#canvas-container canvas:nth-child(2) {
+  z-index: 2;
+}
+#canvas-container canvas:nth-child(3) {
+  z-index: 3;
 }
 
-#canvas-fluid {
-  animation-duration: 2s;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-  animation-direction: alternate;
-
-  animation-name: gelatine;
-  /* animation-name: skew; */
-  /* animation-name: pulse; */
-  /* animation-name: shake; */
-  /* animation-name: wobble; */
-  /* animation-name: shaking; */
+#draw-container,
+#entities img {
+  transition-property: scale;
+  transition-duration: var(--transition-duration);
 }
-
-@keyframes gelatine {
-  0% {
-    transform: scale(1, 1);
-  }
-  33% {
-    transform: scale(0.995, 1.005);
-  }
-  66% {
-    transform: scale(1.005, 0.995);
-  }
-  100% {
-    transform: scale(0.995, 1.005);
-  }
+#draw-container.rotate,
+#entities.rotate img {
+  transition-property: transform, scale;
+  transform: rotate(var(--rotate-deg));
 }
-
-@keyframes skew {
-  0% {
-    transform: skew(0);
-  }
-  33% {
-    transform: skew(0.25deg, 0.25deg);
-  }
-  66% {
-    transform: skew(-0.25deg, -0.25deg);
-  }
-  100% {
-    transform: skew(0.25deg, 0.25deg);
-  }
-}
-
-@keyframes pulse {
-  from {
-    transform: scale(0.995);
-  }
-  to {
-    transform: scale(1.005);
-  }
-}
-
-@keyframes shake {
-  0% {
-    transform: translate(0.1px, 0.1px) rotate(0deg);
-  }
-  10% {
-    transform: translate(-0.1px, -0.2px) rotate(-0.1deg);
-  }
-  20% {
-    transform: translate(-0.3px, 0px) rotate(0.1deg);
-  }
-  30% {
-    transform: translate(0.3px, 0.2px) rotate(0deg);
-  }
-  40% {
-    transform: translate(0.1px, -0.1px) rotate(0.1deg);
-  }
-  50% {
-    transform: translate(-0.1px, 0.2px) rotate(-0.1deg);
-  }
-  60% {
-    transform: translate(-0.3px, 0.1px) rotate(0deg);
-  }
-  70% {
-    transform: translate(0.3px, 0.1px) rotate(-0.1deg);
-  }
-  80% {
-    transform: translate(-0.1px, -0.1px) rotate(0.1deg);
-  }
-  90% {
-    transform: translate(0.1px, 0.2px) rotate(0deg);
-  }
-  100% {
-    transform: translate(0.1px, -0.2px) rotate(-0.1deg);
-  }
-}
-
-@keyframes wobble {
-  33% {
-    transform: rotate(0.25deg);
-  }
-  66% {
-    transform: rotate(-0.25deg);
-  }
-}
-@keyframes shaking {
-  0% {
-    transform: rotate(0deg);
-  }
-  33% {
-    transform: rotate(0.25deg);
-  }
-  66% {
-    transform: rotate(0eg);
-  }
-  100% {
-    transform: rotate(-0.25deg);
-  }
+#draw-container.zoom-in,
+#entities.zoom-in img {
+  scale: 2.5;
 }
