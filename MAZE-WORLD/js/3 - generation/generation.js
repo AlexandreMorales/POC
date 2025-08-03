@@ -7,7 +7,7 @@ import {
   POLY_INFO,
 } from "../1 - polygones/index.js";
 import {
-  addEntity,
+  spawnEntity,
   ENTITY_INFO,
   PLAYER_ENTITY,
 } from "../2 - entities/index.js";
@@ -124,7 +124,7 @@ const createEntitiesForCell = (cell, onMove = false) => {
       let probability = sEntity.probability;
       if (sEntity.increaseWithTime) probability *= ENTITY_INFO.timeOfDay / 2;
       if (canSpawn && Math.random() < probability)
-        addEntity(sEntity.entityType, cell);
+        spawnEntity(sEntity.entityType, cell);
     });
 };
 

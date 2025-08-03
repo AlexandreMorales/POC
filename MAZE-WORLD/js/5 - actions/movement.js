@@ -41,9 +41,9 @@ export const move = (nextCell) => {
     if (MENU_CONFIG.passTime) passTime();
 
     setTimeout(() => {
-      drawEveryCell(PLAYER_ENTITY.cell);
+      drawEveryCell(PLAYER_ENTITY);
       killEntitiesByTimeOfDay();
-      moveEntities();
+      moveEntities(PLAYER_ENTITY.cell);
       spawnEntities(PLAYER_ENTITY.cell);
       canMove = true;
     }, 1000 / MOVEMENT_CONFIG.velocity);

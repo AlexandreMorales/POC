@@ -1,9 +1,10 @@
 import { INITIAL_POS, resetGrid } from "../0 - grid/index.js";
-import { POLY_INFO, configPolys, getPolyInfo } from "../1 - polygones/index.js";
+import { POLY_INFO, configPolys } from "../1 - polygones/index.js";
 import {
+  addEntity,
   PLAYER_ENTITY,
   removeGeneratedEntities,
-  resetEntities,
+  setEntitiesSize,
 } from "../2 - entities/index.js";
 import { loadAndGetCell, getCenterCell } from "../3 - generation/index.js";
 import {
@@ -19,10 +20,11 @@ import {
 import { debounce } from "../utils.js";
 
 export const start = () => {
+  addEntity(PLAYER_ENTITY);
   configPolys();
   resetGrid();
   removeGeneratedEntities();
-  resetEntities();
+  setEntitiesSize();
   resetCanvasSize();
   updateCanvasCss();
   resetDirection();
@@ -31,14 +33,14 @@ export const start = () => {
     getCenterCell(),
     findAccessibleCell(loadAndGetCell(INITIAL_POS), PLAYER_ENTITY)
   );
-  drawEveryCell(PLAYER_ENTITY.cell);
+  drawEveryCell(PLAYER_ENTITY);
 };
 
 export const resetSize = debounce((newSize) => {
   POLY_INFO.cellHeight = newSize || POLY_INFO.cellHeight;
   configPolys();
-  resetEntities();
+  setEntitiesSize();
   resetCanvasSize();
   moveCurrentCell(getCenterCell(), PLAYER_ENTITY.cell);
-  drawEveryCell(PLAYER_ENTITY.cell);
+  drawEveryCell(PLAYER_ENTITY);
 });

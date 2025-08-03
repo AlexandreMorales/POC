@@ -28,26 +28,23 @@ setInterval(() => {
 }, 750);
 
 export const updateClock = () => {
-  const time = getTime();
+  const { hour, hour24, minute } = getTime();
 
   if (MENU_CONFIG.digitalClock) {
     digitalClock.classList.remove("hide");
     analogClock.classList.add("hide");
-    setNumber(hourTensSegments, Math.floor(time.hour24 / 10));
-    setNumber(hourUnitsSegments, Math.floor(time.hour24 % 10));
-    setNumber(minuteTensSegments, Math.floor(time.minute / 10));
-    setNumber(minuteUnitsSegments, Math.floor(time.minute % 10));
+    setNumber(hourTensSegments, Math.floor(hour24 / 10));
+    setNumber(hourUnitsSegments, Math.floor(hour24 % 10));
+    setNumber(minuteTensSegments, Math.floor(minute / 10));
+    setNumber(minuteUnitsSegments, Math.floor(minute % 10));
   } else {
     analogClock.classList.remove("hide");
     digitalClock.classList.add("hide");
     analogClock.style.setProperty(
       "--clock-hour-rotate",
-      `${time.hour * 30 + time.minute * 0.5}deg`
+      `${hour * 30 + minute * 0.5}deg`
     );
-    analogClock.style.setProperty(
-      "--clock-minute-rotate",
-      `${time.minute * 6}deg`
-    );
+    analogClock.style.setProperty("--clock-minute-rotate", `${minute * 6}deg`);
   }
 };
 
@@ -85,7 +82,8 @@ const getTime = () => {
  */
 const setNumber = (segments, value) => {
   segments.forEach((el) => {
-    if (el.classList.contains(`n${value}`)) el.classList.add("active");
-    else el.classList.remove("active");
+    el.classList[el.classList.contains(`n${value}`) ? "add" : "remove"](
+      "active"
+    );
   });
 };

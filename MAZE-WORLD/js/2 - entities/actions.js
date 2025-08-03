@@ -11,7 +11,7 @@ import {
   removeEntity,
 } from "./entities.js";
 import { ENTITY_INFO } from "./infos.js";
-import { PLAYER_ENTITY } from "./player.js";
+import { updateEntityImage } from "./render.js";
 
 const ENTITY_ACTIONS_CONFIG = {
   delayToBurn: 1000,
@@ -32,26 +32,16 @@ const getClosestTarget = (entity) => {
   let minDistance = Infinity;
   let selectedTarget = /** @type {Entity} */ (null);
 
-  /**
-   * @param {Entity} e
-   */
-  const verifyDistance = (e) => {
-    const distance = getPosDistance(entity.cell.pos, e.cell.pos);
-    if (distance < minDistance) {
-      selectedTarget = e;
-      minDistance = distance;
-    }
-  };
-
-  entity.movementOptions.targets.forEach((t) => {
-    if (t === ENTITY_TYPES.PLAYER) {
-      verifyDistance(PLAYER_ENTITY);
-    } else {
-      ENTITIES.forEach((targetEntity) => {
-        if (targetEntity.cell && targetEntity.img && targetEntity.type === t)
-          verifyDistance(targetEntity);
-      });
-    }
+  ENTITIES.forEach((targetEntity) => {
+    entity.movementOptions.targets.forEach((t) => {
+      if (targetEntity.cell && targetEntity.type === t) {
+        const distance = getPosDistance(entity.cell.pos, targetEntity.cell.pos);
+        if (distance < minDistance) {
+          selectedTarget = targetEntity;
+          minDistance = distance;
+        }
+      }
+    });
   });
   return selectedTarget;
 };
@@ -83,11 +73,14 @@ const getClosestCell = (entity, cell, targetCell) => {
   return { cell: selectedCell, index: selectedIndex };
 };
 
-export const moveEntities = () => {
-  const { indexToMove } = getMovementMaps(PLAYER_ENTITY.cell);
+/**
+ * @param {Cell} baseCell
+ */
+export const moveEntities = (baseCell) => {
+  const { indexToMove } = getMovementMaps(baseCell);
 
   ENTITIES.forEach((e) => {
-    if (!e.cell || !e.img || e.deleted || !e.movementOptions?.speed) return;
+    if (!e.cell || e.deleted || !e.movementOptions?.speed) return;
     const { targets, speed } = e.movementOptions;
 
     if (targets) {
@@ -101,7 +94,7 @@ export const moveEntities = () => {
       if (cell === target.cell) return;
 
       index = getMod(index, POLY_INFO.currentPoly);
-      e.img.src = e.imageMap[indexToMove[index]] || e.img.src;
+      updateEntityImage(e, indexToMove[index]);
       moveEntityToCell(e, cell);
     }
   });

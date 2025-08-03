@@ -15,13 +15,16 @@
  * @property {HTMLImageElement} img
  * @property {Cell} cell
  * @property {ImageMap} imageMap
+ * @property {ImageMap} [imageRunningMap]
  * @property {symbol} [defaultDirection]
  * @property {{ [k: string]: Entity }} [connectedEntities]
  * @property {symbol[]} [movementsToCut]
  * @property {EntityMovementOptions} [movementOptions]
  * @property {number} [minTime] The min time that the entity can be spawn/live
- * @property {boolean} [deleted]
  * @property {number} [zIndex]
+ *
+ * @property {boolean} [deleted]
+ * @property {boolean} [isConnected]
  *
  * @property {number} [selectedCellIndex] Cell in which the player can interact
  * @property {CellBlock[]} [pickedCells] Cells that the play dug

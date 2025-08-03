@@ -1,11 +1,11 @@
 :root {
-  --clouds-shadow-color: rgba(0, 0, 0, 0.3);
+  --clouds-shadow-color: rgba(250, 250, 250, 0.3);
 
   --clouds-default-size: 100px;
   --clouds-offset-left: 0;
   --clouds-order: 0;
-  --clouds-scale: 0;
-  --clouds-animation-duration: 0;
+  --clouds-scale: 1;
+  --clouds-animation-duration: 10s;
 }
 
 @keyframes animateCloud {
@@ -51,7 +51,7 @@
   position: relative;
 }
 
-.triangle {
+.triangle .cloud-shape {
   width: 0;
   height: 0;
   background-color: transparent;
@@ -63,18 +63,18 @@
   border-width: calc(var(--clouds-default-size) / 2);
   border-bottom-width: var(--clouds-default-size);
 }
-.triangle:nth-child(even) {
+.triangle .cloud-shape:nth-child(even) {
   transform: rotate(180deg);
   margin-top: 0.5%;
 }
-.cloud-row:nth-child(even) .triangle {
+.triangle .cloud-row:nth-child(even) .cloud-shape {
   transform: rotate(180deg);
 }
-.cloud-row:nth-child(even) .triangle:nth-child(even) {
+.triangle .cloud-row:nth-child(even) .cloud-shape:nth-child(even) {
   transform: none;
 }
 
-.square {
+.square .cloud-shape {
   margin-right: 1%;
   margin-top: 1%;
 
@@ -82,19 +82,19 @@
   height: var(--clouds-default-size);
 }
 
-.hex {
+.hex .cloud-shape {
   width: calc(var(--clouds-default-size) * 0.6);
   height: var(--clouds-default-size);
 
   margin-right: calc(var(--clouds-default-size) * 0.32);
   margin-bottom: -18%;
 }
-.hex::before {
+.hex .cloud-shape::before {
   content: " ";
   width: 0;
   height: 0;
   position: absolute;
-  left: -50%;
+  left: -49.5%;
 
   border-right: solid var(--clouds-shadow-color);
   border-top: solid transparent;
@@ -103,11 +103,11 @@
   border-width: calc(var(--clouds-default-size) / 2);
   border-right-width: calc(var(--clouds-default-size) * 0.3);
 }
-.hex::after {
+.hex .cloud-shape::after {
   content: "";
   width: 0;
   position: absolute;
-  right: -50%;
+  right: -49.5%;
 
   border-left: solid var(--clouds-shadow-color);
   border-top: solid transparent;
@@ -116,6 +116,6 @@
   border-width: calc(var(--clouds-default-size) / 2);
   border-left-width: calc(var(--clouds-default-size) * 0.3);
 }
-.hex:nth-child(even) {
+.hex .cloud-shape:nth-child(even) {
   margin-top: 19%;
 }

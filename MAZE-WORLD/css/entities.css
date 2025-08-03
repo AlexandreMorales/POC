@@ -1,7 +1,38 @@
+:root {
+  --player-z-index: 4;
+
+  --entity-size: 16px;
+  --entity-top: 0px;
+  --entity-left: 0px;
+}
+
 #entities img {
   position: absolute;
   object-fit: cover;
   object-position: 0 0;
   image-rendering: pixelated;
-  z-index: 10;
+  user-select: none;
+
+  width: var(--entity-size);
+  height: var(--entity-size);
+
+  top: var(--entity-top);
+  left: var(--entity-left);
+}
+
+#entities img.not-inverted-both-walls {
+  clip-path: polygon(0 0, 50% 75%, 100% 0);
+}
+#entities img.not-inverted-right-wall {
+  clip-path: polygon(0 0, 0 100%, 35% 100%, 100% 0);
+}
+#entities img.not-inverted-left-wall {
+  clip-path: polygon(0 0, 65% 100%, 100% 100%, 100% 0);
+}
+#entities img.behind-wall {
+  height: calc(var(--entity-size) * 0.8);
+}
+
+#player {
+  z-index: var(--player-z-index);
 }

@@ -7,116 +7,97 @@ import {
 } from "../1 - polygones/index.js";
 import { isPointOutside } from "../utils.js";
 import { MOVEMENT } from "./configs.js";
-import { PLAYER_ENTITY } from "./player.js";
+import { PLAYER_ENTITY } from "./entities/player.js";
 
-const ENTITIES_RENDER_CONFIG = {
-  notInvertedBothClipPath: "polygon(0 0, 50% 75%, 100% 0)",
-  notInvertedRightClipPath: "polygon(0 0, 0 100%, 35% 100%, 100% 0)",
-  notInvertedLeftClipPath: "polygon(0 0, 65% 100%, 100% 100%, 100% 0)",
-
-  defaultSizeRatio: 2.5,
-  wallSizeRatio: 2,
+const CUT_MOVEMENTS_MAP = {
+  [MOVEMENT.UP]: "marginTop",
+  [MOVEMENT.DOWN]: "marginTop",
+  [MOVEMENT.LEFT]: "marginLeft",
+  [MOVEMENT.RIGHT]: "marginRight",
 };
 
 const container = document.getElementById("entities");
 
 /**
- * @param {string} id
- * @param {ImageMap} imageMap
- * @param {Partial<Entity>} entityParams
- * @returns {HTMLImageElement}
+ * @param {Entity} entity
  */
-export const createEntityImage = (id, imageMap, entityParams) =>
-  createImage(
-    id,
-    `${entityParams.zIndex || 2}`,
-    imageMap[entityParams.defaultDirection || MOVEMENT.RIGHT]
-  );
-
-/**
- * @param {string} id
- * @param {string} zIndex
- * @param {string} src
- * @returns {HTMLImageElement}
- */
-const createImage = (id, zIndex, src) => {
+export const createEntityImage = (entity) => {
   const img = document.createElement("img");
-  img.id = id;
-  img.style.zIndex = zIndex;
-  img.src = src;
+  img.id = entity.id;
+  img.style.zIndex = `${entity.zIndex || 2}`;
+  img.src = entity.imageMap[entity.defaultDirection || MOVEMENT.RIGHT];
   container.appendChild(img);
-  setImgSize(img);
-  return img;
+  entity.img = img;
+  setEntitySize(entity);
 };
 
 /**
  * @param {Entity} entity
  */
 export const removeEntityImage = (entity) => {
-  if (entity.img) removeImage(entity.img);
+  if (entity.img) container.removeChild(entity.img);
   entity.img = null;
 };
 
 /**
- * @param {HTMLImageElement} img
- */
-export const removeImage = (img) => container.removeChild(img);
-/**
  * @param {Entity} entity
+ * @param {Point} [parentPoint]
  */
-export const updateEntityPoint = (entity) => {
+export const updateEntityPoint = (entity, parentPoint) => {
+  if (!parentPoint && entity.isConnected) return;
+
   const { hasInverted, canvasHeight, canvasWidth } = getPolyInfo();
-  const point = calculatePointBasedOnPos(
-    entity.cell.pos,
-    hasInverted && entity.cell.isInverted,
-    PLAYER_ENTITY.cell
-  );
+  const point =
+    parentPoint ||
+    calculatePointBasedOnPos(
+      entity.cell.pos,
+      hasInverted && entity.cell.isInverted,
+      PLAYER_ENTITY.cell
+    );
 
   if (isPointOutside(point, canvasHeight, canvasWidth)) {
     if (entity.img) removeEntityImage(entity);
   } else if (!entity.img) {
-    entity.img = createEntityImage(entity.id, entity.imageMap, entity);
+    createEntityImage(entity);
   }
 
-  if (entity.img) setEntityPoint(entity.img, point);
+  if (entity.img) setImagePoint(entity.img, point);
+
+  verifyEntityHeight(entity);
+
+  Object.values(entity.connectedEntities).forEach((e) =>
+    updateEntityPoint(e, point)
+  );
 };
 
 /**
- * @param {HTMLImageElement} img
+ * @return {number}
  */
-export const setImgSize = (img) => {
-  if (!img) return;
-  const { ySide } = getPolyInfo();
-  img.style.height = img.style.width = `${Math.round(
-    ySide * ENTITIES_RENDER_CONFIG.defaultSizeRatio
-  )}px`;
-};
+const getEntitySize = () => Math.round(getPolyInfo().ySide * 2.5);
 
 /**
  * @param {Entity} entity
  */
-export const setEntityToCenter = (entity) => {
-  const { cx, cy } = getPolyInfo();
-  setEntityPoint(entity.img, { x: cx, y: cy });
-};
+export const setEntitySize = (entity) =>
+  entity.img?.style.setProperty("--entity-size", `${getEntitySize()}px`);
 
 /**
  * @param {HTMLImageElement} img
  * @param {Point} point
  */
-export const setEntityPoint = (img, point) => {
-  const { ySide } = getPolyInfo();
-  img.style.top = `${point.y - ySide * 2}px`;
-  img.style.left = `${point.x - ySide * 1.25}px`;
+const setImagePoint = (img, point) => {
+  const entitySize = getEntitySize();
+  img.style.setProperty("--entity-top", `${point.y - entitySize / 1.25}px`);
+  img.style.setProperty("--entity-left", `${point.x - entitySize / 2}px`);
 };
 
 /**
  * @param {Entity} entity
  */
-export const verifyEntityHeight = (entity) => {
+const verifyEntityHeight = (entity) => {
   if (!entity?.cell || !entity?.img) return;
 
-  const { ySide, hasInverted } = getPolyInfo();
+  const { hasInverted } = getPolyInfo();
 
   const downI =
     hasInverted && entity.cell.isInverted
@@ -127,8 +108,8 @@ export const verifyEntityHeight = (entity) => {
 
   if (!downCell) return;
 
-  let height = ySide * ENTITIES_RENDER_CONFIG.defaultSizeRatio;
-  entity.img.style.clipPath = null;
+  while (entity.img.classList.length > 0)
+    entity.img.classList.remove(entity.img.classList.item(0));
 
   const connectedEntities = /** @type {Entity[]} */ (
     Object.values(entity.connectedEntities)
@@ -140,23 +121,46 @@ export const verifyEntityHeight = (entity) => {
     const leftPos = getPosByIndex(entity.cell, leftI);
     const leftCell = getCell(leftPos);
 
-    let clipPath = null;
-
     if (rightCell.wall && leftCell.wall) {
-      clipPath = ENTITIES_RENDER_CONFIG.notInvertedBothClipPath;
+      entity.img.classList.add("not-inverted-both-walls");
     } else if (rightCell.wall) {
-      clipPath = ENTITIES_RENDER_CONFIG.notInvertedRightClipPath;
+      entity.img.classList.add("not-inverted-right-wall");
     } else if (leftCell.wall) {
-      clipPath = ENTITIES_RENDER_CONFIG.notInvertedLeftClipPath;
+      entity.img.classList.add("not-inverted-left-wall");
     }
-
-    entity.img.style.clipPath = clipPath;
   } else if (downCell.wall) {
-    height = ySide * ENTITIES_RENDER_CONFIG.wallSizeRatio;
+    entity.img.classList.add("behind-wall");
   }
 
-  if (connectedEntities.length)
-    height = ySide * ENTITIES_RENDER_CONFIG.wallSizeRatio;
+  if (connectedEntities.length) entity.img.classList.add("behind-wall");
+};
 
-  entity.img.style.height = `${Math.round(height)}px`;
+/**
+ * @param {Entity} entity
+ * @param {symbol} direction
+ * @param {boolean} [isRunning]
+ */
+export const updateEntityImage = (entity, direction, isRunning) => {
+  if (!entity.img) return;
+
+  let map = entity.imageRunningMap;
+  if (!isRunning || !map) map = entity.imageMap;
+  entity.img.src = map[direction] || entity.img.src;
+
+  entity.img.style.marginTop = null;
+  entity.img.style.marginLeft = null;
+  entity.img.style.marginRight = null;
+};
+
+/**
+ * @param {Entity} entity
+ * @param {symbol} direction
+ */
+export const cutEntityImage = (entity, direction) => {
+  if (entity.movementsToCut?.length) {
+    if (entity.movementsToCut.includes(direction)) {
+      const { ySide } = getPolyInfo();
+      entity.img.style[CUT_MOVEMENTS_MAP[direction]] = `${ySide}px`;
+    }
+  }
 };

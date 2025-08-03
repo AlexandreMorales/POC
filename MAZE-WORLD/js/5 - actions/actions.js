@@ -11,10 +11,10 @@ import {
   ENTITY_TYPES,
   getSelectedCell,
   PLAYER_ENTITY,
-  startRunning,
-  updatePlayerDirection,
+  makeEntityRun,
+  updateEntityDirection,
   removeEntitiesFromCell,
-  resetEntities,
+  setEntitiesSize,
   addBoat,
   cellIsBlocked,
   getOutBoat,
@@ -60,7 +60,7 @@ export const rotate = (orientation) => {
 
     setTimeout(() => {
       if (useAnimation) resetRotateCanvas();
-      drawEveryCell(PLAYER_ENTITY.cell);
+      drawEveryCell(PLAYER_ENTITY);
       canRotate = true;
     }, ACTIONS_CONFIG.rotateDelay);
   }
@@ -91,7 +91,7 @@ export const moveBaseOnCode = (code, useDiagonal) => {
 
   if (lastMovement !== code) {
     lastMovement = code;
-    startRunning(lastMovement);
+    makeEntityRun(PLAYER_ENTITY, lastMovement);
   }
 
   const aModI = getNextCellIndexBasedOnCode(code, useDiagonal);
@@ -120,7 +120,7 @@ export const stopMoving = () => {
         }
       }
     }
-    updatePlayerDirection(lastSelection);
+    updateEntityDirection(PLAYER_ENTITY, lastSelection);
     lastMovement = null;
   }
 };
@@ -137,8 +137,8 @@ export const changeSelectedOnCode = (code) => {
 
   PLAYER_ENTITY.selectedCellIndex = aModI;
 
-  if (MENU_CONFIG.showSelectedCell) drawEveryCell(PLAYER_ENTITY.cell);
-  updatePlayerDirection(lastSelection);
+  if (MENU_CONFIG.showSelectedCell) drawEveryCell(PLAYER_ENTITY);
+  updateEntityDirection(PLAYER_ENTITY, lastSelection);
 };
 
 export const changePolySides = () => {
@@ -152,23 +152,23 @@ export const changePolySides = () => {
   PLAYER_ENTITY.selectedCellIndex = 0;
 
   resetDirection();
-  resetEntities();
+  setEntitiesSize();
   resetCanvasSize();
   moveCurrentCell(getCenterCell(), PLAYER_ENTITY.cell);
-  drawEveryCell(PLAYER_ENTITY.cell);
+  drawEveryCell(PLAYER_ENTITY);
 };
 
 export const resetDirection = () => {
   lastMovement = lastSelection = MOVEMENT.UP;
-  updatePlayerDirection(lastSelection);
+  updateEntityDirection(PLAYER_ENTITY, lastSelection);
 };
 
 /**
  * @returns {Cell}
  */
 const updateAndGetSelectedCell = () => {
-  updatePlayerDirection(lastSelection);
-  return getSelectedCell();
+  updateEntityDirection(PLAYER_ENTITY, lastSelection);
+  return getSelectedCell(PLAYER_ENTITY);
 };
 
 export const dig = () => {

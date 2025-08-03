@@ -6,7 +6,7 @@ import { addTree } from "./tree.js";
  * @param {string} entityType
  * @param {Cell} cell
  */
-export const addEntity = (entityType, cell) => {
+export const spawnEntity = (entityType, cell) => {
   switch (entityType) {
     case ENTITY_TYPES.TREE:
       return addTree(cell);

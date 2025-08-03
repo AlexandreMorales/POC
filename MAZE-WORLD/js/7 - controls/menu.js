@@ -22,7 +22,7 @@ menuLabels.map((l) => {
     check.onchange = () => {
       MENU_CONFIG[config] = check.checked;
       updateCanvasCss();
-      drawEveryCell(PLAYER_ENTITY.cell);
+      drawEveryCell(PLAYER_ENTITY);
     };
   } else if (element.tagName === "SELECT") {
     const select = /** @type {HTMLSelectElement} */ (element);

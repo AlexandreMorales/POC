@@ -23,7 +23,7 @@
   top: var(--menu-position);
   left: var(--menu-position);
 
-  z-index: 2;
+  z-index: calc(var(--player-z-index) + 2);
 
   user-select: none;
 }

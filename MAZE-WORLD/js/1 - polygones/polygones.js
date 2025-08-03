@@ -18,6 +18,7 @@ export const calculatePointBasedOnPos = ({ i, j }, isInverted, baseCell) => {
   let x = calcX(j);
   let y = calcY(i);
 
+  // To always have columns static (since horizontal hexagones are not on the same level)
   if (shouldIntercalate && j % 2) y += baseCell?.pos.j % 2 ? -ySide : ySide;
 
   return applyRotation({ x, y }, isInverted, baseCell);
@@ -29,7 +30,9 @@ export const calculatePointBasedOnPos = ({ i, j }, isInverted, baseCell) => {
  * @returns {Pos}
  */
 export const getPosByIndex = (cell, index) =>
-  cell.adjacentPos[POLY_INFO.currentPoly][getMod(index, POLY_INFO.currentPoly)];
+  cell.adjacentPos[POLY_INFO.currentPoly][
+    getMod(index || 0, POLY_INFO.currentPoly)
+  ];
 
 /**
  * @param {Point} points
@@ -167,20 +170,12 @@ const configPoly = (polySides) => {
     Math.sqrt(Math.abs(polySide ** 2 - radiusFromSide ** 2))
   );
 
-  let canvasHeight = window.innerHeight;
-  let canvasWidth = window.innerWidth;
-
-  let rows = canvasHeight;
-  // To always have the same height because of the shouldIntercalate polys
-  rows -= ySide;
-  rows = rows / POLY_INFO.cellHeight;
-  rows = Math.floor(rows);
-
-  let columns = canvasWidth / (xSide * 2);
-  if (hasInverted) columns = ((canvasWidth - 2) * 2 - polySide) / polySide;
+  const { innerHeight, innerWidth } = window;
+  let rows = Math.floor(innerHeight / POLY_INFO.cellHeight);
+  let columns = innerWidth / (xSide * 2);
+  if (hasInverted) columns = ((innerWidth - 2) * 2 - polySide) / polySide;
   if (shouldIntercalate)
-    columns =
-      ((canvasWidth - slopSide) * 2) / (radiusFromCorner * 2 + polySide);
+    columns = ((innerWidth - slopSide) * 2) / (radiusFromCorner * 2 + polySide);
   columns = Math.floor(columns);
 
   if (rows % 2 === 0) rows -= 1;
@@ -188,12 +183,8 @@ const configPoly = (polySides) => {
   // When itercalating the first and last column should be an up column
   if (shouldIntercalate && ((columns + 1) / 2) % 2 === 0) columns -= 2;
 
-  canvasHeight = rows * POLY_INFO.cellHeight;
-  // To always have the same height because of the shouldIntercalate polys
-  canvasHeight += ySide;
-  canvasHeight = Math.round(canvasHeight);
-
-  canvasWidth = columns * (xSide * 2);
+  const canvasHeight = innerHeight;
+  let canvasWidth = columns * (xSide * 2);
   if (hasInverted) canvasWidth = (columns * polySide) / 2 + polySide / 2 + 2;
   if (shouldIntercalate)
     canvasWidth = (columns * (radiusFromCorner * 2 + polySide)) / 2 + slopSide;
@@ -214,7 +205,7 @@ const configPoly = (polySides) => {
     calcX: getXFn(polySides, polySide, xSide),
     calcY: (i) => i * ySide * 2 + ySide,
     cx: correctRoundError(canvasWidth / 2),
-    cy: correctRoundError((canvasHeight - ySide) / 2),
+    cy: correctRoundError((canvasHeight - ySide * 3) / 2),
     shouldIntercalate,
     hasInverted,
   };

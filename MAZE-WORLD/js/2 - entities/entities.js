@@ -1,17 +1,22 @@
-import { MENU_CONFIG } from "../1 - polygones/configs.js";
+import { getCell } from "../0 - grid/index.js";
+import { MENU_CONFIG, getPosByIndex } from "../1 - polygones/index.js";
 
-import { ENTITY_TYPES } from "./configs.js";
-import { PLAYER_ENTITY } from "./player.js";
+import { ENTITY_TYPES, MOVEMENT } from "./configs.js";
 import {
   createEntityImage,
+  cutEntityImage,
   removeEntityImage,
-  setEntityToCenter,
-  setImgSize,
+  setEntitySize,
+  updateEntityImage,
   updateEntityPoint,
-  verifyEntityHeight,
 } from "./render.js";
 
 export const ENTITIES = /** @type {Set<Entity>} */ (new Set());
+
+/**
+ * @param {Entity} entity
+ */
+export const addEntity = (entity) => ENTITIES.add(entity);
 
 /**
  * @param {Entity} entity
@@ -23,7 +28,6 @@ export const moveEntityToCell = (entity, cell) => {
   entity.cell = cell;
   entity.cell.entityType = previousType || entity.type;
   updateEntityPoint(entity);
-  verifyEntityHeight(entity);
 
   if (entity.connectedEntities)
     Object.values(entity.connectedEntities).forEach((e) =>
@@ -67,26 +71,20 @@ export const removeEntitiesFromCell = (cell) => {
  * @returns {Entity}
  */
 export const createEntity = (cell, id, type, imageMap, entityParams = {}) => {
-  id = `${type}_${id}`;
   const entity = /** @type {Entity} */ ({
-    img: createEntityImage(id, imageMap, entityParams),
-    id,
+    id: `${type}_${id}`,
     type,
     imageMap,
     connectedEntities: {},
     ...entityParams,
   });
+  createEntityImage(entity);
   moveEntityToCell(entity, cell);
-  ENTITIES.add(entity);
+  addEntity(entity);
   return entity;
 };
 
-export const resetEntities = () => {
-  setImgSize(PLAYER_ENTITY.img);
-  ENTITIES.forEach((e) => {
-    setImgSize(e.img);
-  });
-};
+export const setEntitiesSize = () => ENTITIES.forEach(setEntitySize);
 
 export const removeGeneratedEntities = () => {
   ENTITIES.forEach((e) => {
@@ -94,21 +92,8 @@ export const removeGeneratedEntities = () => {
   });
 };
 
-export const updateEntities = () => {
-  const connectedEntities = /** @type {Set<Entity>} */ (
-    new Set(Object.values(PLAYER_ENTITY.connectedEntities))
-  );
-  setEntityToCenter(PLAYER_ENTITY);
-  verifyEntityHeight(PLAYER_ENTITY);
-
-  connectedEntities.forEach((e) => {
-    setEntityToCenter(e);
-  });
-  ENTITIES.forEach((e) => {
-    if (!connectedEntities.has(e)) updateEntityPoint(e);
-    verifyEntityHeight(e);
-  });
-};
+export const updateEntities = () =>
+  ENTITIES.forEach((e) => updateEntityPoint(e));
 
 /**
  * @param {Cell} cell
@@ -124,3 +109,43 @@ export const cellIsBlocked = (cell, entity) =>
     (entity.connectedEntities[ENTITY_TYPES.BOAT]
       ? !cell.block.isFluid
       : cell.block.isFluid));
+
+/**
+ * @param {Entity} entity
+ * @returns {Cell}
+ */
+export const getSelectedCell = (entity) =>
+  getCell(getPosByIndex(entity.cell, entity.selectedCellIndex));
+
+/**
+ * @param {Entity} entity
+ * @param {symbol} direction
+ */
+export const updateEntityDirection = (entity, direction) => {
+  updateEntityImage(entity, direction);
+  Object.values(entity.connectedEntities).forEach((e) => {
+    updateEntityImage(e, MOVEMENT.RIGHT);
+  });
+};
+
+/**
+ * @param {Entity} entity
+ * @param {symbol} direction
+ */
+export const makeEntityRun = (entity, direction) => {
+  const connectedEntities = /** @type {Entity[]} */ (
+    Object.values(entity.connectedEntities)
+  );
+
+  if (!connectedEntities.length) {
+    updateEntityImage(entity, direction, true);
+    return;
+  }
+
+  updateEntityImage(entity, direction);
+
+  connectedEntities.forEach((e) => {
+    updateEntityImage(e, direction);
+    cutEntityImage(e, direction);
+  });
+};

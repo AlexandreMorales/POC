@@ -1,8 +1,5 @@
 import { POLY_INFO, MENU_CONFIG } from "../../1 - polygones/index.js";
-
-const RAIN_CONFIG = {
-  lightningMaxSecs: 30,
-};
+import { getRandomFloat } from "../../utils.js";
 
 const rainContainer = document.getElementById("rain-container");
 
@@ -20,7 +17,8 @@ export const updateRain = () => {
 
 let lightningInterval = null;
 const createLightining = () => {
-  const secs = Math.floor(Math.random() * RAIN_CONFIG.lightningMaxSecs * 1000);
+  clearTimeout(lightningInterval);
+  const secs = getRandomFloat(10, 30) * 1000;
   lightningInterval = setTimeout(() => {
     rainContainer.classList.remove("lightning");
     // trigger reflow
