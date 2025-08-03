@@ -7,12 +7,22 @@ const CLOCK_CONFIG = {
   midNightHour: 60,
 };
 
-const analogClock = document.getElementById("clock");
+const analogClock = document.getElementById("analog-clock");
 const digitalClock = document.getElementById("digital-clock");
-const [hour1, hour2] = document.querySelectorAll(".hours .digit");
-const [minute1, minute2] = document.querySelectorAll(".minutes .digit");
-const [colons] = document.querySelectorAll(".colons");
+const hourTensSegments = document.querySelectorAll(
+  "#digital-clock-hours .digit-tens .segment"
+);
+const hourUnitsSegments = document.querySelectorAll(
+  "#digital-clock-hours .digit-units .segment"
+);
+const minuteTensSegments = document.querySelectorAll(
+  "#digital-clock-minutes .digit-tens .segment"
+);
+const minuteUnitsSegments = document.querySelectorAll(
+  "#digital-clock-minutes .digit-units .segment"
+);
 
+const colons = document.getElementById("digital-clock-colons");
 setInterval(() => {
   colons.classList.toggle("active");
 }, 750);
@@ -21,15 +31,15 @@ export const updateClock = () => {
   const time = getTime();
 
   if (MENU_CONFIG.digitalClock) {
-    digitalClock.style.display = "flex";
-    analogClock.style.display = "none";
-    setNumber(hour1, Math.floor(time.hour24 / 10));
-    setNumber(hour2, Math.floor(time.hour24 % 10));
-    setNumber(minute1, Math.floor(time.minute / 10));
-    setNumber(minute2, Math.floor(time.minute % 10));
+    digitalClock.classList.remove("hide");
+    analogClock.classList.add("hide");
+    setNumber(hourTensSegments, Math.floor(time.hour24 / 10));
+    setNumber(hourUnitsSegments, Math.floor(time.hour24 % 10));
+    setNumber(minuteTensSegments, Math.floor(time.minute / 10));
+    setNumber(minuteUnitsSegments, Math.floor(time.minute % 10));
   } else {
-    digitalClock.style.display = "none";
-    analogClock.style.display = "block";
+    analogClock.classList.remove("hide");
+    digitalClock.classList.add("hide");
     analogClock.style.setProperty(
       "--clock-hour-rotate",
       `${time.hour * 30 + time.minute * 0.5}deg`
@@ -70,14 +80,12 @@ const getTime = () => {
 };
 
 /**
- * @param {Element} element
+ * @param {NodeListOf<Element>} segments
  * @param {number} value
  */
-const setNumber = (element, value) => {
-  element
-    .querySelectorAll(`:not(.n${value})`)
-    .forEach((el) => el.classList.remove("active"));
-  element
-    .querySelectorAll(`.n${value}`)
-    .forEach((el) => el.classList.add("active"));
+const setNumber = (segments, value) => {
+  segments.forEach((el) => {
+    if (el.classList.contains(`n${value}`)) el.classList.add("active");
+    else el.classList.remove("active");
+  });
 };

@@ -58,13 +58,11 @@ export const resetCanvasSize = () => {
 
 export const updateCanvasCss = () => {
   if (MENU_CONFIG.usePerspective) {
-    canvasContainer.style.transform = "perspective(50px) rotateX(1deg)";
-    canvasContainer.style.marginTop = "-70px";
+    canvasContainer.classList.add("perspective");
     return;
   }
 
-  canvasContainer.style.transform = null;
-  canvasContainer.style.marginTop = null;
+  canvasContainer.classList.remove("perspective");
   updateRain();
   updateWidgets();
 };

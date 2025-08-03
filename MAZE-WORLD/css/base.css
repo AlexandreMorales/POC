@@ -32,3 +32,7 @@ body {
   position: relative;
   width: 100vw;
 }
+
+*.hide {
+  display: none !important;
+}

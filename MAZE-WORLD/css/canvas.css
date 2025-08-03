@@ -10,6 +10,10 @@
   width: 100%;
   height: 100%;
 }
+#canvas-container.perspective {
+  transform: perspective(50px) rotateX(1deg);
+  margin-top: -70px;
+}
 
 #canvas-fluid {
   animation-duration: 2s;

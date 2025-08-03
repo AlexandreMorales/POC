@@ -12,7 +12,7 @@
   --digital-height: calc(var(--widget-size) / 25);
 }
 
-#clock {
+#analog-clock {
   position: relative;
   height: var(--widget-size);
   width: var(--widget-size);
@@ -67,8 +67,8 @@
       transparent 51%
     );
 }
-#clock::before,
-#clock::after {
+#analog-clock::before,
+#analog-clock::after {
   content: "";
   position: absolute;
   width: var(--clock-pointer-width);
@@ -80,11 +80,11 @@
   background-color: var(--clock-color);
   transform-origin: bottom;
 }
-#clock::before {
+#analog-clock::before {
   height: calc(var(--clock-pointer-height) * 0.8);
   transform: rotate(var(--clock-hour-rotate));
 }
-#clock::after {
+#analog-clock::after {
   height: var(--clock-pointer-height);
   transform: rotate(var(--clock-minute-rotate));
 }
@@ -146,14 +146,14 @@
 .segment-7 {
   margin-top: calc(var(--digital-width) * 2);
 }
-.colons {
+#digital-clock-colons {
   display: flex;
   justify-content: space-around;
   height: calc(var(--widget-size) / 4);
   flex-direction: column;
 }
-.colons::before,
-.colons::after {
+#digital-clock-colons::before,
+#digital-clock-colons::after {
   content: "";
   width: calc(var(--widget-size) / 16);
   height: calc(var(--widget-size) / 16);
@@ -161,7 +161,7 @@
   border-radius: 50%;
   opacity: 0.08;
 }
-.colons.active::before,
-.colons.active::after {
+#digital-clock-colons.active::before,
+#digital-clock-colons.active::after {
   opacity: 1;
 }

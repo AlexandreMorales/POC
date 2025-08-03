@@ -62,7 +62,7 @@
     opacity var(--menu-animation-time) ease;
 }
 
-.hamburger-slice:nth-child(3) {
+.hamburger-slice-3 {
   transform-origin: 0% 100%;
 }
 
@@ -72,12 +72,12 @@
   background: var(--background-color-black);
 }
 
-#menuToggle:checked ~ .hamburger-menu .hamburger-slice:nth-child(2) {
+#menuToggle:checked ~ .hamburger-menu .hamburger-slice-2 {
   opacity: 0;
   transform: rotate(0deg) scale(0.2, 0.2);
 }
 
-#menuToggle:checked ~ .hamburger-menu .hamburger-slice:nth-child(3) {
+#menuToggle:checked ~ .hamburger-menu .hamburger-slice-3 {
   margin-top: 12px;
   transform: rotate(-45deg) translate(0, -1px) scale(1.3, 1.3);
 }
