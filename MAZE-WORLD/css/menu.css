@@ -12,8 +12,8 @@
 
   --menu-checkbox-margin: 7px;
   --menu-checkbox-height: calc(
-    ((var(--hamburger-slice-height) + var(--hamburger-slice-magin)) * 3) +
-      (2 * var(--menu-checkbox-margin))
+    ((var(--hamburger-slice-height) + var(--hamburger-slice-magin)) * 2.5) +
+      (var(--menu-checkbox-margin) * 2)
   );
 }
 
@@ -40,18 +40,16 @@
 
   opacity: 0;
   z-index: 2;
-
-  -webkit-touch-callout: none;
 }
 
-#menu-container span {
+.hamburger-slice {
   display: block;
   width: var(--hamburger-slice-width);
   height: var(--hamburger-slice-height);
   margin-bottom: var(--hamburger-slice-magin);
   position: relative;
 
-  background: #cdcdcd;
+  background: var(--background-color);
   border-radius: 3px;
 
   z-index: 1;
@@ -59,31 +57,29 @@
   transform-origin: 4px 0px;
 
   transition: transform var(--menu-animation-time) var(--menu-animation-curve),
+    margin-top var(--menu-animation-time) var(--menu-animation-curve),
     background var(--menu-animation-time) var(--menu-animation-curve),
     opacity var(--menu-animation-time) ease;
 }
 
-#menu-container span:first-child {
-  transform-origin: 0% 0%;
-}
-
-#menu-container span:nth-last-child(2) {
+.hamburger-slice:nth-child(3) {
   transform-origin: 0% 100%;
 }
 
-#menuToggle:checked ~ span {
+#menuToggle:checked ~ .hamburger-menu .hamburger-slice {
   opacity: 1;
-  transform: rotate(45deg) translate(-2px, -1px);
-  background: #232323;
+  transform: rotate(45deg) translate(-2px, -1px) scale(1.3, 1.3);
+  background: var(--background-color-black);
 }
 
-#menuToggle:checked ~ span:nth-last-child(3) {
+#menuToggle:checked ~ .hamburger-menu .hamburger-slice:nth-child(2) {
   opacity: 0;
   transform: rotate(0deg) scale(0.2, 0.2);
 }
 
-#menuToggle:checked ~ span:nth-last-child(2) {
-  transform: rotate(-45deg) translate(0, -1px);
+#menuToggle:checked ~ .hamburger-menu .hamburger-slice:nth-child(3) {
+  margin-top: 12px;
+  transform: rotate(-45deg) translate(0, -1px) scale(1.3, 1.3);
 }
 
 #menu {
@@ -103,7 +99,7 @@
   list-style-type: none;
   -webkit-font-smoothing: antialiased;
 
-  margin-top: calc(var(--menu-position) * -2);
+  margin-top: calc((var(--menu-position) + var(--menu-checkbox-height)) * -1);
   margin-left: calc(var(--menu-position) * -1);
   left: calc(var(--menu-width) * -1);
 

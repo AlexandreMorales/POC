@@ -108,6 +108,7 @@ export const moveEntities = () => {
 };
 
 export const killEntitiesByTimeOfDay = () => {
+  // If its raining the enemies wont burn
   if (MENU_CONFIG.rain) return;
 
   const entitiesToKill = /** @type {Entity[]} */ ([]);

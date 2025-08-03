@@ -1,5 +1,6 @@
 :root {
   --widgets-position: 50px;
+  --widget-size: 10vh;
 }
 
 #widgets {

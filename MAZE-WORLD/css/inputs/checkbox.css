@@ -42,7 +42,7 @@
 }
 
 .checkbox:checked {
-  background-color: var(--input-select-color);
+  background-color: var(--active-color);
 }
 
 .checkbox:checked::after {
@@ -53,5 +53,5 @@
 }
 
 .checkbox:checked:hover {
-  background-color: var(--input-select-color-hover);
+  background-color: var(--active-color-hover);
 }

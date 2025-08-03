@@ -2,7 +2,9 @@
   --action-color: rgba(207, 207, 207, 0.4);
   --action-border-radius: 12px;
 
-  --background-color: #ededed;
+  --background-color: #cdcdcd;
+  --background-color-black: #232323;
+  --active-color: #6e79d6;
 }
 
 * {
@@ -15,6 +17,7 @@
 
   font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
+  color: var(--background-color-black);
 }
 
 html,
