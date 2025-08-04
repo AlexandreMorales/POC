@@ -17,7 +17,8 @@ export const addTree = (cell) => {
     cell,
     `${cell.pos.i}_${cell.pos.j}`,
     ENTITY_TYPES.TREE,
-    TREE_IMG_MAP
+    TREE_IMG_MAP,
+    { isGenerated: true }
   );
   if (cell.block.isFluid) getInBoat(treeEntity);
 };

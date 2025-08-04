@@ -88,7 +88,7 @@ export const setEntitiesSize = () => ENTITIES.forEach(setEntitySize);
 
 export const removeGeneratedEntities = () => {
   ENTITIES.forEach((e) => {
-    if (e.type === ENTITY_TYPES.TREE) removeEntity(e);
+    if (e.isGenerated) removeEntity(e);
   });
 };
 

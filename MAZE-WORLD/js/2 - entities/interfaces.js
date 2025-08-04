@@ -22,6 +22,7 @@
  * @property {EntityMovementOptions} [movementOptions]
  * @property {number} [minTime] The min time that the entity can be spawn/live
  * @property {number} [zIndex]
+ * @property {boolean} [isGenerated]
  *
  * @property {boolean} [deleted]
  * @property {boolean} [isConnected]
