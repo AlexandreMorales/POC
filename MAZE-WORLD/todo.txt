@@ -68,7 +68,6 @@ J AND I OFFSET ON BASE CELL
 
 ------------------------------------- FIXES -------------------------------------
 
-FIX REMOVE keepTrianglePosition
 FIX REMOVE mapGeneration
 FIX PERSPECTIVE MOBILE
 FIX ROTATION ANIMATION MOVING PLAYER

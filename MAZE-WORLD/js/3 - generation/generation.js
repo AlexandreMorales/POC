@@ -6,11 +6,7 @@ import {
   MENU_CONFIG,
   POLY_INFO,
 } from "../1 - polygones/index.js";
-import {
-  spawnEntity,
-  ENTITY_INFO,
-  PLAYER_ENTITY,
-} from "../2 - entities/index.js";
+import { spawnEntity, ENTITY_INFO } from "../2 - entities/index.js";
 import { getPosDistance, tweakColor } from "../utils.js";
 
 import { GENERATION_CONFIG } from "./configs.js";
@@ -92,25 +88,7 @@ const createCell = (pos, block) => {
   cell.isInverted = isCellInverted(cell.pos);
   cell.adjacentPos = getAdjacentPos(cell.pos, cell.isInverted);
 
-  return new Proxy(cell, {
-    get(target, prop, receiver) {
-      if (
-        MENU_CONFIG.keepTrianglePosition &&
-        POLY_INFO.currentPoly % 2 &&
-        PLAYER_ENTITY.cell &&
-        (prop === "isInverted" || prop === "adjacentPos")
-      ) {
-        const isPlayerInverted = isCellInverted(PLAYER_ENTITY.cell.pos);
-        const newIsInverted = isPlayerInverted
-          ? !cell.isInverted
-          : cell.isInverted;
-        if (prop === "isInverted") return newIsInverted;
-        if (prop === "adjacentPos")
-          return getAdjacentPos(cell.pos, newIsInverted);
-      }
-      return Reflect.get(target, prop, receiver);
-    },
-  });
+  return cell;
 };
 
 /**

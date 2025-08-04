@@ -19,7 +19,6 @@ export const MENU_CONFIG = {
   showPos: false,
   showChunks: false,
   usePerspective: false,
-  keepTrianglePosition: false,
   showSelectedCell: false,
   rain: false,
   clouds: true,
