@@ -210,7 +210,6 @@ const drawCell = (cell, context, baseEntity) => {
   drawItem(context, drawable);
 };
 
-const masterContainer = document.getElementById("container");
 const entitiesContainer = document.getElementById("entities");
 /**
  * @param {number} deg
@@ -224,19 +223,11 @@ export const rotateCanvas = (deg, rotateDelay) => {
     rotateDelay,
     MENU_CONFIG.rotationAnimationWithZoom
   );
-
-  if (!MENU_CONFIG.rotationAnimationWithZoom)
-    masterContainer.style.background = canvasLayers
-      .map((c) => `url(${c.toDataURL()})`)
-      .join(", ");
 };
 
 export const resetRotateCanvas = () => {
   rotateElement(entitiesContainer);
   rotateElement(drawContainer);
-
-  if (!MENU_CONFIG.rotationAnimationWithZoom)
-    masterContainer.style.background = null;
 };
 
 /**
@@ -246,8 +237,9 @@ export const resetRotateCanvas = () => {
  * @param {boolean} [zoomIn]
  */
 const rotateElement = (element, deg, rotateDelay, zoomIn) => {
-  element.style.setProperty("--transition-duration", `${rotateDelay}ms`);
-  element.style.setProperty("--rotate-deg", `${deg}deg`);
+  if (rotateDelay)
+    element.style.setProperty("--transition-duration", `${rotateDelay}ms`);
+  if (deg) element.style.setProperty("--rotate-deg", `${deg}deg`);
 
   element.classList[deg ? "add" : "remove"]("rotate");
   element.classList[deg && zoomIn ? "add" : "remove"]("zoom-in");

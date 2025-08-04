@@ -3,7 +3,6 @@
   --canvas-width: 100%;
 
   --transition-duration: 500ms;
-  --transition-duration: 500ms;
 
   --rotate-deg: 0;
 }
@@ -48,7 +47,6 @@
   transition-property: transform, scale;
   transform: rotate(var(--rotate-deg));
 }
-#draw-container.zoom-in,
-#entities.zoom-in img {
-  scale: 2.5;
+#draw-container.zoom-in {
+  scale: 3;
 }
