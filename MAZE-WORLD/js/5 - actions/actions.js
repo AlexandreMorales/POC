@@ -46,10 +46,8 @@ export const rotate = (orientation) => {
       POLY_INFO.rotationTurns + orientation,
       POLY_INFO.currentPoly
     );
-    const useAnimation =
-      MENU_CONFIG.rotationAnimation || MENU_CONFIG.rotationAnimationWithZoom;
 
-    if (useAnimation)
+    if (MENU_CONFIG.rotationAnimation)
       rotateCanvas(
         (360 / POLY_INFO.currentPoly) * -orientation,
         COMPASS_CONFIG.rotateDelay
@@ -59,7 +57,7 @@ export const rotate = (orientation) => {
     resetDirection();
 
     setTimeout(() => {
-      if (useAnimation) resetRotateCanvas();
+      if (MENU_CONFIG.rotationAnimation) resetRotateCanvas();
       drawEveryCell(PLAYER_ENTITY);
       canRotate = true;
     }, COMPASS_CONFIG.rotateDelay);
