@@ -1,0 +1,73 @@
+:root {
+  --compass-font-size: calc(var(--widget-size) / 7);
+
+  --compass-margin: 2%;
+  --compass-north-color: #ef5052;
+
+  --compass-rotate: 0deg;
+}
+
+#compass {
+  height: var(--widget-size);
+  width: var(--widget-size);
+  background-color: var(--background-color-black);
+  border-radius: 100%;
+  position: relative;
+  border: 3px solid var(--background-color);
+}
+
+#compass-arrow {
+  width: calc(var(--widget-size) * 0.3);
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: center;
+  transform: translate(-50%, -50%) rotate(var(--compass-rotate));
+}
+#compass-arrow::before,
+#compass-arrow::after {
+  content: " ";
+  width: 0;
+  height: 0;
+  border-left: calc(var(--widget-size) * 0.1) solid transparent;
+  border-right: calc(var(--widget-size) * 0.1) solid transparent;
+  position: relative;
+}
+#compass-arrow::before {
+  border-bottom: calc(var(--widget-size) * 0.3) solid var(--compass-north-color);
+}
+#compass-arrow::after {
+  border-top: calc(var(--widget-size) * 0.3) solid var(--background-color);
+}
+
+.compass-letter {
+  font-size: var(--compass-font-size);
+  color: var(--background-color);
+  position: absolute;
+}
+#compass-north {
+  left: 50%;
+  top: var(--compass-margin);
+  transform: translate(-50%);
+}
+#compass-east {
+  right: var(--compass-margin);
+  top: 50%;
+  transform: translate(0, -50%);
+}
+#compass-west {
+  left: var(--compass-margin);
+  top: 50%;
+  transform: translate(0, -50%);
+}
+#compass-south {
+  left: 50%;
+  bottom: var(--compass-margin);
+  transform: translate(-50%);
+}

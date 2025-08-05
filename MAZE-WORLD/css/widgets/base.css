@@ -1,6 +1,6 @@
 :root {
   --widgets-position: 50px;
-  --widget-size: 10vh;
+  --widget-size: 7vh;
 }
 
 #widgets {
@@ -10,4 +10,12 @@
   right: var(--widgets-position);
 
   user-select: none;
+
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+#widgets > * {
+  margin-bottom: 10%;
 }

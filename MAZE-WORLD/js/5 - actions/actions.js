@@ -28,14 +28,12 @@ import {
   resetRotateCanvas,
   rotateCanvas,
   updateWeather,
+  updateCompass,
+  COMPASS_CONFIG,
 } from "../4 - draw/index.js";
 import { getMod } from "../utils.js";
 
 import { move, moveCurrentCell } from "./movement.js";
-
-const ACTIONS_CONFIG = {
-  rotateDelay: 500,
-};
 
 let canRotate = true;
 /**
@@ -54,16 +52,17 @@ export const rotate = (orientation) => {
     if (useAnimation)
       rotateCanvas(
         (360 / POLY_INFO.currentPoly) * -orientation,
-        ACTIONS_CONFIG.rotateDelay
+        COMPASS_CONFIG.rotateDelay
       );
 
+    updateCompass();
     resetDirection();
 
     setTimeout(() => {
       if (useAnimation) resetRotateCanvas();
       drawEveryCell(PLAYER_ENTITY);
       canRotate = true;
-    }, ACTIONS_CONFIG.rotateDelay);
+    }, COMPASS_CONFIG.rotateDelay);
   }
 };
 
@@ -153,6 +152,7 @@ export const changePolySides = () => {
   POLY_INFO.rotationTurns = 0;
   PLAYER_ENTITY.selectedCellIndex = 0;
 
+  updateCompass();
   resetDirection();
   resetMap();
 };

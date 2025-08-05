@@ -207,38 +207,3 @@ const drawCell = (cell, context, baseEntity) => {
 
   drawItem(context, drawable);
 };
-
-const entitiesContainer = document.getElementById("entities");
-/**
- * @param {number} deg
- * @param {number} rotateDelay
- */
-export const rotateCanvas = (deg, rotateDelay) => {
-  rotateElement(entitiesContainer, -deg, rotateDelay);
-  rotateElement(
-    drawContainer,
-    deg,
-    rotateDelay,
-    MENU_CONFIG.rotationAnimationWithZoom
-  );
-};
-
-export const resetRotateCanvas = () => {
-  rotateElement(entitiesContainer);
-  rotateElement(drawContainer);
-};
-
-/**
- * @param {HTMLElement} element
- * @param {number} [deg]
- * @param {number} [rotateDelay]
- * @param {boolean} [zoomIn]
- */
-const rotateElement = (element, deg, rotateDelay, zoomIn) => {
-  if (rotateDelay)
-    element.style.setProperty("--transition-duration", `${rotateDelay}ms`);
-  if (deg) element.style.setProperty("--rotate-deg", `${deg}deg`);
-
-  element.classList[deg ? "add" : "remove"]("rotate");
-  element.classList[deg && zoomIn ? "add" : "remove"]("zoom-in");
-};

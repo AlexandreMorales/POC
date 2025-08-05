@@ -1,0 +1,48 @@
+import { MENU_CONFIG, POLY_INFO } from "../../1 - polygones/index.js";
+
+const drawContainer = document.getElementById("draw-container");
+const compass = document.getElementById("compass");
+
+export const COMPASS_CONFIG = {
+  rotateDelay: 500,
+};
+
+export const updateCompass = () => {
+  const angle = (360 / POLY_INFO.currentPoly) * POLY_INFO.rotationTurns;
+  compass.style.setProperty("--compass-rotate", `${-angle}deg`);
+};
+
+const entitiesContainer = document.getElementById("entities");
+/**
+ * @param {number} deg
+ * @param {number} rotateDelay
+ */
+export const rotateCanvas = (deg, rotateDelay) => {
+  rotateElement(entitiesContainer, -deg, rotateDelay);
+  rotateElement(
+    drawContainer,
+    deg,
+    rotateDelay,
+    MENU_CONFIG.rotationAnimationWithZoom
+  );
+};
+
+export const resetRotateCanvas = () => {
+  rotateElement(entitiesContainer);
+  rotateElement(drawContainer);
+};
+
+/**
+ * @param {HTMLElement} element
+ * @param {number} [deg]
+ * @param {number} [rotateDelay]
+ * @param {boolean} [zoomIn]
+ */
+const rotateElement = (element, deg, rotateDelay, zoomIn) => {
+  if (rotateDelay)
+    element.style.setProperty("--transition-duration", `${rotateDelay}ms`);
+  if (deg) element.style.setProperty("--rotate-deg", `${deg}deg`);
+
+  element.classList[deg ? "add" : "remove"]("rotate");
+  element.classList[deg && zoomIn ? "add" : "remove"]("zoom-in");
+};
