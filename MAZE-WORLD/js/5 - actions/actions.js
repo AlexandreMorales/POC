@@ -127,13 +127,14 @@ export const stopMoving = () => {
 };
 
 /**
- * @param {symbol} code
+ * @param {symbol} direction
+ * @param {boolean} [useDiagonal]
  */
-export const changeSelectedOnCode = (code) => {
-  if (!code) return;
+export const changeSelectedOnCode = (direction, useDiagonal) => {
+  if (!direction) return;
 
-  lastSelection = code;
-  const aModI = getNextCellIndexBasedOnCode(code);
+  lastSelection = direction;
+  const aModI = getNextCellIndexBasedOnCode(direction, useDiagonal);
   if (aModI === undefined || aModI === PLAYER_ENTITY.selectedCellIndex) return;
 
   PLAYER_ENTITY.selectedCellIndex = aModI;

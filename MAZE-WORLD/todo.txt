@@ -1,7 +1,5 @@
 ------------------------------------- NEXT -------------------------------------
 
-ADD SELECT STICK TO MOBILE
-
 MOVING RABBITS (https://www.shutterstock.com/pt/image-vector/pixelated-bunny-8-bit-pixel-art-541878964)
 
 
@@ -53,6 +51,7 @@ ADD DIRECTION ON ENTITY TO KNOW WHERE TO CUT WHEN CONNECTED
 J AND I OFFSET ON BASE CELL
 CLOUDS NUMBER BASE ON CELL HEIGHT?
 CREATE NEW ACELLS FOR SQUARE TO ADD CORNERS TO USE ON LIGHT (AND MINEFIELD IN FUTURE) (MENU OPTION?)
+ENEMIES DONT GO BACK TO PREVIOUS CELL
 
 
 ------------------------------------- FIXES -------------------------------------

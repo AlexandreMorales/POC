@@ -1,0 +1,45 @@
+:root {
+  --selection-stick-size: 75px;
+
+  --selection-stick-top: 50%;
+  --selection-stick-left: 50%;
+}
+
+.selection-stick {
+  width: var(--selection-stick-size);
+  height: var(--selection-stick-size);
+
+  max-width: 25vw;
+  max-height: 25vw;
+
+  border-radius: 50%;
+  position: absolute;
+}
+.selection-stick::before {
+  content: " ";
+  display: block;
+  position: absolute;
+
+  width: 75%;
+  height: 75%;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  border-radius: 50%;
+  border: calc(var(--selection-stick-size) / 20) var(--action-color) solid;
+}
+.selection-stick::after {
+  content: " ";
+  position: absolute;
+  width: 65%;
+  height: 65%;
+  border-radius: 50%;
+
+  top: var(--selection-stick-top);
+  left: var(--selection-stick-left);
+  transform: translate(-50%, -50%);
+
+  background: var(--action-color);
+}

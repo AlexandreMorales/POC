@@ -1,25 +1,20 @@
-import { POLY_INFO } from "../1 - polygones/index.js";
-import { MOVEMENT } from "../2 - entities/index.js";
+import { POLY_INFO } from "../../1 - polygones/index.js";
 import {
   changePolySides,
   dig,
-  moveBaseOnCode,
   place,
   rotate,
-  stopMoving,
   useBoat,
-} from "../5 - actions/index.js";
-import { resetSize } from "../6 - boot/index.js";
+} from "../../5 - actions/index.js";
+import { resetSize } from "../../6 - boot/index.js";
 
-import { CONTROLS_CONFIG } from "./configs.js";
+import { CONTROLS_CONFIG } from "../configs.js";
+
+const canvasContainer = document.getElementById("canvas-container");
 
 let zoomDist = 0;
-let touchPos = { x: 0, y: 0, interval: null };
-const MOBILE_CONFIG = {
-  touchThreshold: 25,
-};
 
-document.ontouchstart = (e) => {
+canvasContainer.ontouchstart = (e) => {
   e = e || /** @type {TouchEvent} */ (window.event);
   const { screenX, screenY } = e.touches[0];
 
@@ -31,30 +26,9 @@ document.ontouchstart = (e) => {
     );
     return;
   }
-
-  clearInterval(touchPos.interval);
-  touchPos.x = screenX;
-  touchPos.y = screenY;
-
-  touchPos.interval = setInterval(() => {
-    const finalX = screenX - touchPos.x;
-    const finalY = screenY - touchPos.y;
-
-    let code = null;
-    let useDiagonal = false;
-    if (Math.abs(finalY) > MOBILE_CONFIG.touchThreshold) {
-      useDiagonal = finalY > 0;
-      code = useDiagonal ? MOVEMENT.DOWN : MOVEMENT.UP;
-    }
-    if (Math.abs(finalX) > MOBILE_CONFIG.touchThreshold) {
-      code = finalX < 0 ? MOVEMENT.LEFT : MOVEMENT.RIGHT;
-    }
-
-    if (code) moveBaseOnCode(code, useDiagonal);
-  }, 100);
 };
 
-document.ontouchmove = (e) => {
+canvasContainer.ontouchmove = (e) => {
   e = e || /** @type {TouchEvent} */ (window.event);
   const { screenX, screenY } = e.touches[0];
 
@@ -78,16 +52,10 @@ document.ontouchmove = (e) => {
     }
 
     zoomDist = nZoomDist;
-  } else {
-    touchPos.x = screenX;
-    touchPos.y = screenY;
   }
 };
 
-document.ontouchend = () => {
-  clearInterval(touchPos.interval);
-  touchPos = { x: 0, y: 0, interval: null };
-  stopMoving();
+canvasContainer.ontouchend = () => {
   zoomDist = 0;
 };
 

@@ -146,8 +146,8 @@
     </div>
     <div id="widgets">
       <div id="clock-container">
-        <div id="analog-clock"></div>
-        <div id="digital-clock">
+        <div id="analog-clock" class="widgets-item"></div>
+        <div id="digital-clock" class="widgets-item">
           <div id="digital-clock-hours" class="digit-container">
             <div class="digit digit-tens">
               <div class="segment segment-1 n0 n2 n3 n5 n6 n7 n8 n9"></div>
@@ -191,18 +191,20 @@
           </div>
         </div>
       </div>
-      <div id="compass">
+      <div id="compass" class="widgets-item">
         <p id="compass-north" class="compass-letter">N</p>
         <p id="compass-east" class="compass-letter">E</p>
         <p id="compass-west" class="compass-letter">W</p>
         <p id="compass-south" class="compass-letter">S</p>
         <div id="compass-arrow"></div>
       </div>
-      <div id="map-container">
-        <canvas id="map-canvas" />
+      <div id="map-container" class="widgets-item">
+        <canvas id="map-canvas"></canvas>
       </div>
     </div>
     <div id="mobile-hud">
+      <div id="selection-stick-left" class="selection-stick"></div>
+      <div id="selection-stick-right" class="selection-stick"></div>
       <button type="button" id="change-poly">Change Polygon</button>
       <button type="button" id="use-boat">Use Boat</button>
       <button type="button" id="dig">Dig</button>

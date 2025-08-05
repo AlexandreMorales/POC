@@ -19,7 +19,7 @@ export const MENU_CONFIG = {
   showPos: false,
   showChunks: false,
   usePerspective: false,
-  showSelectedCell: false,
+  showSelectedCell: true,
   rain: false,
   clouds: true,
   digitalClock: false,

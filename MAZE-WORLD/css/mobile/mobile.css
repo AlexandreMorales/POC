@@ -1,0 +1,74 @@
+:root {
+  --mobile-margin: 25px;
+}
+
+#mobile-hud {
+  display: none;
+  position: fixed;
+  z-index: var(--player-z-index);
+  bottom: 0;
+
+  margin: 0 var(--mobile-margin);
+  width: calc(100vw - (var(--mobile-margin) * 2));
+}
+#mobile-hud button {
+  background-color: var(--action-color);
+  border-radius: var(--action-border-radius);
+  padding: 12px;
+  font-size: 12px;
+
+  position: absolute;
+}
+
+#rotate-left {
+  bottom: 0;
+  left: 0;
+}
+#rotate-right {
+  bottom: 0;
+  right: 0;
+}
+#dig {
+  bottom: 50px;
+  left: 0;
+}
+#place {
+  bottom: 50px;
+  right: 0;
+}
+#change-poly {
+  bottom: 100px;
+  left: 0;
+}
+#use-boat {
+  bottom: 100px;
+  right: 0;
+}
+#selection-stick-left {
+  bottom: 150px;
+  left: 0;
+}
+#selection-stick-right {
+  bottom: 150px;
+  right: 0;
+}
+
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none;
+  }
+
+  #mobile-hud {
+    display: block;
+  }
+}
+
+@media (max-height: 768px) {
+  .hide-mobile {
+    display: none;
+  }
+
+  #mobile-hud {
+    display: block;
+  }
+}
