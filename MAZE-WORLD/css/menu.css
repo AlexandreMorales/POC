@@ -1,5 +1,4 @@
 :root {
-  --menu-position: 50px;
   --menu-width: 400px;
   --menu-padding: 25px;
 
@@ -23,7 +22,7 @@
   top: var(--menu-position);
   left: var(--menu-position);
 
-  z-index: calc(var(--player-z-index) + 2);
+  z-index: calc(var(--player-z-index) + 3);
 
   user-select: none;
 }
@@ -49,7 +48,7 @@
   margin-bottom: var(--hamburger-slice-magin);
   position: relative;
 
-  background: var(--background-color);
+  background: var(--background-color-border);
   border-radius: 3px;
 
   z-index: 1;

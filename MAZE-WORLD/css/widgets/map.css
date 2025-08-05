@@ -2,5 +2,4 @@
   height: var(--widget-size);
   width: var(--widget-size);
   background-color: var(--background-color);
-  border: calc(var(--widget-size) * 0.05) bisque solid;
 }

@@ -1,13 +1,14 @@
 :root {
-  --widgets-position: 50px;
   --widget-size: 10vh;
 }
 
 #widgets {
   display: block;
   position: fixed;
-  top: var(--widgets-position);
-  right: var(--widgets-position);
+  top: var(--menu-position);
+  right: var(--menu-position);
+
+  z-index: calc(var(--player-z-index) + 2);
 
   user-select: none;
 
@@ -16,6 +17,7 @@
   flex-direction: column;
 }
 
-#widgets > * {
+.widgets-item {
+  border: calc(var(--widget-size) * 0.05) var(--background-color-border) solid;
   margin-bottom: 10%;
 }

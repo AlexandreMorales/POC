@@ -13,7 +13,6 @@
   background-color: var(--background-color-black);
   border-radius: 100%;
   position: relative;
-  border: 3px solid var(--background-color);
 }
 
 #compass-arrow {

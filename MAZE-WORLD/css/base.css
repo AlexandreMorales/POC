@@ -3,8 +3,11 @@
   --action-border-radius: 12px;
 
   --background-color: #cdcdcd;
+  --background-color-border: white;
   --background-color-black: #232323;
   --active-color: #6e79d6;
+
+  --menu-position: 5vh;
 }
 
 * {
