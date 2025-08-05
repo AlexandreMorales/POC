@@ -3,6 +3,7 @@ import {
   cellIsBlocked,
   killEntitiesByTimeOfDay,
   moveEntities,
+  moveEntityToCell,
   PLAYER_ENTITY,
 } from "../2 - entities/index.js";
 import { loadAndGetCell, spawnEntities } from "../3 - generation/index.js";
@@ -27,7 +28,7 @@ export const moveCurrentCell = (oldCell, nextCell) => {
   const nextPos = getCleanPos(nextCell?.pos);
   POLY_INFO.iOffset += nextPos.i - oldPos.i;
   POLY_INFO.jOffset += nextPos.j - oldPos.j;
-  PLAYER_ENTITY.cell = nextCell;
+  moveEntityToCell(PLAYER_ENTITY, nextCell);
 };
 
 let canMove = true;

@@ -5,6 +5,7 @@
 /**
  * @typedef {Object} EntityMovementOptions
  * @property {Set<string>} [targets] List of entity types that the entity will try to go to the nearest
+ * @property {boolean} [random] If the entity moves randomnly
  * @property {number} speed Blocks per turn that it can move
  */
 

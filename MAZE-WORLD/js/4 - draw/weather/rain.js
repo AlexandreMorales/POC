@@ -18,7 +18,8 @@ export const updateRain = () => {
 let lightningInterval = null;
 const createLightining = () => {
   clearTimeout(lightningInterval);
-  const secs = getRandomFloat(10, 30) * 1000;
+  // Between 10s and 30s
+  const secs = getRandomFloat(10000, 30000);
   lightningInterval = setTimeout(() => {
     rainContainer.classList.remove("lightning");
     // trigger reflow

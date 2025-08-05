@@ -1,7 +1,7 @@
 import { getCell } from "../0 - grid/index.js";
 import { getPolyInfo, MENU_CONFIG, POLY_INFO } from "../1 - polygones/index.js";
 
-import { getMod, getPosDistance } from "../utils.js";
+import { getMod, getPosDistance, getRandomFloat } from "../utils.js";
 import { ENTITY_TYPES, MOVEMENT } from "./configs.js";
 import {
   cellIsBlocked,
@@ -81,55 +81,38 @@ export const moveEntities = (baseCell) => {
 
   ENTITIES.forEach((e) => {
     if (!e.cell || e.deleted || !e.movementOptions?.speed) return;
-    const { targets, speed } = e.movementOptions;
+    const { targets, speed, random } = e.movementOptions;
 
-    if (targets) {
-      const target = getClosestTarget(e);
-      if (!target) return;
-      let closestInfo = { cell: e.cell, index: 0 };
-      for (let index = 0; index < speed; index++)
-        closestInfo = getClosestCell(e, closestInfo.cell, target.cell);
-      if (!closestInfo?.cell) return;
-      let { cell, index } = closestInfo;
-      if (cell === target.cell) return;
+    let nextCell = e.cell;
+    let nextIndex = 0;
 
-      index = getMod(index, POLY_INFO.currentPoly);
-      updateEntityImage(e, indexToMove[index]);
-      moveEntityToCell(e, cell);
+    for (let index = 0; index < speed; index++) {
+      if (targets) {
+        const target = getClosestTarget(e);
+        if (!target) return;
+        const nextCellInfo = getClosestCell(e, nextCell, target.cell);
+        nextCell = nextCellInfo.cell;
+        nextIndex = nextCellInfo.index;
+        if (!nextCell) return;
+      } else if (random) {
+        nextIndex = Math.floor(getRandomFloat(0, POLY_INFO.currentPoly));
+        const aPos = nextCell.adjacentPos[POLY_INFO.currentPoly];
+        nextCell = getCell(aPos[nextIndex]);
+
+        for (let i = 0; i < aPos.length; i++) {
+          if (!cellIsBlocked(nextCell, e)) break;
+          nextIndex = getMod(nextIndex + 1, POLY_INFO.currentPoly);
+          nextCell = getCell(aPos[nextIndex]);
+        }
+      }
     }
+
+    if (cellIsBlocked(nextCell, e)) return;
+
+    nextIndex = getMod(nextIndex, POLY_INFO.currentPoly);
+    updateEntityImage(e, indexToMove[nextIndex]);
+    moveEntityToCell(e, nextCell);
   });
-};
-
-export const killEntitiesByTimeOfDay = () => {
-  // If its raining the enemies wont burn
-  if (MENU_CONFIG.rain) return;
-
-  const entitiesToKill = /** @type {Entity[]} */ ([]);
-  ENTITIES.forEach((e) => {
-    if (
-      !e.cell ||
-      !e.minTime ||
-      e.deleted ||
-      e.minTime <= ENTITY_INFO.timeOfDay
-    )
-      return;
-
-    const fireEntity = createEntity(
-      e.cell,
-      e.id,
-      ENTITY_TYPES.FIRE,
-      FIRE_IMG_MAP,
-      { zIndex: 3 }
-    );
-    e.connectedEntities[ENTITY_TYPES.FIRE] = fireEntity;
-    e.deleted = true;
-
-    entitiesToKill.push(e);
-  });
-
-  setTimeout(() => {
-    entitiesToKill.forEach(removeEntity);
-  }, ENTITY_ACTIONS_CONFIG.delayToBurn);
 };
 
 /**
@@ -137,7 +120,7 @@ export const killEntitiesByTimeOfDay = () => {
  * @param {boolean} [useDiagonal]
  * @returns {{ moveToIndex: { [k: symbol]: number }, indexToMove: { [k: number]: symbol } }}
  */
-export const getMovementMaps = (baseCell, useDiagonal) => {
+const getMovementMaps = (baseCell, useDiagonal) => {
   let topI = POLY_INFO.rotationTurns;
   let bottomI = topI + Math.floor(POLY_INFO.currentPoly / 2);
 
@@ -180,3 +163,35 @@ export const getMovementMaps = (baseCell, useDiagonal) => {
  */
 export const getMovementMap = (baseCell, useDiagonal) =>
   getMovementMaps(baseCell, useDiagonal).moveToIndex;
+
+export const killEntitiesByTimeOfDay = () => {
+  // If its raining the enemies wont burn
+  if (MENU_CONFIG.rain) return;
+
+  const entitiesToKill = /** @type {Entity[]} */ ([]);
+  ENTITIES.forEach((e) => {
+    if (
+      !e.cell ||
+      !e.minTime ||
+      e.deleted ||
+      e.minTime <= ENTITY_INFO.timeOfDay
+    )
+      return;
+
+    const fireEntity = createEntity(
+      e.cell,
+      e.id,
+      ENTITY_TYPES.FIRE,
+      FIRE_IMG_MAP,
+      { zIndex: 3 }
+    );
+    e.connectedEntities[ENTITY_TYPES.FIRE] = fireEntity;
+    e.deleted = true;
+
+    entitiesToKill.push(e);
+  });
+
+  setTimeout(() => {
+    entitiesToKill.forEach(removeEntity);
+  }, ENTITY_ACTIONS_CONFIG.delayToBurn);
+};

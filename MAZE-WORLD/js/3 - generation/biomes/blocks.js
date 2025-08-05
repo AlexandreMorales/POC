@@ -12,36 +12,39 @@ const hexToRgb = (hexColor) => {
   return { r, g, b };
 };
 
+const ENEMY_SPAWN = {
+  probability: 0.00001,
+  entityType: ENTITY_TYPES.ENEMY,
+  spawnOnMove: true,
+  increaseWithTime: true,
+};
+
 export const BLOCKS = /** @type {{ [k: string]: Block }} */ ({
   DEEP_WATER: {
     color: hexToRgb("#256299"),
     layer: 0,
     isFluid: true,
     spawnableEntities: [
-      { probability: 0.004, entityType: ENTITY_TYPES.TREE },
-      {
-        probability: 0.00001,
-        entityType: ENTITY_TYPES.ENEMY,
-        spawnOnMove: true,
-        increaseWithTime: true,
-      },
+      { probability: 0.0005, entityType: ENTITY_TYPES.TREE },
+      { probability: 0.0005, entityType: ENTITY_TYPES.RABBIT },
+      ENEMY_SPAWN,
     ],
   },
   MEDIUM_WATER: { color: hexToRgb("#2375b4"), layer: 0, isFluid: true },
   SEA_SHORE: { color: hexToRgb("#4699de"), layer: 0, isFluid: true },
-  BEACH_SAND: { color: hexToRgb("#ab976a"), layer: 0 },
+  BEACH_SAND: {
+    color: hexToRgb("#ab976a"),
+    layer: 0,
+    spawnableEntities: [ENEMY_SPAWN],
+  },
   LOW_GRASS: { color: hexToRgb("#457950"), layer: 0 },
   MID_GRASS: {
     color: hexToRgb("#2d673e"),
     layer: 0,
     spawnableEntities: [
       { probability: 0.01, entityType: ENTITY_TYPES.TREE },
-      {
-        probability: 0.00001,
-        entityType: ENTITY_TYPES.ENEMY,
-        spawnOnMove: true,
-        increaseWithTime: true,
-      },
+      { probability: 0.0005, entityType: ENTITY_TYPES.RABBIT },
+      ENEMY_SPAWN,
     ],
   },
   HIGH_GRASS: { color: hexToRgb("#2d673e"), layer: 1 },

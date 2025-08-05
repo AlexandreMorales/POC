@@ -1,16 +1,14 @@
 ------------------------------------- NEXT -------------------------------------
 
-MOVING RABBITS (https://www.shutterstock.com/pt/image-vector/pixelated-bunny-8-bit-pixel-art-541878964)
-
-
-
-------------------------------------- BACKLOG -------------------------------------
-
 SONG AND SOUNDS
     ADD RAIN AND THUNDER SOUNDS
     FREE SOUNDS FOR ROTATION, WALK, DIG, PLACE
     EACH BLOCK HAS A RIFF, PLAYS A SONG AFTER DRAW ALL BASED ON ALL UNIQUE RIFFS DRAWED, THE MORE BLOCKS THE HIGHER INTENSITY/VOLUME
     SONGS ARE ALWAYS PLAYING, NUMBER OF BLOCKS OF EACH TYPE DICTATE THE VOLUME
+
+
+
+------------------------------------- BACKLOG -------------------------------------
 
 BIOMES (DISTANCE FROM 0,0)
     TELEPORTATION ON MENU (NUMBER INPUTS)

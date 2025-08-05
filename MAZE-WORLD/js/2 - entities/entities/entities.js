@@ -1,5 +1,6 @@
 import { ENTITY_TYPES } from "../configs.js";
 import { addEnemy } from "./enemy.js";
+import { addRabbit } from "./rabbit.js";
 import { addTree } from "./tree.js";
 
 /**
@@ -10,6 +11,8 @@ export const spawnEntity = (entityType, cell) => {
   switch (entityType) {
     case ENTITY_TYPES.TREE:
       return addTree(cell);
+    case ENTITY_TYPES.RABBIT:
+      return addRabbit(cell);
     case ENTITY_TYPES.ENEMY:
       return addEnemy(cell);
   }
