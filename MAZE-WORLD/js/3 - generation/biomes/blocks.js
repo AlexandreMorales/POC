@@ -1,4 +1,4 @@
-import { ENTITY_TYPES } from "../2 - entities/index.js";
+import { ENTITY_TYPES } from "../../2 - entities/index.js";
 
 /**
  * @param {string} hexColor
@@ -11,13 +11,6 @@ const hexToRgb = (hexColor) => {
   let b = parseInt(hex.substring(4, 6), 16);
   return { r, g, b };
 };
-
-/**
- * @param {Block} block
- * @param {BlockProps} props
- * @returns {BlockEntity}
- */
-const addPropsToBlock = (block, props) => ({ ...block, ...props });
 
 export const BLOCKS = /** @type {{ [k: string]: Block }} */ ({
   DEEP_WATER: {
@@ -55,36 +48,3 @@ export const BLOCKS = /** @type {{ [k: string]: Block }} */ ({
   DIRT: { color: hexToRgb("#3F573A"), layer: 1 },
   ROCK: { color: hexToRgb("#CBC0BB"), layer: 1 },
 });
-
-const BIOMES_RAW = /** @type {{ [k: string]: Biome }} */ ({
-  FOREST: {
-    maxValue: 0,
-    maxDistance: 50,
-    higherGroundBlock: BLOCKS.MID_GRASS,
-    ranges: [
-      addPropsToBlock(BLOCKS.MEDIUM_WATER, { max: -0.5 }),
-      addPropsToBlock(BLOCKS.SEA_SHORE, { max: -0.4 }),
-      addPropsToBlock(BLOCKS.LOW_GRASS, { max: -0.2 }),
-      addPropsToBlock(BLOCKS.MID_GRASS, { max: 0.4 }),
-      addPropsToBlock(BLOCKS.HIGH_GRASS, { max: 0.5 }),
-      addPropsToBlock(BLOCKS.DIRT, { max: 0.7 }),
-      addPropsToBlock(BLOCKS.ROCK, { max: 1 }),
-    ],
-  },
-  OCEAN: {
-    maxValue: Infinity,
-    maxDistance: Infinity,
-    higherGroundBlock: BLOCKS.MID_GRASS,
-    ranges: [
-      addPropsToBlock(BLOCKS.DEEP_WATER, { max: -0.1 }),
-      addPropsToBlock(BLOCKS.MEDIUM_WATER, { max: 0.1 }),
-      addPropsToBlock(BLOCKS.SEA_SHORE, { max: 0.2 }),
-      addPropsToBlock(BLOCKS.BEACH_SAND, { max: 0.4 }),
-      addPropsToBlock(BLOCKS.LOW_GRASS, { max: 0.5 }),
-      addPropsToBlock(BLOCKS.HIGH_GRASS, { max: 0.7 }),
-      addPropsToBlock(BLOCKS.DIRT, { max: 1 }),
-    ],
-  },
-});
-
-export const BIOMES = /** @type {Biome[]} */ (Object.values(BIOMES_RAW));

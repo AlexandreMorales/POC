@@ -45,14 +45,14 @@ const initializeVector = (vector) => {
 
 const vectors = /** @type {{ [k: symbol]: Vector }} */ ({
   [VECTORS.BIOME]: initializeVector({
-    width: GENERATION_CONFIG.chunkColumns,
-    height: GENERATION_CONFIG.chunkRows,
+    width: GENERATION_CONFIG.chunkSize,
+    height: GENERATION_CONFIG.chunkSize,
     vectors: [],
     resolution: PERLIN_CONFIG.noiseResolutionBiome,
   }),
   [VECTORS.BLOCK]: initializeVector({
-    width: GENERATION_CONFIG.chunkColumns,
-    height: GENERATION_CONFIG.chunkRows,
+    width: GENERATION_CONFIG.chunkSize,
+    height: GENERATION_CONFIG.chunkSize,
     vectors: [],
     resolution: PERLIN_CONFIG.noiseResolution,
   }),
@@ -64,16 +64,12 @@ const vectors = /** @type {{ [k: symbol]: Vector }} */ ({
  * @param {Vector} vector
  */
 const updateVector = (i, j, vector) => {
-  const [offsetI, offsetJ] = getChunkStart(
-    { i, j },
-    vector.height,
-    vector.width
-  );
+  const offsetPos = getChunkStart({ i, j }, vector.height, vector.width);
   for (let i = 0; i <= vector.height - 1; i++) {
-    const nI = i + offsetI;
+    const nI = i + offsetPos.i;
     vector.vectors[nI] = vector.vectors[nI] || [];
     for (let j = 0; j <= vector.width - 1; j++) {
-      const nJ = j + offsetJ;
+      const nJ = j + offsetPos.j;
       vector.vectors[nI][nJ] = getRandUnitVect();
     }
   }

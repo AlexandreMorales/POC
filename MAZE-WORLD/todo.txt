@@ -1,14 +1,12 @@
 ------------------------------------- NEXT -------------------------------------
 
-MAP (CENTER CELL DEFINE BIOME OF CHUNK, BIOME AND CHUNKS HAVE COLOR)
+ADD SELECT STICK TO MOBILE
+
+MOVING RABBITS (https://www.shutterstock.com/pt/image-vector/pixelated-bunny-8-bit-pixel-art-541878964)
 
 
 
 ------------------------------------- BACKLOG -------------------------------------
-    
-ADD SELECT STICK TO MOBILE
-
-MOVING RABBITS (https://www.shutterstock.com/pt/image-vector/pixelated-bunny-8-bit-pixel-art-541878964)
 
 SONG AND SOUNDS
     ADD RAIN AND THUNDER SOUNDS

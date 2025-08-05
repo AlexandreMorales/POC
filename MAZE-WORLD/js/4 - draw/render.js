@@ -71,7 +71,7 @@ export const drawItem = (
  * @param {number} modifier
  * @return {string}
  */
-const getFillStyle = ({ r, g, b }, shoulApplyDark, modifier = 1) => {
+export const getFillStyle = ({ r, g, b }, shoulApplyDark, modifier = 1) => {
   if (ENTITY_INFO.timeOfDay && shoulApplyDark)
     modifier = (1 - ENTITY_INFO.timeOfDay / 100) * modifier;
 
@@ -141,8 +141,8 @@ const showPos = (context, pos, point, isInverted, polyInfo) => {
  */
 const showChunks = (context, pos, point, points) => {
   if (
-    pos.i % GENERATION_CONFIG.chunkRows === 0 ||
-    pos.j % GENERATION_CONFIG.chunkColumns === 0
+    pos.i % GENERATION_CONFIG.chunkSize === 0 ||
+    pos.j % GENERATION_CONFIG.chunkSize === 0
   ) {
     context.strokeStyle = DRAW_CONFIG.borderColor;
     context.lineWidth = DRAW_CONFIG.lineWidth;

@@ -11,7 +11,7 @@ import { debounce, getMod, isPointOutside, tweakColor } from "../utils.js";
 
 import { drawItem, drawWall, drawWallTop } from "./render.js";
 import { updateWeather } from "./weather/index.js";
-import { updateWidgets } from "./widgets/index.js";
+import { updateMap, updateWidgets } from "./widgets/index.js";
 
 const CANVAS_CONFIG = {
   fluidSpeed: 500,
@@ -93,6 +93,7 @@ export const drawEveryCell = (baseEntity) => {
   drawWalls();
   updateEntities();
   tweakFluids();
+  updateMap();
 };
 
 let wallLayers = /** @type {Wall[][]} */ ([]);

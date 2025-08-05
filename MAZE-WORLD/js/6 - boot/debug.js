@@ -10,12 +10,12 @@ import { BLOCKS } from "../3 - generation/index.js";
 import { drawEveryCell } from "../4 - draw/index.js";
 import { placeBlock } from "../5 - actions/index.js";
 
-const container = document.getElementById("container");
+const canvasContainer = document.getElementById("canvas-container");
 
-container.onclick = (e) => {
+canvasContainer.onclick = (e) => {
   if (!MENU_CONFIG.debugMode || POLY_INFO.rotationTurns) return;
   e = e || /** @type {Event} */ (window.event);
-  const { left, top } = container.getBoundingClientRect();
+  const { left, top } = canvasContainer.getBoundingClientRect();
   let x = e.clientX - left;
   let y = e.clientY - top;
   if (MENU_CONFIG.usePerspective) {

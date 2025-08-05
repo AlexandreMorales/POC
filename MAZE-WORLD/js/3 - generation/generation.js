@@ -12,7 +12,7 @@ import { getPosDistance, tweakColor } from "../utils.js";
 import { GENERATION_CONFIG } from "./configs.js";
 import { getChunkStart } from "./utils.js";
 import { getValue, VECTORS } from "./perlin.js";
-import { BIOMES } from "./biomes.js";
+import { addBiomeToMap, BIOMES } from "./biomes/index.js";
 
 /**
  * @param {Pos} param
@@ -125,20 +125,23 @@ const getBiome = (pos) => {
 /**
  * @param {Pos} initialPos
  */
-export const loadChunk = (initialPos) => {
-  const [offsetI, offsetJ] = getChunkStart(
+const loadChunk = (initialPos) => {
+  const offsetPos = getChunkStart(
     initialPos,
-    GENERATION_CONFIG.chunkRows,
-    GENERATION_CONFIG.chunkColumns
+    GENERATION_CONFIG.chunkSize,
+    GENERATION_CONFIG.chunkSize
   );
 
-  for (let i = 0; i < GENERATION_CONFIG.chunkRows; i++) {
-    const nI = i + offsetI;
-    for (let j = 0; j < GENERATION_CONFIG.chunkColumns; j++) {
-      const nJ = j + offsetJ;
+  const biomeMap = /** @type {{ [k: string]: number }} */ ({});
+
+  for (let i = 0; i < GENERATION_CONFIG.chunkSize; i++) {
+    const nI = i + offsetPos.i;
+    for (let j = 0; j < GENERATION_CONFIG.chunkSize; j++) {
+      const nJ = j + offsetPos.j;
       const pos = { i: nI, j: nJ };
 
       const biome = getBiome(pos);
+      biomeMap[biome.name] = (biomeMap[biome.name] || 0) + 1;
       const value = getValue(nI, nJ, VECTORS.BLOCK);
       const originalBlock = biome.ranges.find((r) => value <= r.max);
       const isHighBlock = originalBlock.layer > 0;
@@ -155,6 +158,15 @@ export const loadChunk = (initialPos) => {
       else createEntitiesForCell(cell);
     }
   }
+
+  // chose biome with the most block count in the chunk
+  const biomeName = Object.entries(biomeMap).sort(
+    ([_, a], [__, b]) => b - a
+  )[0][0];
+  addBiomeToMap(
+    offsetPos,
+    BIOMES.find((b) => b.name === biomeName)
+  );
 };
 
 /**
