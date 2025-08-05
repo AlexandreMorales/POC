@@ -4,18 +4,13 @@ import {
   addEntity,
   PLAYER_ENTITY,
   removeGeneratedEntities,
-  setEntitiesSize,
 } from "../2 - entities/index.js";
-import { loadAndGetCell, getCenterCell } from "../3 - generation/index.js";
-import {
-  resetCanvasSize,
-  drawEveryCell,
-  updateCanvasCss,
-} from "../4 - draw/index.js";
+import { loadAndGetCell } from "../3 - generation/index.js";
+import { updateCanvasCss } from "../4 - draw/index.js";
 import {
   findAccessibleCell,
-  moveCurrentCell,
   resetDirection,
+  resetMap,
 } from "../5 - actions/index.js";
 import { debounce } from "../utils.js";
 
@@ -24,23 +19,18 @@ export const start = () => {
   configPolys();
   resetGrid();
   removeGeneratedEntities();
-  setEntitiesSize();
-  resetCanvasSize();
   updateCanvasCss();
   resetDirection();
 
-  moveCurrentCell(
-    getCenterCell(),
-    findAccessibleCell(loadAndGetCell(INITIAL_POS), PLAYER_ENTITY)
+  PLAYER_ENTITY.cell = findAccessibleCell(
+    loadAndGetCell(INITIAL_POS),
+    PLAYER_ENTITY
   );
-  drawEveryCell(PLAYER_ENTITY);
+  resetMap();
 };
 
 export const resetSize = debounce((newSize) => {
   POLY_INFO.cellHeight = newSize || POLY_INFO.cellHeight;
   configPolys();
-  setEntitiesSize();
-  resetCanvasSize();
-  moveCurrentCell(getCenterCell(), PLAYER_ENTITY.cell);
-  drawEveryCell(PLAYER_ENTITY);
+  resetMap();
 });

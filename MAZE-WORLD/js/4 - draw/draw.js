@@ -10,7 +10,7 @@ import { loadAndGetCell } from "../3 - generation/index.js";
 import { debounce, getMod, isPointOutside, tweakColor } from "../utils.js";
 
 import { drawItem, drawWall, drawWallTop } from "./render.js";
-import { updateClouds, updateRain } from "./weather/index.js";
+import { updateWeather } from "./weather/index.js";
 import { updateWidgets } from "./widgets/index.js";
 
 const CANVAS_CONFIG = {
@@ -35,7 +35,7 @@ for (let i = 0; i < CANVAS_CONFIG.maxLayer; i++) {
  * @param {number} height
  * @param {number} width
  */
-export const setCanvasSize = (height, width) => {
+const setCanvasSize = (height, width) => {
   if (height) {
     drawContainer.style.setProperty("--canvas-height", `${height}px`);
     canvasLayers.forEach((canvas) => (canvas.height = height));
@@ -44,7 +44,6 @@ export const setCanvasSize = (height, width) => {
     drawContainer.style.setProperty("--canvas-width", `${width}px`);
     canvasLayers.forEach((canvas) => (canvas.width = width));
   }
-  updateRain();
 };
 
 export const resetCanvasSize = () => {
@@ -59,7 +58,7 @@ export const updateCanvasCss = () => {
   }
 
   canvasContainer.classList.remove("perspective");
-  updateRain();
+  updateWeather();
   updateWidgets();
 };
 
@@ -94,7 +93,6 @@ export const drawEveryCell = (baseEntity) => {
   drawWalls();
   updateEntities();
   tweakFluids();
-  updateClouds();
 };
 
 let wallLayers = /** @type {Wall[][]} */ ([]);

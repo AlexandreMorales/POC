@@ -2,8 +2,8 @@ import {
   KNOWN_POLYGONS,
   MENU_CONFIG,
   POLY_INFO,
-  getPolyInfo,
 } from "../../1 - polygones/index.js";
+import { MOVEMENT } from "../../2 - entities/configs.js";
 import { correctRoundError, getMod, getRandomFloat } from "../../utils.js";
 
 const CLOUDS_CONFIG = {
@@ -11,6 +11,8 @@ const CLOUDS_CONFIG = {
   rows: 3,
   columns: 3,
   durationMult: 30,
+  offsetSize: 6,
+  offset: 0,
 };
 
 const POLYGONS_CLASS_MAP = {
@@ -19,18 +21,28 @@ const POLYGONS_CLASS_MAP = {
   [KNOWN_POLYGONS.HEXAGON]: "hex",
 };
 
+const CLOUDS_DIRECTION_MAP = {
+  [MOVEMENT.RIGHT]: -CLOUDS_CONFIG.offsetSize,
+  [MOVEMENT.LEFT]: CLOUDS_CONFIG.offsetSize,
+};
+
 const cloudsContainer = document.getElementById("clouds-container");
 let clouds = /** @type {HTMLDivElement[]} */ ([]);
 
-export const updateClouds = () => {
+/**
+ * @param {symbol} direction
+ */
+export const updateClouds = (direction) => {
   if (MENU_CONFIG.clouds) {
-    if (!clouds.length) createClouds();
+    if (!clouds.length) {
+      createClouds();
+      offsetClouds(MOVEMENT.RIGHT);
+    }
 
     setCloudShape();
-    offsetClouds();
+    offsetClouds(direction);
   } else {
-    clouds.forEach((c) => cloudsContainer.removeChild(c));
-    clouds = [];
+    cloudsContainer.classList.add("off");
   }
 };
 
@@ -45,17 +57,21 @@ const setCloudShape = () => {
   cloudsContainer.style.setProperty("--clouds-default-size", `${size}px`);
 };
 
-const offsetClouds = () => {
-  const { xSide } = getPolyInfo();
-  const { jOffset, currentPoly } = POLY_INFO;
-  const offsetSize = (xSide * jOffset * currentPoly) / -4;
-  const offsetLeft = getMod(offsetSize, cloudsContainer.offsetWidth);
+/**
+ * @param {symbol} direction
+ */
+const offsetClouds = (direction) => {
+  const offsetSize = CLOUDS_DIRECTION_MAP[direction];
+  if (!offsetSize) return;
+  CLOUDS_CONFIG.offset += offsetSize;
+
+  const offsetLeft = getMod(CLOUDS_CONFIG.offset, cloudsContainer.offsetWidth);
   const width = cloudsContainer.offsetWidth / CLOUDS_CONFIG.num;
   const defaultOffsetLeft = cloudsContainer.offsetWidth / 4;
 
   cloudsContainer.style.setProperty(
     "--clouds-offset-left",
-    `${getMod(offsetSize, width) - defaultOffsetLeft}px`
+    `${getMod(CLOUDS_CONFIG.offset, width) - defaultOffsetLeft}px`
   );
   const offset = Math.floor(offsetLeft / width);
 

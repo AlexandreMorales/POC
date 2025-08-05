@@ -19,13 +19,15 @@
 
 #clouds-container {
   position: fixed;
-  width: 100%;
   display: flex;
   justify-content: space-around;
   width: 150%;
 
   margin-left: var(--clouds-offset-left);
   min-width: calc(var(--clouds-default-size) * 20);
+}
+#clouds-container.off {
+  opacity: 0;
 }
 
 .cloud-row {

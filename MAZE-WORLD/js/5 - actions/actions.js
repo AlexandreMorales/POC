@@ -27,6 +27,7 @@ import {
   drawEveryCell,
   resetRotateCanvas,
   rotateCanvas,
+  updateWeather,
 } from "../4 - draw/index.js";
 import { getMod } from "../utils.js";
 
@@ -83,18 +84,18 @@ let lastMovement = /** @type {symbol} */ (null);
 let lastSelection = /** @type {symbol} */ (null);
 
 /**
- * @param {symbol} code
+ * @param {symbol} direction
  * @param {boolean} [useDiagonal]
  */
-export const moveBaseOnCode = (code, useDiagonal) => {
-  if (!code) return;
+export const moveBaseOnCode = (direction, useDiagonal) => {
+  if (!direction) return;
 
-  if (lastMovement !== code) {
-    lastMovement = code;
+  if (lastMovement !== direction) {
+    lastMovement = direction;
     makeEntityRun(PLAYER_ENTITY, lastMovement);
   }
 
-  const aModI = getNextCellIndexBasedOnCode(code, useDiagonal);
+  const aModI = getNextCellIndexBasedOnCode(direction, useDiagonal);
   if (aModI === undefined) return;
   const nextPos = getPosByIndex(PLAYER_ENTITY.cell, aModI);
 
@@ -105,6 +106,7 @@ export const moveBaseOnCode = (code, useDiagonal) => {
   if (cellIsBlocked(nextCell, PLAYER_ENTITY)) return;
 
   move(nextCell);
+  updateWeather(direction);
 };
 
 export const MOVEMENT_VALUES = Object.values(MOVEMENT);
@@ -152,10 +154,7 @@ export const changePolySides = () => {
   PLAYER_ENTITY.selectedCellIndex = 0;
 
   resetDirection();
-  setEntitiesSize();
-  resetCanvasSize();
-  moveCurrentCell(getCenterCell(), PLAYER_ENTITY.cell);
-  drawEveryCell(PLAYER_ENTITY);
+  resetMap();
 };
 
 export const resetDirection = () => {
@@ -245,4 +244,14 @@ export const useBoat = () => {
   } else if (canMove) {
     addBoat(selectedCell, PLAYER_ENTITY);
   }
+};
+
+// Called when zooming, creation, set PolySides
+export const resetMap = () => {
+  setEntitiesSize();
+  resetCanvasSize();
+  moveCurrentCell(getCenterCell(), PLAYER_ENTITY.cell);
+  drawEveryCell(PLAYER_ENTITY);
+
+  updateWeather(lastMovement);
 };
