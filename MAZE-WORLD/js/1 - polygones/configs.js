@@ -4,6 +4,12 @@ export const KNOWN_POLYGONS = {
   HEXAGON: 6,
 };
 
+export const POLYGONS_FAVICONS = {
+  [KNOWN_POLYGONS.TRIANGLE]: "images/favicons/triangle.png",
+  [KNOWN_POLYGONS.SQUARE]: "images/favicons/square.png",
+  [KNOWN_POLYGONS.HEXAGON]: "images/favicons/hexagon.png",
+};
+
 export const KNOWN_POLYGONS_VALUES = Object.values(KNOWN_POLYGONS);
 
 export const MAP_GENERATION = {
@@ -22,5 +28,6 @@ export const MENU_CONFIG = {
   rain: false,
   clouds: true,
   digitalClock: false,
+  music: false,
   mapGeneration: MAP_GENERATION.DISTANCE,
 };

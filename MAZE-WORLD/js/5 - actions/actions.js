@@ -5,6 +5,7 @@ import {
   KNOWN_POLYGONS_VALUES,
   MENU_CONFIG,
   POLY_INFO,
+  POLYGONS_FAVICONS,
 } from "../1 - polygones/index.js";
 import {
   MOVEMENT,
@@ -35,6 +36,11 @@ import { getMod } from "../utils.js";
 
 import { move, moveCurrentCell } from "./movement.js";
 
+const digAudio = new Audio("sounds/actions/dig.mp3");
+digAudio.volume = 0.25;
+const rotateAudio = new Audio("sounds/actions/rotate.mp3");
+rotateAudio.volume = 0.25;
+
 let canRotate = true;
 /**
  * @param {number} orientation
@@ -47,11 +53,13 @@ export const rotate = (orientation) => {
       POLY_INFO.currentPoly
     );
 
-    if (MENU_CONFIG.rotationAnimation)
+    if (MENU_CONFIG.rotationAnimation) {
       rotateCanvas(
         (360 / POLY_INFO.currentPoly) * -orientation,
         COMPASS_CONFIG.rotateDelay
       );
+      rotateAudio.play();
+    }
 
     updateCompass();
     resetDirection();
@@ -183,6 +191,7 @@ export const dig = () => {
 
   PLAYER_ENTITY.pickedCells.push({ ...(selectedCell.wall || selectedCell) });
 
+  digAudio.play();
   if (selectedCell.wall) {
     selectedCell.wall = null;
   } else {
@@ -198,6 +207,8 @@ export const place = () => {
 
   const selectedCell = updateAndGetSelectedCell();
   if (selectedCell?.wall) return;
+
+  digAudio.play();
   placeBlock(selectedCell);
 
   move();
@@ -245,12 +256,17 @@ export const useBoat = () => {
   }
 };
 
+const link = /** @type {HTMLLinkElement} */ (
+  document.querySelector("link[rel~='icon']")
+);
 // Called when zooming, creation, set PolySides
 export const resetMap = () => {
   setEntitiesSize();
   resetCanvasSize();
   moveCurrentCell(getCenterCell(), PLAYER_ENTITY.cell);
   drawEveryCell(PLAYER_ENTITY);
+
+  link.href = POLYGONS_FAVICONS[POLY_INFO.currentPoly];
 
   updateWeather(lastMovement);
 };

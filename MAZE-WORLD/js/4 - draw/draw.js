@@ -10,6 +10,7 @@ import { loadAndGetCell } from "../3 - generation/index.js";
 import { debounce, getMod, isPointOutside, tweakColor } from "../utils.js";
 
 import { drawItem, drawWall, drawWallTop } from "./render.js";
+import { updateTracks } from "./sounds.js";
 import { updateWeather } from "./weather/index.js";
 import { updateBiomeMap, updateWidgets } from "./widgets/index.js";
 
@@ -63,6 +64,15 @@ export const updateCanvasCss = () => {
 };
 
 let filledThisRound = /** @type {Set<Pos>} */ (new Set());
+let tracksCount = /** @type {{ [k: string]: number }} */ ({});
+
+/**
+ * @param {Block} block
+ */
+const addToTrackCount = (block) => {
+  if (block?.trackType)
+    tracksCount[block.trackType] = (tracksCount[block.trackType] || 0) + 1;
+};
 
 /**
  * @param {Entity} baseEntity
@@ -71,6 +81,7 @@ export const drawEveryCell = (baseEntity) => {
   wallLayers = [];
   fluids = [];
   filledThisRound = new Set();
+  tracksCount = {};
 
   const offsetCell = baseEntity.cell.pos.j % 2;
   const { rows, columns, shouldIntercalate } = getPolyInfo();
@@ -94,6 +105,7 @@ export const drawEveryCell = (baseEntity) => {
   updateEntities();
   tweakFluids();
   updateBiomeMap();
+  updateTracks(tracksCount);
 };
 
 let wallLayers = /** @type {Wall[][]} */ ([]);
@@ -146,6 +158,8 @@ const drawCell = (cell, context, baseEntity) => {
     cell !== baseEntity.cell && aCells.every((c) => c !== baseEntity.cell);
   const isSelectedCell =
     MENU_CONFIG.showSelectedCell && cell === getSelectedCell(baseEntity);
+
+  addToTrackCount(cell.wall?.block || cell.block);
 
   if (cell.wall) {
     const wallPoints = isInverted
