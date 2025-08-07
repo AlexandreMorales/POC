@@ -20,8 +20,7 @@ const BIOMES_RAW = /** @type {{ [k: string]: Biome }} */ ({
       addPropsToBlock(BLOCKS.LOW_GRASS, { max: -0.2 }),
       addPropsToBlock(BLOCKS.MID_GRASS, { max: 0.4 }),
       addPropsToBlock(BLOCKS.HIGH_GRASS, { max: 0.5 }),
-      addPropsToBlock(BLOCKS.DIRT, { max: 0.7 }),
-      addPropsToBlock(BLOCKS.ROCK, { max: 1 }),
+      addPropsToBlock(BLOCKS.DIRT, { max: 1 }),
     ],
   },
   OCEAN: {
