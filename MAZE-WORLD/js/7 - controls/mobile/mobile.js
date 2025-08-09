@@ -1,4 +1,4 @@
-import { POLY_INFO } from "../../1 - polygones/index.js";
+import { RENDER_INFO } from "../../1 - polygones/index.js";
 import {
   changePolySides,
   dig,
@@ -41,14 +41,14 @@ canvasContainer.ontouchmove = (e) => {
 
     if (
       nZoomDist > zoomDist &&
-      POLY_INFO.cellHeight < CONTROLS_CONFIG.maxZoom
+      RENDER_INFO.cellHeight < CONTROLS_CONFIG.maxZoom
     ) {
-      resetSize(POLY_INFO.cellHeight + 1);
+      resetSize(RENDER_INFO.cellHeight + 1);
     } else if (
       nZoomDist < zoomDist &&
-      POLY_INFO.cellHeight > CONTROLS_CONFIG.minZoom
+      RENDER_INFO.cellHeight > CONTROLS_CONFIG.minZoom
     ) {
-      resetSize(POLY_INFO.cellHeight - 1);
+      resetSize(RENDER_INFO.cellHeight - 1);
     }
 
     zoomDist = nZoomDist;

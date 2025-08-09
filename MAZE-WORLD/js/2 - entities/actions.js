@@ -1,5 +1,9 @@
 import { getCell } from "../0 - grid/index.js";
-import { getPolyInfo, MENU_CONFIG, POLY_INFO } from "../1 - polygones/index.js";
+import {
+  getPolyInfo,
+  MENU_CONFIG,
+  RENDER_INFO,
+} from "../1 - polygones/index.js";
 
 import { getMod, getPosDistance, getRandomFloat } from "../utils.js";
 import { ENTITY_TYPES, MOVEMENT } from "./configs.js";
@@ -57,7 +61,7 @@ const getClosestCell = (entity, cell, targetCell) => {
   let selectedCell = /** @type {Cell} */ (null);
   let selectedIndex = 0;
 
-  const aPos = cell.adjacentPos[POLY_INFO.currentPoly];
+  const aPos = cell.adjacentPos[RENDER_INFO.currentPoly];
   for (let index = 0; index < aPos.length; index++) {
     const pos = aPos[index];
     const aCell = getCell(pos);
@@ -95,13 +99,13 @@ export const moveEntities = (baseCell) => {
         nextIndex = nextCellInfo.index;
         if (!nextCell) return;
       } else if (random) {
-        nextIndex = Math.floor(getRandomFloat(0, POLY_INFO.currentPoly));
-        const aPos = nextCell.adjacentPos[POLY_INFO.currentPoly];
+        nextIndex = Math.floor(getRandomFloat(0, RENDER_INFO.currentPoly));
+        const aPos = nextCell.adjacentPos[RENDER_INFO.currentPoly];
         nextCell = getCell(aPos[nextIndex]);
 
         for (let i = 0; i < aPos.length; i++) {
           if (!cellIsBlocked(nextCell, e)) break;
-          nextIndex = getMod(nextIndex + 1, POLY_INFO.currentPoly);
+          nextIndex = getMod(nextIndex + 1, RENDER_INFO.currentPoly);
           nextCell = getCell(aPos[nextIndex]);
         }
       }
@@ -109,7 +113,7 @@ export const moveEntities = (baseCell) => {
 
     if (cellIsBlocked(nextCell, e)) return;
 
-    nextIndex = getMod(nextIndex, POLY_INFO.currentPoly);
+    nextIndex = getMod(nextIndex, RENDER_INFO.currentPoly);
     updateEntityImage(e, indexToMove[nextIndex]);
     moveEntityToCell(e, nextCell);
   });
@@ -121,10 +125,10 @@ export const moveEntities = (baseCell) => {
  * @returns {{ moveToIndex: { [k: symbol]: number }, indexToMove: { [k: number]: symbol } }}
  */
 const getMovementMaps = (baseCell, useDiagonal) => {
-  let topI = POLY_INFO.rotationTurns;
-  let bottomI = topI + Math.floor(POLY_INFO.currentPoly / 2);
+  let topI = RENDER_INFO.rotationTurns;
+  let bottomI = topI + Math.floor(RENDER_INFO.currentPoly / 2);
 
-  let topLeftI = topI + POLY_INFO.currentPoly - 1;
+  let topLeftI = topI + RENDER_INFO.currentPoly - 1;
   let topRightI = topI + 1;
 
   let bottomLeftI = bottomI + 1;

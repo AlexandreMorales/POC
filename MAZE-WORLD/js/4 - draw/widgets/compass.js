@@ -1,4 +1,4 @@
-import { POLY_INFO } from "../../1 - polygones/index.js";
+import { RENDER_INFO } from "../../1 - polygones/index.js";
 
 const drawContainer = document.getElementById("draw-container");
 const compass = document.getElementById("compass");
@@ -8,7 +8,7 @@ export const COMPASS_CONFIG = {
 };
 
 export const updateCompass = () => {
-  const angle = (360 / POLY_INFO.currentPoly) * POLY_INFO.rotationTurns;
+  const angle = (360 / RENDER_INFO.currentPoly) * RENDER_INFO.rotationTurns;
   compass.style.setProperty("--compass-rotate", `${-angle}deg`);
 };
 

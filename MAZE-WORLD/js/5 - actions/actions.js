@@ -4,8 +4,7 @@ import {
   getPosByIndex,
   KNOWN_POLYGONS_VALUES,
   MENU_CONFIG,
-  POLY_INFO,
-  POLYGONS_FAVICONS,
+  RENDER_INFO,
 } from "../1 - polygones/index.js";
 import {
   MOVEMENT,
@@ -24,7 +23,7 @@ import {
 } from "../2 - entities/index.js";
 import { getCenterCell } from "../3 - generation/index.js";
 import {
-  resetCanvasSize,
+  resetCanvas,
   drawEveryCell,
   resetRotateCanvas,
   rotateCanvas,
@@ -48,14 +47,14 @@ let canRotate = true;
 export const rotate = (orientation) => {
   if (canRotate) {
     canRotate = false;
-    POLY_INFO.rotationTurns = PLAYER_ENTITY.selectedCellIndex = getMod(
-      POLY_INFO.rotationTurns + orientation,
-      POLY_INFO.currentPoly
+    RENDER_INFO.rotationTurns = PLAYER_ENTITY.selectedCellIndex = getMod(
+      RENDER_INFO.rotationTurns + orientation,
+      RENDER_INFO.currentPoly
     );
 
     if (MENU_CONFIG.rotationAnimation) {
       rotateCanvas(
-        (360 / POLY_INFO.currentPoly) * -orientation,
+        (360 / RENDER_INFO.currentPoly) * -orientation,
         COMPASS_CONFIG.rotateDelay
       );
       rotateAudio.play();
@@ -82,7 +81,7 @@ const getNextCellIndexBasedOnCode = (code, useDiagonal) => {
 
   if (aIndex === undefined) return;
 
-  return getMod(aIndex, POLY_INFO.currentPoly);
+  return getMod(aIndex, RENDER_INFO.currentPoly);
 };
 
 let lastMovement = /** @type {symbol} */ (null);
@@ -150,13 +149,13 @@ export const changeSelectedOnCode = (direction, useDiagonal) => {
 };
 
 export const changePolySides = () => {
-  POLY_INFO.currentPoly =
+  RENDER_INFO.currentPoly =
     KNOWN_POLYGONS_VALUES[
-      (KNOWN_POLYGONS_VALUES.indexOf(POLY_INFO.currentPoly) + 1) %
+      (KNOWN_POLYGONS_VALUES.indexOf(RENDER_INFO.currentPoly) + 1) %
         KNOWN_POLYGONS_VALUES.length
     ];
 
-  POLY_INFO.rotationTurns = 0;
+  RENDER_INFO.rotationTurns = 0;
   PLAYER_ENTITY.selectedCellIndex = 0;
 
   updateCompass();
@@ -165,7 +164,7 @@ export const changePolySides = () => {
 };
 
 export const resetDirection = () => {
-  lastMovement = lastSelection = MOVEMENT.UP;
+  lastSelection = MOVEMENT.UP;
   updateEntityDirection(PLAYER_ENTITY, lastSelection);
 };
 
@@ -256,17 +255,12 @@ export const useBoat = () => {
   }
 };
 
-const link = /** @type {HTMLLinkElement} */ (
-  document.querySelector("link[rel~='icon']")
-);
 // Called when zooming, creation, set PolySides
 export const resetMap = () => {
   setEntitiesSize();
-  resetCanvasSize();
+  resetCanvas();
   moveCurrentCell(getCenterCell(), PLAYER_ENTITY.cell);
   drawEveryCell(PLAYER_ENTITY);
 
-  link.href = POLYGONS_FAVICONS[POLY_INFO.currentPoly];
-
-  updateWeather(lastMovement);
+  updateWeather();
 };

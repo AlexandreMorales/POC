@@ -7,11 +7,8 @@ const SELECT_OPTIONS = {
   mapGeneration: Object.entries(MAP_GENERATION),
 };
 
-const menuLabels = /** @type {HTMLLabelElement[]} */ ([
-  ...document.querySelectorAll("#menu label"),
-]);
-menuLabels.map((l) => {
-  const config = l.htmlFor;
+document.querySelectorAll("#menu label").forEach((l) => {
+  const config = /** @type {HTMLLabelElement} */ (l).htmlFor;
   const element = /** @type {HTMLInputElement | HTMLSelectElement} */ (
     document.getElementById(config)
   );

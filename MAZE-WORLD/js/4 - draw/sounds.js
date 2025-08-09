@@ -1,9 +1,10 @@
-import { MENU_CONFIG } from "../1 - polygones/index.js";
+import { getPolyInfo, MENU_CONFIG } from "../1 - polygones/index.js";
 import { TRACK_TYPES } from "../3 - generation/index.js";
 
 const AUDIO_DURATION = 13;
 const AUDIO_BUFFER = AUDIO_DURATION - 0.13;
 const audios = /** @type {{ [k: string]: HTMLAudioElement }} */ ({});
+
 Object.entries(TRACK_TYPES).forEach(([track, path]) => {
   const audio = new Audio(path);
   audio.volume = 0;
@@ -20,6 +21,7 @@ Object.entries(TRACK_TYPES).forEach(([track, path]) => {
     false
   );
 });
+const audiosList = Object.values(audios);
 
 const TRACK_LIST = Object.keys(TRACK_TYPES);
 
@@ -28,15 +30,13 @@ const TRACK_LIST = Object.keys(TRACK_TYPES);
  */
 export const updateTracks = (tracksCount) => {
   if (MENU_CONFIG.music) {
-    Object.values(audios).forEach((a) => a.play());
-    const max = Object.values(tracksCount).reduce(
-      (acc, v) => acc + (v || 0),
-      0
-    );
+    const polyInfo = getPolyInfo();
+    audiosList.forEach((a) => a.play());
+    const max = polyInfo.rows * polyInfo.columns;
     TRACK_LIST.forEach((track) => {
       audios[track].volume = (tracksCount[track] || 0) / max;
     });
   } else {
-    if (audios) Object.values(audios).forEach((a) => a.pause());
+    if (audios) audiosList.forEach((a) => a.pause());
   }
 };

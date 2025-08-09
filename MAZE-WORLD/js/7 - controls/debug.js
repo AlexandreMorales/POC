@@ -3,7 +3,7 @@ import {
   getPolyInfo,
   KNOWN_POLYGONS,
   MENU_CONFIG,
-  POLY_INFO,
+  RENDER_INFO,
 } from "../1 - polygones/index.js";
 import { PLAYER_ENTITY } from "../2 - entities/index.js";
 import { BLOCKS } from "../3 - generation/index.js";
@@ -13,7 +13,7 @@ import { placeBlock } from "../5 - actions/index.js";
 const canvasContainer = document.getElementById("canvas-container");
 
 canvasContainer.onclick = (e) => {
-  if (!MENU_CONFIG.debugMode || POLY_INFO.rotationTurns) return;
+  if (!MENU_CONFIG.debugMode || RENDER_INFO.rotationTurns) return;
   e = e || /** @type {Event} */ (window.event);
   const { left, top } = canvasContainer.getBoundingClientRect();
   let x = e.clientX - left;
@@ -78,10 +78,10 @@ const calcI = (y, ySide, shouldIntercalate, evenJ) => {
 const calculatePosBasedOnPoint = ({ x, y }) => {
   const { xSide, ySide, shouldIntercalate, polySide } = getPolyInfo();
 
-  let j = getJFn(POLY_INFO.currentPoly, polySide, xSide)(x);
-  j = Math.round(j + (POLY_INFO.jOffset || 0));
+  let j = getJFn(RENDER_INFO.currentPoly, polySide, xSide)(x);
+  j = Math.round(j + (RENDER_INFO.jOffset || 0));
   let i = calcI(y, ySide, shouldIntercalate, !!(j % 2));
-  i += POLY_INFO.iOffset || 0;
+  i += RENDER_INFO.iOffset || 0;
 
   return { i: Math.round(i), j: j };
 };

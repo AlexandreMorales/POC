@@ -4,7 +4,7 @@ import {
   KNOWN_POLYGONS,
   MAP_GENERATION,
   MENU_CONFIG,
-  POLY_INFO,
+  RENDER_INFO,
 } from "../1 - polygones/index.js";
 import { spawnEntity, ENTITY_INFO } from "../2 - entities/index.js";
 import { getPosDistance, tweakColor } from "../utils.js";
@@ -183,7 +183,7 @@ export const loadAndGetCell = (pos) => {
  */
 export const getCenterCell = () => {
   const { rows, columns } = getPolyInfo();
-  const { iOffset, jOffset } = POLY_INFO;
+  const { iOffset, jOffset } = RENDER_INFO;
   const i = Math.floor(rows / 2) + iOffset;
   const j = Math.floor(columns / 2) + jOffset;
   return loadAndGetCell({ i, j });

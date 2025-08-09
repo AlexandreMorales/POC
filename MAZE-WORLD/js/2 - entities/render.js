@@ -3,7 +3,7 @@ import {
   calculatePointBasedOnPos,
   getPolyInfo,
   getPosByIndex,
-  POLY_INFO,
+  RENDER_INFO,
 } from "../1 - polygones/index.js";
 import { isPointOutside } from "../utils.js";
 import { MOVEMENT } from "./configs.js";
@@ -101,8 +101,8 @@ const verifyEntityHeight = (entity) => {
 
   const downI =
     hasInverted && entity.cell.isInverted
-      ? POLY_INFO.rotationTurns
-      : POLY_INFO.rotationTurns + Math.floor(POLY_INFO.currentPoly / 2);
+      ? RENDER_INFO.rotationTurns
+      : RENDER_INFO.rotationTurns + Math.floor(RENDER_INFO.currentPoly / 2);
   const downPos = getPosByIndex(entity.cell, downI);
   const downCell = getCell(downPos);
 
@@ -117,7 +117,7 @@ const verifyEntityHeight = (entity) => {
   if (hasInverted && !entity.cell.isInverted) {
     const rightCell = downCell;
 
-    const leftI = POLY_INFO.rotationTurns + POLY_INFO.currentPoly - 1;
+    const leftI = RENDER_INFO.rotationTurns + RENDER_INFO.currentPoly - 1;
     const leftPos = getPosByIndex(entity.cell, leftI);
     const leftCell = getCell(leftPos);
 

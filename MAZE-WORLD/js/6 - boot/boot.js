@@ -1,5 +1,5 @@
 import { INITIAL_POS, resetGrid } from "../0 - grid/index.js";
-import { POLY_INFO, configPolys } from "../1 - polygones/index.js";
+import { RENDER_INFO, configPolys } from "../1 - polygones/index.js";
 import {
   addEntity,
   PLAYER_ENTITY,
@@ -32,7 +32,7 @@ export const start = () => {
 };
 
 export const resetSize = debounce((newSize) => {
-  POLY_INFO.cellHeight = newSize || POLY_INFO.cellHeight;
+  RENDER_INFO.cellHeight = newSize || RENDER_INFO.cellHeight;
   configPolys();
   resetBiomeMap();
   resetMap();

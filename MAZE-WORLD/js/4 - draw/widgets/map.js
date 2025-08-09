@@ -1,4 +1,4 @@
-import { POLY_INFO } from "../../1 - polygones/index.js";
+import { RENDER_INFO } from "../../1 - polygones/index.js";
 import { GENERATION_CONFIG, getBiomeMap } from "../../3 - generation/index.js";
 import { getFillStyle } from "../render.js";
 
@@ -28,7 +28,7 @@ export const resetBiomeMap = () => {
 };
 
 export const updateBiomeMap = () => {
-  const { iOffset, jOffset } = POLY_INFO;
+  const { iOffset, jOffset } = RENDER_INFO;
   const biomes = getBiomeMap();
 
   for (let i = -MAP_CONFIG.posRatio; i <= MAP_CONFIG.posRatio; i++) {

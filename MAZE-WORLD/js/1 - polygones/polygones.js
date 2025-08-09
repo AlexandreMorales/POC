@@ -1,8 +1,9 @@
-import { POLY_INFO, POLYS_INFO } from "./infos.js";
+import { RENDER_INFO } from "./infos.js";
 import { correctRoundError, getMod } from "../utils.js";
 import { KNOWN_POLYGONS, KNOWN_POLYGONS_VALUES } from "./configs.js";
 
-export const getPolyInfo = () => POLYS_INFO[POLY_INFO.currentPoly];
+const POLYS_INFO = /** @type {{ [k: number]: PolyInfoProp }} */ ({});
+export const getPolyInfo = () => POLYS_INFO[RENDER_INFO.currentPoly];
 
 /**
  * @param {Pos} pos
@@ -12,8 +13,8 @@ export const getPolyInfo = () => POLYS_INFO[POLY_INFO.currentPoly];
  */
 export const calculatePointBasedOnPos = ({ i, j }, isInverted, baseCell) => {
   const { calcX, calcY, ySide, shouldIntercalate } = getPolyInfo();
-  i -= POLY_INFO.iOffset || 0;
-  j -= POLY_INFO.jOffset || 0;
+  i -= RENDER_INFO.iOffset || 0;
+  j -= RENDER_INFO.jOffset || 0;
 
   let x = calcX(j);
   let y = calcY(i);
@@ -30,8 +31,8 @@ export const calculatePointBasedOnPos = ({ i, j }, isInverted, baseCell) => {
  * @returns {Pos}
  */
 export const getPosByIndex = (cell, index) =>
-  cell.adjacentPos[POLY_INFO.currentPoly][
-    getMod(index || 0, POLY_INFO.currentPoly)
+  cell.adjacentPos[RENDER_INFO.currentPoly][
+    getMod(index || 0, RENDER_INFO.currentPoly)
   ];
 
 /**
@@ -41,11 +42,11 @@ export const getPosByIndex = (cell, index) =>
  * @return {Point}
  */
 const applyRotation = ({ x, y }, isInverted, baseCell) => {
-  if (!POLY_INFO.rotationTurns) return { x, y };
+  if (!RENDER_INFO.rotationTurns) return { x, y };
 
   const { cx, cy, ySide, xSide, hasInverted } = getPolyInfo();
 
-  const angle = (360 / POLY_INFO.currentPoly) * POLY_INFO.rotationTurns;
+  const angle = (360 / RENDER_INFO.currentPoly) * RENDER_INFO.rotationTurns;
   const radians = (Math.PI / 180) * angle;
   const cos = Math.cos(radians);
   const sin = Math.sin(radians);
@@ -55,7 +56,7 @@ const applyRotation = ({ x, y }, isInverted, baseCell) => {
   let ny = correctRoundError(cos * (y - cy) - sin * (x - cx) + cy);
 
   if (hasInverted && isInverted !== baseCell?.isInverted && angle) {
-    const oddTurn = !!(POLY_INFO.rotationTurns % 2);
+    const oddTurn = !!(RENDER_INFO.rotationTurns % 2);
     ny += ySide * (baseCell?.isInverted ? 1 : -1);
     nx += (xSide / 2) * (baseCell?.isInverted === oddTurn ? -1 : 1);
   }
@@ -113,12 +114,12 @@ const configPoly = (polySides) => {
   let polySide = 0;
   const hasInverted = polySides % 2 === 1;
 
-  const ySide = correctRoundError(POLY_INFO.cellHeight / 2);
+  const ySide = correctRoundError(RENDER_INFO.cellHeight / 2);
 
   if (hasInverted) {
     // Pythagoras of (height² + (side/2)² = side²)
     polySide = correctRoundError(
-      Math.sqrt(POLY_INFO.cellHeight ** 2 / (1 - 1 / 4))
+      Math.sqrt(RENDER_INFO.cellHeight ** 2 / (1 - 1 / 4))
     );
     // (1/2)a cot(π/n);
     radiusFromSide = correctRoundError(
@@ -140,7 +141,7 @@ const configPoly = (polySides) => {
   const shouldIntercalate = polySides > KNOWN_POLYGONS.SQUARE;
 
   const yCoeficient = hasInverted
-    ? correctRoundError(-POLY_INFO.cellHeight / 6)
+    ? correctRoundError(-RENDER_INFO.cellHeight / 6)
     : 0;
   const coeficient = (polySides / 2 + 1) / 2;
   const points = [];
@@ -171,7 +172,7 @@ const configPoly = (polySides) => {
   );
 
   const { innerHeight, innerWidth } = window;
-  let rows = Math.floor(innerHeight / POLY_INFO.cellHeight);
+  let rows = Math.floor(innerHeight / RENDER_INFO.cellHeight);
   let columns = innerWidth / (xSide * 2);
   if (hasInverted) columns = ((innerWidth - 2) * 2 - polySide) / polySide;
   if (shouldIntercalate)

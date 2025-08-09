@@ -1,13 +1,63 @@
-import { getPolyInfo, MENU_CONFIG } from "../1 - polygones/index.js";
+import {
+  getPolyInfo,
+  MENU_CONFIG,
+  RENDER_INFO,
+  POLYGONS_FAVICONS,
+} from "../1 - polygones/index.js";
 import { ENTITY_INFO } from "../2 - entities/index.js";
 import { GENERATION_CONFIG } from "../3 - generation/index.js";
+import { DRAW_CONFIG } from "./config.js";
 
-const DRAW_CONFIG = {
+const RENDER_CONFIG = {
   selectedBorderColor: "white",
   borderColor: "black",
   emptyColor: "black",
   lineWidth: 1,
   wallDarkness: 0.5,
+};
+
+const drawContainer = document.getElementById("draw-container");
+const canvasContainer = document.getElementById("canvas-container");
+
+export const canvasLayers = /** @type {HTMLCanvasElement[]} */ ([]);
+export const contextsLayers = /** @type {CanvasRenderingContext2D[]} */ ([]);
+
+for (let i = 0; i < DRAW_CONFIG.maxLayer; i++) {
+  const canvas = document.createElement("canvas");
+  canvasContainer.appendChild(canvas);
+  canvasLayers.push(canvas);
+  contextsLayers.push(canvas.getContext("2d"));
+}
+
+/**
+ * @param {number} height
+ * @param {number} width
+ */
+export const setCanvasSize = (height, width) => {
+  drawContainer.style.setProperty("--canvas-height", `${height}px`);
+  canvasLayers.forEach((canvas) => (canvas.height = height));
+  drawContainer.style.setProperty("--canvas-width", `${width}px`);
+  canvasLayers.forEach((canvas) => (canvas.width = width));
+};
+
+export const setFavicon = () => {
+  const link = /** @type {HTMLLinkElement} */ (
+    document.querySelector("link[rel~='icon']")
+  );
+  link.href = POLYGONS_FAVICONS[RENDER_INFO.currentPoly];
+};
+
+export const updateConfigs = () => {
+  canvasContainer.classList[MENU_CONFIG.usePerspective ? "add" : "remove"](
+    "perspective"
+  );
+};
+
+/**
+ * @param {HTMLCanvasElement} canvas
+ */
+export const clearCanvas = (canvas) => {
+  canvas.width = getPolyInfo().canvasWidth;
 };
 
 /**
@@ -17,7 +67,7 @@ const DRAW_CONFIG = {
 export const drawWall = (wall, context) => {
   // Only draw if there is a gap, if is sorrounded by walls it doesnt need
   if (wall.borderMap.find((b) => !!b))
-    drawItem(context, wall, DRAW_CONFIG.wallDarkness);
+    drawItem(context, wall, RENDER_CONFIG.wallDarkness);
 };
 
 /**
@@ -28,9 +78,9 @@ export const drawWallTop = (wall, context) => {
   drawItem(context, wall.topInfo);
 
   context.strokeStyle = wall.isSelectedCell
-    ? DRAW_CONFIG.selectedBorderColor
-    : DRAW_CONFIG.borderColor;
-  context.lineWidth = DRAW_CONFIG.lineWidth;
+    ? RENDER_CONFIG.selectedBorderColor
+    : RENDER_CONFIG.borderColor;
+  context.lineWidth = RENDER_CONFIG.lineWidth;
   applyBorders(
     context,
     wall.topInfo.point,
@@ -51,16 +101,16 @@ export const drawItem = (
 ) => {
   context.fillStyle = color
     ? getFillStyle(color, shoulApplyDark, modifier)
-    : DRAW_CONFIG.emptyColor;
+    : RENDER_CONFIG.emptyColor;
 
   fillPolygon(context, point, points);
 
   if (MENU_CONFIG.showPos)
-    showPos(context, pos, point, isInverted, getPolyInfo());
+    showPos(context, pos, point, isInverted, getPolyInfo().ySide);
 
   if (isSelectedCell) {
-    context.strokeStyle = DRAW_CONFIG.selectedBorderColor;
-    context.lineWidth = DRAW_CONFIG.lineWidth;
+    context.strokeStyle = RENDER_CONFIG.selectedBorderColor;
+    context.lineWidth = RENDER_CONFIG.lineWidth;
     applyBorders(context, point, points);
   } else if (MENU_CONFIG.showChunks) showChunks(context, pos, point, points);
 };
@@ -119,17 +169,17 @@ const applyBorders = (context, { x, y }, points, map) => {
  * @param {Pos} pos
  * @param {Point} point
  * @param {boolean} isInverted
- * @param {PolyInfoProp} polyInfo
+ * @param {number} ySide
  */
-const showPos = (context, pos, point, isInverted, polyInfo) => {
+const showPos = (context, pos, point, isInverted, ySide) => {
   context.fillStyle = "black";
-  context.font = `bold ${polyInfo.ySide / 2}px Arial`;
+  context.font = `bold ${ySide / 2}px Arial`;
   context.textAlign = "center";
   context.textBaseline = "middle";
   context.fillText(
     `${pos.i},${pos.j}`,
     point.x,
-    isInverted ? point.y + polyInfo.ySide / 2 : point.y
+    isInverted ? point.y + ySide / 2 : point.y
   );
 };
 
@@ -144,8 +194,8 @@ const showChunks = (context, pos, point, points) => {
     pos.i % GENERATION_CONFIG.chunkSize === 0 ||
     pos.j % GENERATION_CONFIG.chunkSize === 0
   ) {
-    context.strokeStyle = DRAW_CONFIG.borderColor;
-    context.lineWidth = DRAW_CONFIG.lineWidth;
+    context.strokeStyle = RENDER_CONFIG.borderColor;
+    context.lineWidth = RENDER_CONFIG.lineWidth;
     applyBorders(context, point, points);
   }
 };

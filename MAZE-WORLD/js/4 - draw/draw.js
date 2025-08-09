@@ -3,62 +3,40 @@ import {
   calculatePointBasedOnPos,
   getPolyInfo,
   MENU_CONFIG,
-  POLY_INFO,
+  RENDER_INFO,
 } from "../1 - polygones/index.js";
 import { getSelectedCell, updateEntities } from "../2 - entities/index.js";
 import { loadAndGetCell } from "../3 - generation/index.js";
 import { debounce, getMod, isPointOutside, tweakColor } from "../utils.js";
+import { DRAW_CONFIG } from "./config.js";
 
-import { drawItem, drawWall, drawWallTop } from "./render.js";
+import {
+  canvasLayers,
+  contextsLayers,
+  drawItem,
+  drawWall,
+  drawWallTop,
+  clearCanvas,
+  setCanvasSize,
+  setFavicon,
+  updateConfigs,
+} from "./render.js";
 import { updateTracks } from "./sounds.js";
 import { updateWeather } from "./weather/index.js";
 import { updateBiomeMap, updateWidgets } from "./widgets/index.js";
 
 const CANVAS_CONFIG = {
   fluidSpeed: 500,
-  maxLayer: 2,
 };
 
-const drawContainer = document.getElementById("draw-container");
-const canvasContainer = document.getElementById("canvas-container");
-
-const canvasLayers = /** @type {HTMLCanvasElement[]} */ ([]);
-const contextsLayers = /** @type {CanvasRenderingContext2D[]} */ ([]);
-
-for (let i = 0; i < CANVAS_CONFIG.maxLayer; i++) {
-  const canvas = document.createElement("canvas");
-  canvasContainer.appendChild(canvas);
-  canvasLayers.push(canvas);
-  contextsLayers.push(canvas.getContext("2d"));
-}
-
-/**
- * @param {number} height
- * @param {number} width
- */
-const setCanvasSize = (height, width) => {
-  if (height) {
-    drawContainer.style.setProperty("--canvas-height", `${height}px`);
-    canvasLayers.forEach((canvas) => (canvas.height = height));
-  }
-  if (width) {
-    drawContainer.style.setProperty("--canvas-width", `${width}px`);
-    canvasLayers.forEach((canvas) => (canvas.width = width));
-  }
-};
-
-export const resetCanvasSize = () => {
+export const resetCanvas = () => {
   const polyInfo = getPolyInfo();
   setCanvasSize(polyInfo.canvasHeight, polyInfo.canvasWidth);
+  setFavicon();
 };
 
 export const updateCanvasCss = () => {
-  if (MENU_CONFIG.usePerspective) {
-    canvasContainer.classList.add("perspective");
-    return;
-  }
-
-  canvasContainer.classList.remove("perspective");
+  updateConfigs();
   updateWeather();
   updateWidgets();
 };
@@ -89,10 +67,10 @@ export const drawEveryCell = (baseEntity) => {
   const size = rows + columns;
 
   for (let i = -columns; i < size; i++) {
-    const baseI = i + POLY_INFO.iOffset;
+    const baseI = i + RENDER_INFO.iOffset;
     for (let j = -rows; j < size; j++) {
       let nI = baseI;
-      const nJ = j + POLY_INFO.jOffset;
+      const nJ = j + RENDER_INFO.jOffset;
       const pos = { i: nI, j: nJ };
 
       if (shouldIntercalate && offsetCell && nJ % 2 === 0) nI = nI + 1;
@@ -110,10 +88,9 @@ export const drawEveryCell = (baseEntity) => {
 
 let wallLayers = /** @type {Wall[][]} */ ([]);
 const drawWalls = () => {
-  for (let i = 1; i < CANVAS_CONFIG.maxLayer; i++) {
+  for (let i = 1; i < DRAW_CONFIG.maxLayer; i++) {
     const walls = wallLayers[i];
-    // reset canvas
-    canvasLayers[i].width = getPolyInfo().canvasWidth;
+    clearCanvas(canvasLayers[i]);
     if (!walls) continue;
     walls.forEach((w) => drawWall(w, contextsLayers[i]));
     walls.forEach((w) => drawWallTop(w, contextsLayers[i]));
@@ -153,7 +130,7 @@ const drawCell = (cell, context, baseEntity) => {
     return;
 
   const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;
-  const aCells = cell.adjacentPos[POLY_INFO.currentPoly].map(getCell);
+  const aCells = cell.adjacentPos[RENDER_INFO.currentPoly].map(getCell);
   const shoulApplyDark =
     cell !== baseEntity.cell && aCells.every((c) => c !== baseEntity.cell);
   const isSelectedCell =
@@ -188,9 +165,9 @@ const drawCell = (cell, context, baseEntity) => {
         points,
       },
       borderMap: aCells.reduce((acc, c, i) => {
-        let index = i - POLY_INFO.rotationTurns;
-        if (shouldOffset) index = POLY_INFO.currentPoly - 1 - index;
-        acc[getMod(index, POLY_INFO.currentPoly)] = !c?.wall;
+        let index = i - RENDER_INFO.rotationTurns;
+        if (shouldOffset) index = RENDER_INFO.currentPoly - 1 - index;
+        acc[getMod(index, RENDER_INFO.currentPoly)] = !c?.wall;
         return acc;
       }, []),
     });

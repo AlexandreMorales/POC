@@ -37,3 +37,12 @@
  * @property {boolean} shouldIntercalate If the polygon should intercalate (up and down)
  * @property {boolean} hasInverted If the polygon has inverted positions
  */
+
+/**
+ * @typedef {Object} RenderInfo
+ * @property {number} currentPoly The number of sides of the current polygon
+ * @property {number} cellHeight
+ * @property {number} iOffset
+ * @property {number} jOffset
+ * @property {number} rotationTurns
+ */

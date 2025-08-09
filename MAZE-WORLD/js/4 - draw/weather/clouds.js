@@ -1,7 +1,7 @@
 import {
   KNOWN_POLYGONS,
   MENU_CONFIG,
-  POLY_INFO,
+  RENDER_INFO,
 } from "../../1 - polygones/index.js";
 import { MOVEMENT } from "../../2 - entities/configs.js";
 import { correctRoundError, getMod, getRandomFloat } from "../../utils.js";
@@ -47,7 +47,7 @@ export const updateClouds = (direction) => {
 };
 
 const setCloudShape = () => {
-  const { currentPoly, cellHeight } = POLY_INFO;
+  const { currentPoly, cellHeight } = RENDER_INFO;
   const size = Math.min(
     cellHeight * 4,
     cloudsContainer.offsetWidth /

@@ -1,4 +1,4 @@
-import { POLY_INFO, MENU_CONFIG } from "../../1 - polygones/index.js";
+import { RENDER_INFO, MENU_CONFIG } from "../../1 - polygones/index.js";
 import { getRandomFloat } from "../../utils.js";
 
 const rainContainer = document.getElementById("rain-container");
@@ -14,7 +14,7 @@ export const updateRain = () => {
   if (MENU_CONFIG.rain) {
     rainAudio.play();
     rainContainer.classList.remove("hide");
-    const size = POLY_INFO.cellHeight * 10;
+    const size = RENDER_INFO.cellHeight * 10;
     rainContainer.style.setProperty("--rain-size", `${size}px`);
     createLightining();
   } else {

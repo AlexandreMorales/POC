@@ -23,6 +23,7 @@ export const addEntity = (entity) => ENTITIES.add(entity);
  * @param {Cell} cell
  */
 export const moveEntityToCell = (entity, cell) => {
+  if (!cell) return;
   const previousType = entity.cell?.entityType || cell.entityType;
   if (entity.cell) entity.cell.entityType = null;
   entity.cell = cell;

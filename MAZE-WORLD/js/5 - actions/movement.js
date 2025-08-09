@@ -1,4 +1,4 @@
-import { MENU_CONFIG, POLY_INFO } from "../1 - polygones/index.js";
+import { MENU_CONFIG, RENDER_INFO } from "../1 - polygones/index.js";
 import {
   cellIsBlocked,
   killEntitiesByTimeOfDay,
@@ -26,8 +26,8 @@ const getCleanPos = (pos) => ({ i: pos?.i || 0, j: pos?.j || 0 });
 export const moveCurrentCell = (oldCell, nextCell) => {
   const oldPos = getCleanPos(oldCell?.pos);
   const nextPos = getCleanPos(nextCell?.pos);
-  POLY_INFO.iOffset += nextPos.i - oldPos.i;
-  POLY_INFO.jOffset += nextPos.j - oldPos.j;
+  RENDER_INFO.iOffset += nextPos.i - oldPos.i;
+  RENDER_INFO.jOffset += nextPos.j - oldPos.j;
   moveEntityToCell(PLAYER_ENTITY, nextCell);
 };
 

@@ -1,4 +1,4 @@
-import { POLY_INFO } from "../1 - polygones/index.js";
+import { RENDER_INFO } from "../1 - polygones/index.js";
 import { MOVEMENT } from "../2 - entities/index.js";
 import {
   changePolySides,
@@ -57,7 +57,7 @@ document.onkeyup = () => {
 const heightSlider = /** @type {HTMLInputElement} */ (
   document.getElementById("zoom")
 );
-heightSlider.value = `${POLY_INFO.cellHeight}`;
+heightSlider.value = `${RENDER_INFO.cellHeight}`;
 heightSlider.min = `${CONTROLS_CONFIG.minZoom}`;
 heightSlider.max = `${CONTROLS_CONFIG.maxZoom}`;
 heightSlider.oninput = () => {
