@@ -22,8 +22,10 @@ import {
   updateConfigs,
 } from "./render.js";
 import { updateTracks } from "./sounds.js";
+import { updateBiomeMap } from "./toolbar/index.js";
+import { blockToWall } from "./utils.js";
 import { updateWeather } from "./weather/index.js";
-import { updateBiomeMap, updateWidgets } from "./widgets/index.js";
+import { updateWidgets } from "./widgets/index.js";
 
 const CANVAS_CONFIG = {
   fluidSpeed: 500,
@@ -139,38 +141,27 @@ const drawCell = (cell, context, baseEntity) => {
   addToTrackCount(cell.wall?.block || cell.block);
 
   if (cell.wall) {
-    const wallPoints = isInverted
-      ? polyInfo.wallInvertedPoints
-      : polyInfo.wallPoints;
     const wallLayer = cell.layer + 1;
 
     const shouldOffset = polyInfo.hasInverted && !cell.isInverted;
 
     if (!wallLayers[wallLayer]) wallLayers[wallLayer] = [];
-    const commonInfos = {
-      shoulApplyDark,
-      color: cell.wall.color,
-      pos: cell.pos,
-      isInverted,
-      isSelectedCell,
-    };
 
-    wallLayers[wallLayer].push({
-      ...commonInfos,
-      point: { x: point.x, y: point.y - polyInfo.ySide * cell.layer },
-      points: wallPoints,
-      topInfo: {
-        ...commonInfos,
-        point: { x: point.x, y: point.y - polyInfo.ySide * wallLayer },
-        points,
-      },
-      borderMap: aCells.reduce((acc, c, i) => {
-        let index = i - RENDER_INFO.rotationTurns;
-        if (shouldOffset) index = RENDER_INFO.currentPoly - 1 - index;
-        acc[getMod(index, RENDER_INFO.currentPoly)] = !c?.wall;
-        return acc;
-      }, []),
-    });
+    wallLayers[wallLayer].push(
+      blockToWall(cell.wall, point, {
+        layer: cell.layer,
+        isInverted,
+        shoulApplyDark,
+        isSelectedCell,
+        pos: cell.pos,
+        borderMap: aCells.reduce((acc, c, i) => {
+          let index = i - RENDER_INFO.rotationTurns;
+          if (shouldOffset) index = RENDER_INFO.currentPoly - 1 - index;
+          acc[getMod(index, RENDER_INFO.currentPoly)] = !c?.wall;
+          return acc;
+        }, []),
+      })
+    );
 
     return;
   }

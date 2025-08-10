@@ -30,6 +30,7 @@ import {
   updateWeather,
   updateCompass,
   COMPASS_CONFIG,
+  addBlockToToolbar,
 } from "../4 - draw/index.js";
 import { getMod } from "../utils.js";
 
@@ -148,12 +149,17 @@ export const changeSelectedOnCode = (direction, useDiagonal) => {
   updateEntityDirection(PLAYER_ENTITY, lastSelection);
 };
 
+const getNextBlockToPlace = () =>
+  PLAYER_ENTITY.pickedCells[PLAYER_ENTITY.pickedCells.length - 1];
+
+export const getNextPolygon = () =>
+  KNOWN_POLYGONS_VALUES[
+    (KNOWN_POLYGONS_VALUES.indexOf(RENDER_INFO.currentPoly) + 1) %
+      KNOWN_POLYGONS_VALUES.length
+  ];
+
 export const changePolySides = () => {
-  RENDER_INFO.currentPoly =
-    KNOWN_POLYGONS_VALUES[
-      (KNOWN_POLYGONS_VALUES.indexOf(RENDER_INFO.currentPoly) + 1) %
-        KNOWN_POLYGONS_VALUES.length
-    ];
+  RENDER_INFO.currentPoly = getNextPolygon();
 
   RENDER_INFO.rotationTurns = 0;
   PLAYER_ENTITY.selectedCellIndex = 0;
@@ -161,6 +167,7 @@ export const changePolySides = () => {
   updateCompass();
   resetDirection();
   resetMap();
+  addBlockToToolbar(getNextBlockToPlace());
 };
 
 export const resetDirection = () => {
@@ -188,7 +195,9 @@ export const dig = () => {
 
   if (selectedCell.block.isFluid) return;
 
-  PLAYER_ENTITY.pickedCells.push({ ...(selectedCell.wall || selectedCell) });
+  const pickedBlock = { ...(selectedCell.wall || selectedCell) };
+  PLAYER_ENTITY.pickedCells.push(pickedBlock);
+  addBlockToToolbar(pickedBlock);
 
   digAudio.play();
   if (selectedCell.wall) {
@@ -225,6 +234,7 @@ export const placeBlock = (cell, block, color) => {
     const cellBlock = PLAYER_ENTITY.pickedCells.pop();
     block = cellBlock.block;
     color = cellBlock.color;
+    addBlockToToolbar(getNextBlockToPlace());
   }
 
   if (cell.block && !cell.block.isFluid) {

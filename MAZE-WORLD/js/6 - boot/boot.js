@@ -6,7 +6,7 @@ import {
   removeGeneratedEntities,
 } from "../2 - entities/index.js";
 import { loadAndGetCell, resetBiomes } from "../3 - generation/index.js";
-import { resetBiomeMap, updateCanvasCss } from "../4 - draw/index.js";
+import { resetToolbar, updateCanvasCss } from "../4 - draw/index.js";
 import {
   findAccessibleCell,
   resetDirection,
@@ -27,13 +27,13 @@ export const start = () => {
     loadAndGetCell(INITIAL_POS),
     PLAYER_ENTITY
   );
-  resetBiomeMap();
+  resetToolbar();
   resetMap();
 };
 
 export const resetSize = debounce((newSize) => {
   RENDER_INFO.cellHeight = newSize || RENDER_INFO.cellHeight;
   configPolys();
-  resetBiomeMap();
+  resetToolbar();
   resetMap();
 });

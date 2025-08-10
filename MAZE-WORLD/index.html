@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no" />
     <title>Poolingnos</title>
-    <link rel="icon" type="image/x-icon" href="images/favicons/default.ico" />
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico" />
     <link rel="stylesheet" href="css/index.css" />
   </head>
   <body>
@@ -107,19 +107,10 @@
             <p><bold>Arrows</bold> - Walk</p>
           </li>
           <li>
-            <p><bold>Q</bold> - Rotate Left</p>
+            <p><bold>1, 2, 3, 4</bold> - Dig, Place, Boat, Map</p>
           </li>
           <li>
-            <p><bold>E</bold> - Rotate Right</p>
-          </li>
-          <li>
-            <p><bold>R</bold> - Dig</p>
-          </li>
-          <li>
-            <p><bold>F</bold> - Place</p>
-          </li>
-          <li>
-            <p><bold>B</bold> - Place/Enter/Leave Boat</p>
+            <p><bold>F</bold> - Use Item</p>
           </li>
           <li>
             <p><bold>Shift</bold> - Change Polygon</p>
@@ -196,19 +187,35 @@
         <p id="compass-south" class="compass-letter">S</p>
         <div id="compass-arrow"></div>
       </div>
-      <div id="map-container" class="widgets-item">
+    </div>
+    <div id="toolbar">
+      <div id="toolbar-dig" class="toolbar-selected">
+        <p class="hide-mobile">1</p>
+        <img src="images/tools/picaxe.png" />
+      </div>
+      <div id="toolbar-place">
+        <p class="hide-mobile">2</p>
+        <canvas id="place-canvas"></canvas>
+      </div>
+      <div id="toolbar-boat">
+        <p class="hide-mobile">3</p>
+        <img src="images/boat/left.png" />
+      </div>
+      <div id="toolbar-map">
+        <p class="hide-mobile">4</p>
         <canvas id="map-canvas"></canvas>
       </div>
     </div>
     <div id="mobile-hud">
       <div id="selection-stick-left" class="selection-stick"></div>
       <div id="selection-stick-right" class="selection-stick"></div>
-      <button type="button" id="change-poly">Change Polygon</button>
-      <button type="button" id="use-boat">Use Boat</button>
-      <button type="button" id="dig">Dig</button>
-      <button type="button" id="place">Place</button>
-      <button type="button" id="rotate-left">Rotate L</button>
-      <button type="button" id="rotate-right">Rotate R</button>
+      <img id="rotate-left" src="images/tools/rotate_left.png" />
+      <div id="change-poly">
+        <img id="current-poly" />
+        <div class="long-arrow-right"></div>
+        <img id="next-poly" />
+      </div>
+      <img id="rotate-right" src="images/tools/rotate_right.png" />
     </div>
   </body>
   <script type="module" src="js/start.js"></script>

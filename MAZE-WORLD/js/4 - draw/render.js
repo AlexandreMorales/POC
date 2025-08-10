@@ -2,7 +2,7 @@ import {
   getPolyInfo,
   MENU_CONFIG,
   RENDER_INFO,
-  POLYGONS_FAVICONS,
+  POLYGONS_IMAGES,
 } from "../1 - polygones/index.js";
 import { ENTITY_INFO } from "../2 - entities/index.js";
 import { GENERATION_CONFIG } from "../3 - generation/index.js";
@@ -44,7 +44,7 @@ export const setFavicon = () => {
   const link = /** @type {HTMLLinkElement} */ (
     document.querySelector("link[rel~='icon']")
   );
-  link.href = POLYGONS_FAVICONS[RENDER_INFO.currentPoly];
+  link.href = POLYGONS_IMAGES[RENDER_INFO.currentPoly];
 };
 
 export const updateConfigs = () => {
@@ -57,7 +57,7 @@ export const updateConfigs = () => {
  * @param {HTMLCanvasElement} canvas
  */
 export const clearCanvas = (canvas) => {
-  canvas.width = getPolyInfo().canvasWidth;
+  canvas.width = canvas.width;
 };
 
 /**
@@ -66,7 +66,7 @@ export const clearCanvas = (canvas) => {
  */
 export const drawWall = (wall, context) => {
   // Only draw if there is a gap, if is sorrounded by walls it doesnt need
-  if (wall.borderMap.find((b) => !!b))
+  if (!wall.borderMap || wall.borderMap.find((b) => !!b))
     drawItem(context, wall, RENDER_CONFIG.wallDarkness);
 };
 
@@ -105,23 +105,28 @@ export const drawItem = (
 
   fillPolygon(context, point, points);
 
-  if (MENU_CONFIG.showPos)
+  if (MENU_CONFIG.showPos && pos)
     showPos(context, pos, point, isInverted, getPolyInfo().ySide);
 
   if (isSelectedCell) {
     context.strokeStyle = RENDER_CONFIG.selectedBorderColor;
     context.lineWidth = RENDER_CONFIG.lineWidth;
     applyBorders(context, point, points);
-  } else if (MENU_CONFIG.showChunks) showChunks(context, pos, point, points);
+  } else if (MENU_CONFIG.showChunks && pos)
+    showChunks(context, pos, point, points);
 };
 
 /**
  * @param {Color} color
- * @param {boolean} shoulApplyDark
- * @param {number} modifier
+ * @param {boolean} [shoulApplyDark]
+ * @param {number} [modifier]
  * @return {string}
  */
-export const getFillStyle = ({ r, g, b }, shoulApplyDark, modifier = 1) => {
+export const getFillStyle = (
+  { r, g, b },
+  shoulApplyDark = false,
+  modifier = 1
+) => {
   if (ENTITY_INFO.timeOfDay && shoulApplyDark)
     modifier = (1 - ENTITY_INFO.timeOfDay / 100) * modifier;
 

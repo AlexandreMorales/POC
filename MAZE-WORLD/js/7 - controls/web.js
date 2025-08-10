@@ -1,5 +1,6 @@
 import { RENDER_INFO } from "../1 - polygones/index.js";
 import { MOVEMENT } from "../2 - entities/index.js";
+import { toggleFullMap } from "../4 - draw/index.js";
 import {
   changePolySides,
   changeSelectedOnCode,
@@ -27,6 +28,13 @@ const ARROW_MOVEMENT_MAP = {
   ["ArrowDown"]: MOVEMENT.DOWN,
   ["ArrowRight"]: MOVEMENT.RIGHT,
 };
+const TOOLBAR_ACTIONS = [
+  undefined,
+  document.getElementById("toolbar-dig"),
+  document.getElementById("toolbar-place"),
+  document.getElementById("toolbar-boat"),
+  document.getElementById("toolbar-map"),
+];
 const MOVEMENT_KEYS = Object.keys(KEY_MOVEMENT_MAP);
 
 document.onkeydown = (e) => {
@@ -35,19 +43,22 @@ document.onkeydown = (e) => {
   if (e.code.startsWith("Arrow"))
     return moveBaseOnCode(ARROW_MOVEMENT_MAP[e.code]);
 
+  if (e.code.startsWith("Digit"))
+    return updateToolbarSelected(+e.code.replace("Digit", ""));
+
   if (MOVEMENT_KEYS.includes(e.code))
     return changeSelectedOnCode(KEY_MOVEMENT_MAP[e.code]);
 
   if (e.code === "KeyQ") return rotate(-1);
   if (e.code === "KeyE") return rotate(1);
 
-  if (e.code === "KeyR") return dig();
-  if (e.code === "KeyF") return place();
-  if (e.code === "KeyB") return useBoat();
+  if (e.code === "KeyF") return TOOLBAR_ACTIONS[selectedIndex].click();
 
   if (e.code.includes("Shift")) return changePolySides();
 
   if (e.code === "Space") return move();
+
+  if (e.code === "Escape") return toggleFullMap(false);
 };
 
 document.onkeyup = () => {
@@ -63,4 +74,26 @@ heightSlider.max = `${CONTROLS_CONFIG.maxZoom}`;
 heightSlider.oninput = () => {
   resetSize(+heightSlider.value);
   heightSlider.blur();
+};
+
+let selectedIndex = 1;
+/**
+ * @param {number} keyIndex
+ */
+const updateToolbarSelected = (keyIndex) => {
+  const element = TOOLBAR_ACTIONS[keyIndex];
+  if (!element) return;
+  TOOLBAR_ACTIONS[selectedIndex].classList.remove("toolbar-selected");
+  selectedIndex = keyIndex;
+  element.classList.add("toolbar-selected");
+};
+
+TOOLBAR_ACTIONS[1].onclick = () => dig();
+TOOLBAR_ACTIONS[2].onclick = () => place();
+TOOLBAR_ACTIONS[3].onclick = () => useBoat();
+TOOLBAR_ACTIONS[4].onclick = () => toggleFullMap();
+
+document.onwheel = (e) => {
+  e = e || /** @type {WheelEvent} */ (window.event);
+  updateToolbarSelected(e.deltaY < 0 ? selectedIndex - 1 : selectedIndex + 1);
 };
