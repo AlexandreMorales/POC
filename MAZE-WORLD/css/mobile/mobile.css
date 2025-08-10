@@ -11,46 +11,65 @@
   margin: 0 var(--mobile-margin);
   width: calc(100vw - (var(--mobile-margin) * 2));
 }
-#mobile-hud button {
-  background-color: var(--action-color);
-  border-radius: var(--action-border-radius);
-  padding: 12px;
-  font-size: 12px;
-
+#mobile-hud > * {
   position: absolute;
+  user-select: none;
 }
 
-#rotate-left {
-  bottom: 0;
-  left: 0;
-}
-#rotate-right {
-  bottom: 0;
-  right: 0;
-}
-#dig {
-  bottom: 50px;
-  left: 0;
-}
-#place {
-  bottom: 50px;
-  right: 0;
-}
-#change-poly {
-  bottom: 100px;
-  left: 0;
-}
-#use-boat {
-  bottom: 100px;
-  right: 0;
-}
 #selection-stick-left {
-  bottom: 150px;
+  bottom: 25vh;
   left: 0;
 }
 #selection-stick-right {
-  bottom: 150px;
+  bottom: 25vh;
   right: 0;
+}
+
+#mobile-hud > img {
+  bottom: 0;
+  width: 46px;
+  height: 46px;
+  transition: bottom 50ms ease-out;
+}
+#mobile-hud > img:active {
+  bottom: -16px;
+}
+
+#rotate-left {
+  left: 0;
+}
+#rotate-right {
+  right: 0;
+}
+
+#change-poly {
+  bottom: 10px;
+  left: 50%;
+  transform: translate(-50%);
+  display: flex;
+  background-color: #c6c6c6;
+  padding: max(0.75vw, 10px);
+  border-radius: var(--action-border-radius);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#change-poly > img {
+  width: 16px;
+  height: 16px;
+}
+#change-poly > img:not(:first-child) {
+  margin-left: 5px;
+}
+
+.long-arrow-right {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid #000;
+  border-left: 2px solid #000;
+  transform: rotate(135deg);
 }
 
 @media (max-width: 768px) {
@@ -61,6 +80,10 @@
   #mobile-hud {
     display: block;
   }
+
+  #toolbar > * {
+    border: none !important;
+  }
 }
 
 @media (max-height: 768px) {
@@ -70,5 +93,9 @@
 
   #mobile-hud {
     display: block;
+  }
+
+  #toolbar > * {
+    border: none !important;
   }
 }

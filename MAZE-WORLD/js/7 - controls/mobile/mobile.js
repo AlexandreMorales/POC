@@ -1,10 +1,8 @@
-import { RENDER_INFO } from "../../1 - polygones/index.js";
+import { POLYGONS_IMAGES, RENDER_INFO } from "../../1 - polygones/index.js";
 import {
   changePolySides,
-  dig,
-  place,
+  getNextPolygon,
   rotate,
-  useBoat,
 } from "../../5 - actions/index.js";
 import { resetSize } from "../../6 - boot/index.js";
 
@@ -59,9 +57,21 @@ canvasContainer.ontouchend = () => {
   zoomDist = 0;
 };
 
-document.getElementById("change-poly").onclick = changePolySides;
-document.getElementById("use-boat").onclick = useBoat;
-document.getElementById("dig").onclick = dig;
-document.getElementById("place").onclick = place;
+document.getElementById("change-poly").onclick = () => {
+  changePolySides();
+  updatePolyImages();
+};
 document.getElementById("rotate-left").onclick = () => rotate(-1);
 document.getElementById("rotate-right").onclick = () => rotate(1);
+
+const currentPoly = /** @type {HTMLImageElement} */ (
+  document.getElementById("current-poly")
+);
+const nextPoly = /** @type {HTMLImageElement} */ (
+  document.getElementById("next-poly")
+);
+const updatePolyImages = () => {
+  currentPoly.src = POLYGONS_IMAGES[RENDER_INFO.currentPoly];
+  nextPoly.src = POLYGONS_IMAGES[getNextPolygon()];
+};
+updatePolyImages();
