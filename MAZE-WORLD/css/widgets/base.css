@@ -5,8 +5,8 @@
 #widgets {
   display: block;
   position: fixed;
-  top: var(--menu-position);
-  right: var(--menu-position);
+  top: var(--menu-position-top);
+  right: var(--menu-position-left);
 
   z-index: calc(var(--player-z-index) + 2);
 

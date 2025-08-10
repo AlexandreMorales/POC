@@ -7,7 +7,8 @@
   --background-color-black: #232323;
   --active-color: #6e79d6;
 
-  --menu-position: 5vh;
+  --menu-position-top: 2vh;
+  --menu-position-left: 2vw;
 }
 
 * {
