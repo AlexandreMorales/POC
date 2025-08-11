@@ -18,6 +18,6 @@
 }
 
 .widgets-item {
-  border: calc(var(--widget-size) * 0.05) var(--background-color-border) solid;
+  border: calc(var(--widget-size) * 0.05) var(--background-color-black) solid;
   margin-bottom: 10%;
 }

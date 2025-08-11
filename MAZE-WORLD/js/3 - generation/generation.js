@@ -96,14 +96,16 @@ const createCell = (pos, block) => {
  * @param {boolean} onMove
  */
 const createEntitiesForCell = (cell, onMove = false) => {
-  if (cell.block.spawnableEntities)
-    cell.block.spawnableEntities.forEach((sEntity) => {
-      const canSpawn = onMove ? sEntity.spawnOnMove : !sEntity.spawnOnMove;
-      let probability = sEntity.probability;
-      if (sEntity.increaseWithTime) probability *= ENTITY_INFO.timeOfDay / 2;
-      if (canSpawn && Math.random() < probability)
-        spawnEntity(sEntity.entityType, cell);
-    });
+  if (!cell.block.spawnableEntities?.length) return;
+  for (const sEntity of cell.block.spawnableEntities) {
+    const canSpawn = onMove ? sEntity.spawnOnMove : !sEntity.spawnOnMove;
+    let probability = sEntity.probability;
+    if (sEntity.increaseWithTime) probability *= ENTITY_INFO.timeOfDay / 2;
+    if (canSpawn && Math.random() < probability) {
+      spawnEntity(sEntity.entityType, cell);
+      return;
+    }
+  }
 };
 
 /**

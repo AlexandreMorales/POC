@@ -48,5 +48,5 @@
   transform: rotate(var(--rotate-deg));
 }
 #draw-container.zoom-in {
-  scale: 3;
+  scale: 2.5;
 }

@@ -1,12 +1,12 @@
 #toolbar {
   position: absolute;
-  bottom: 15vh;
+  bottom: 7vh;
   left: 50%;
   transform: translate(-50%);
   z-index: calc(var(--player-z-index) + 2);
 
   display: flex;
-  background-color: #c6c6c6;
+  background-color: var(--background-color);
   padding: max(0.75vw, 10px);
   border-radius: var(--action-border-radius);
 }
