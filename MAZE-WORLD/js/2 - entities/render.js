@@ -5,8 +5,9 @@ import {
   getPosByIndex,
   RENDER_INFO,
 } from "../1 - polygones/index.js";
-import { isPointOutside } from "../utils.js";
-import { MOVEMENT } from "./configs.js";
+
+import { isPointOutside } from "../_utils.js";
+import { MOVEMENT } from "./_configs.js";
 import { PLAYER_ENTITY } from "./entities/player.js";
 
 const CUT_MOVEMENTS_MAP = {

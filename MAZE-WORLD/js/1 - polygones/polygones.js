@@ -1,6 +1,7 @@
-import { RENDER_INFO } from "./infos.js";
-import { correctRoundError, getMod } from "../utils.js";
-import { KNOWN_POLYGONS, KNOWN_POLYGONS_VALUES } from "./configs.js";
+import { correctRoundError, getMod } from "../_utils.js";
+
+import { RENDER_INFO } from "./_infos.js";
+import { KNOWN_POLYGONS, KNOWN_POLYGONS_VALUES } from "./_configs.js";
 
 const POLYS_INFO = /** @type {{ [k: number]: PolyInfoProp }} */ ({});
 export const getPolyInfo = () => POLYS_INFO[RENDER_INFO.currentPoly];
@@ -172,14 +173,13 @@ const configPoly = (polySides) => {
   );
 
   const { innerHeight, innerWidth } = window;
-  let rows = Math.floor(innerHeight / RENDER_INFO.cellHeight);
+  const rows = Math.floor(innerHeight / RENDER_INFO.cellHeight);
   let columns = innerWidth / (xSide * 2);
   if (hasInverted) columns = ((innerWidth - 2) * 2 - polySide) / polySide;
   if (shouldIntercalate)
     columns = ((innerWidth - slopSide) * 2) / (radiusFromCorner * 2 + polySide);
   columns = Math.floor(columns);
 
-  if (rows % 2 === 0) rows -= 1;
   if (columns % 2 === 0) columns -= 1;
   // When itercalating the first and last column should be an up column
   if (shouldIntercalate && ((columns + 1) / 2) % 2 === 0) columns -= 2;

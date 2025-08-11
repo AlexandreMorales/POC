@@ -1,4 +1,4 @@
-import { KNOWN_POLYGONS } from "./configs.js";
+import { KNOWN_POLYGONS } from "./_configs.js";
 
 export const RENDER_INFO = /** @type {RenderInfo} */ ({
   currentPoly: KNOWN_POLYGONS.HEXAGON,

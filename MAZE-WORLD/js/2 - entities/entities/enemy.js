@@ -1,6 +1,6 @@
-import { ENTITY_TYPES, MOVEMENT } from "../configs.js";
+import { ENTITY_TYPES, MOVEMENT } from "../_configs.js";
+import { ENTITY_INFO } from "../_infos.js";
 import { createEntity } from "../entities.js";
-import { ENTITY_INFO } from "../infos.js";
 import { getInBoat } from "./boat.js";
 
 const ENEMY_IMG_MAP = /** @type {ImageMap} */ ({

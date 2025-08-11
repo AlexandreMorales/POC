@@ -1,5 +1,5 @@
-import { GENERATION_CONFIG } from "./configs.js";
-import { getChunkStart } from "./utils.js";
+import { GENERATION_CONFIG } from "./_configs.js";
+import { getChunkStart } from "./_utils.js";
 
 export const VECTORS = {
   BIOME: Symbol("BIOME"),

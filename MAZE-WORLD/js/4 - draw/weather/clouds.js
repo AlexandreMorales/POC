@@ -3,8 +3,8 @@ import {
   MENU_CONFIG,
   RENDER_INFO,
 } from "../../1 - polygones/index.js";
-import { MOVEMENT } from "../../2 - entities/configs.js";
-import { correctRoundError, getMod, getRandomFloat } from "../../utils.js";
+import { MOVEMENT } from "../../2 - entities/_configs.js";
+import { correctRoundError, getMod, getRandomFloat } from "../../_utils.js";
 
 const CLOUDS_CONFIG = {
   num: 4,

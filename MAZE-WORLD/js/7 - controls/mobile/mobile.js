@@ -7,7 +7,7 @@ import {
 } from "../../5 - actions/index.js";
 import { resetSize } from "../../6 - boot/index.js";
 
-import { CONTROLS_CONFIG } from "../configs.js";
+import { CONTROLS_CONFIG } from "../_configs.js";
 
 let zoomDist = 0;
 

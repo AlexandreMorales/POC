@@ -1,7 +1,7 @@
 import { getCell } from "../0 - grid/index.js";
 import { MENU_CONFIG, getPosByIndex } from "../1 - polygones/index.js";
 
-import { ENTITY_TYPES, MOVEMENT } from "./configs.js";
+import { ENTITY_TYPES, MOVEMENT } from "./_configs.js";
 import {
   createEntityImage,
   cutEntityImage,

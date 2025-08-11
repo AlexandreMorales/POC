@@ -1,4 +1,4 @@
-import { ENTITY_TYPES, MOVEMENT } from "../configs.js";
+import { ENTITY_TYPES, MOVEMENT } from "../_configs.js";
 
 const MOVEMENT_IMG_MAP = /** @type {ImageMap} */ ({
   [MOVEMENT.UP]: "images/player/up.png",
@@ -15,7 +15,7 @@ const RUNNING_IMG_MAP = /** @type {ImageMap} */ ({
 });
 
 export const PLAYER_ENTITY = /** @type {Entity} */ ({
-  id: "PLAYER 1",
+  id: "PLAYER_1",
   type: ENTITY_TYPES.PLAYER,
   imageMap: MOVEMENT_IMG_MAP,
   imageRunningMap: RUNNING_IMG_MAP,

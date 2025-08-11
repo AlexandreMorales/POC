@@ -7,9 +7,10 @@ import {
 } from "../1 - polygones/index.js";
 import { getSelectedCell, updateEntities } from "../2 - entities/index.js";
 import { loadAndGetCell } from "../3 - generation/index.js";
-import { debounce, getMod, isPointOutside, tweakColor } from "../utils.js";
-import { DRAW_CONFIG } from "./config.js";
+import { debounce, getMod, isPointOutside, tweakColor } from "../_utils.js";
 
+import { DRAW_CONFIG } from "./_config.js";
+import { blockToWall } from "./_utils.js";
 import {
   canvasLayers,
   contextsLayers,
@@ -23,7 +24,6 @@ import {
 } from "./render.js";
 import { updateTracks } from "./sounds.js";
 import { updateBiomeMap } from "./toolbar/index.js";
-import { blockToWall } from "./utils.js";
 import { updateWeather } from "./weather/index.js";
 import { updateWidgets } from "./widgets/index.js";
 

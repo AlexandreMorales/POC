@@ -14,7 +14,7 @@ import {
 } from "../5 - actions/index.js";
 import { resetSize } from "../6 - boot/index.js";
 
-import { CONTROLS_CONFIG } from "./configs.js";
+import { CONTROLS_CONFIG } from "./_configs.js";
 
 const KEY_MOVEMENT_MAP = {
   ["KeyW"]: MOVEMENT.UP,

@@ -1,4 +1,4 @@
-import { ENTITY_TYPES, MOVEMENT } from "../configs.js";
+import { ENTITY_TYPES, MOVEMENT } from "../_configs.js";
 import { createEntity, moveEntityToCell } from "../entities.js";
 
 const BOAT_IMG_MAP = /** @type {ImageMap} */ ({

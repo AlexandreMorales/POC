@@ -12,7 +12,7 @@ import {
   resetDirection,
   resetMap,
 } from "../5 - actions/index.js";
-import { debounce } from "../utils.js";
+import { debounce } from "../_utils.js";
 
 export const start = () => {
   addEntity(PLAYER_ENTITY);

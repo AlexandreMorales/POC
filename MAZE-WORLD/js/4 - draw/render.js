@@ -7,7 +7,7 @@ import {
 import { ENTITY_INFO } from "../2 - entities/index.js";
 import { GENERATION_CONFIG } from "../3 - generation/index.js";
 
-import { DRAW_CONFIG } from "./config.js";
+import { DRAW_CONFIG } from "./_config.js";
 import { canvasContainer, drawContainer } from "./containers.js";
 
 const RENDER_CONFIG = {

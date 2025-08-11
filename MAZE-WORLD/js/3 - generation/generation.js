@@ -7,10 +7,10 @@ import {
   RENDER_INFO,
 } from "../1 - polygones/index.js";
 import { spawnEntity, ENTITY_INFO } from "../2 - entities/index.js";
-import { getPosDistance, tweakColor } from "../utils.js";
+import { getPosDistance, tweakColor } from "../_utils.js";
 
-import { GENERATION_CONFIG } from "./configs.js";
-import { getChunkStart } from "./utils.js";
+import { GENERATION_CONFIG } from "./_configs.js";
+import { getChunkStart } from "./_utils.js";
 import { getValue, VECTORS } from "./perlin.js";
 import { addBiomeToMap, BIOMES } from "./biomes/index.js";
 

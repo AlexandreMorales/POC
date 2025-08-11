@@ -1,4 +1,4 @@
-import { GENERATION_CONFIG } from "../configs.js";
+import { GENERATION_CONFIG } from "../_configs.js";
 
 let BIOME_MAPS = /** @type {Biome[][]} */ ([]);
 

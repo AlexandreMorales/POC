@@ -1,6 +1,7 @@
 import { getPolyInfo } from "../../1 - polygones/index.js";
+
 import { clearCanvas, drawWall, drawWallTop } from "../render.js";
-import { blockToWall } from "../utils.js";
+import { blockToWall } from "../_utils.js";
 
 const placeCanvas = /** @type {HTMLCanvasElement} */ (
   document.getElementById("place-canvas")

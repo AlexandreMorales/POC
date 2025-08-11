@@ -32,7 +32,7 @@ import {
   COMPASS_CONFIG,
   addBlockToToolbar,
 } from "../4 - draw/index.js";
-import { getMod } from "../utils.js";
+import { getMod } from "../_utils.js";
 
 import { move, moveCurrentCell } from "./movement.js";
 

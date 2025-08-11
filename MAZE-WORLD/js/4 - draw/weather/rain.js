@@ -1,5 +1,5 @@
 import { RENDER_INFO, MENU_CONFIG } from "../../1 - polygones/index.js";
-import { getRandomFloat } from "../../utils.js";
+import { getRandomFloat } from "../../_utils.js";
 
 const rainContainer = document.getElementById("rain-container");
 

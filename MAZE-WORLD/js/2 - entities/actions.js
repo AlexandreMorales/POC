@@ -5,8 +5,8 @@ import {
   RENDER_INFO,
 } from "../1 - polygones/index.js";
 
-import { getMod, getPosDistance, getRandomFloat } from "../utils.js";
-import { ENTITY_TYPES, MOVEMENT } from "./configs.js";
+import { getMod, getPosDistance, getRandomFloat } from "../_utils.js";
+import { ENTITY_TYPES, MOVEMENT } from "./_configs.js";
 import {
   cellIsBlocked,
   createEntity,
@@ -14,7 +14,7 @@ import {
   moveEntityToCell,
   removeEntity,
 } from "./entities.js";
-import { ENTITY_INFO } from "./infos.js";
+import { ENTITY_INFO } from "./_infos.js";
 import { updateEntityImage } from "./render.js";
 
 const ENTITY_ACTIONS_CONFIG = {

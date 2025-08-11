@@ -1,4 +1,4 @@
-import { ENTITY_TYPES } from "../configs.js";
+import { ENTITY_TYPES } from "../_configs.js";
 import { addEnemy } from "./enemy.js";
 import { addRabbit } from "./rabbit.js";
 import { addTree } from "./tree.js";

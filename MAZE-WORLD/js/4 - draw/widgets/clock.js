@@ -1,6 +1,6 @@
 import { MENU_CONFIG } from "../../1 - polygones/index.js";
 import { ENTITY_INFO } from "../../2 - entities/index.js";
-import { getMod } from "../../utils.js";
+import { getMod } from "../../_utils.js";
 
 const CLOCK_CONFIG = {
   passHour: 0.25,

@@ -1,4 +1,4 @@
-import { ENTITY_TYPES, MOVEMENT } from "../configs.js";
+import { ENTITY_TYPES, MOVEMENT } from "../_configs.js";
 import { createEntity } from "../entities.js";
 import { getInBoat } from "./boat.js";
 
