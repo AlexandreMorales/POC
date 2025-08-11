@@ -14,7 +14,7 @@
  * @property {string} id
  * @property {string} type
  * @property {HTMLImageElement} img
- * @property {Cell} cell
+ * @property {Cell | null} cell
  * @property {ImageMap} imageMap
  * @property {ImageMap} [imageRunningMap]
  * @property {symbol} [defaultDirection]

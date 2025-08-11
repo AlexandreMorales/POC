@@ -1,6 +1,6 @@
 import { RENDER_INFO } from "../../1 - polygones/index.js";
+import { drawContainer } from "../containers.js";
 
-const drawContainer = document.getElementById("draw-container");
 const compass = document.getElementById("compass");
 
 export const COMPASS_CONFIG = {

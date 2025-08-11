@@ -3,5 +3,6 @@
     "checkJs": true,
     "target": "ESNext",
     "lib": ["dom", "esnext", "webworker"]
-  }
+  },
+  "exclude": ["./dist/"]
 }

@@ -1,4 +1,5 @@
 import { POLYGONS_IMAGES, RENDER_INFO } from "../../1 - polygones/index.js";
+import { canvasContainer } from "../../4 - draw/index.js";
 import {
   changePolySides,
   getNextPolygon,
@@ -7,8 +8,6 @@ import {
 import { resetSize } from "../../6 - boot/index.js";
 
 import { CONTROLS_CONFIG } from "../configs.js";
-
-const canvasContainer = document.getElementById("canvas-container");
 
 let zoomDist = 0;
 

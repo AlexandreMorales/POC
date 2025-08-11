@@ -145,7 +145,8 @@ export const updateEntityImage = (entity, direction, isRunning) => {
 
   let map = entity.imageRunningMap;
   if (!isRunning || !map) map = entity.imageMap;
-  entity.img.src = map[direction] || entity.img.src;
+  const newSrc = map[direction] || entity.img.src;
+  if (!entity.img.src.endsWith(newSrc)) entity.img.src = newSrc;
 
   entity.img.style.marginTop = null;
   entity.img.style.marginLeft = null;

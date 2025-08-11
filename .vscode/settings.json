@@ -1,0 +1,14 @@
+{
+  "emeraldwalk.runonsave": {
+    "commands": [
+      {
+        "match": "MAZE-WORLD/.*.js",
+        "cmd": "node MAZE-WORLD/scripts/minify-js.js"
+      },
+      {
+        "match": "MAZE-WORLD/.*.css",
+        "cmd": "node MAZE-WORLD/scripts/minify-css.js"
+      }
+    ]
+  }
+}

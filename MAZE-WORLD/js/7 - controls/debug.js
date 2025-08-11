@@ -7,10 +7,8 @@ import {
 } from "../1 - polygones/index.js";
 import { PLAYER_ENTITY } from "../2 - entities/index.js";
 import { BLOCKS } from "../3 - generation/index.js";
-import { drawEveryCell } from "../4 - draw/index.js";
+import { drawEveryCell, canvasContainer } from "../4 - draw/index.js";
 import { placeBlock } from "../5 - actions/index.js";
-
-const canvasContainer = document.getElementById("canvas-container");
 
 canvasContainer.onclick = (e) => {
   if (!MENU_CONFIG.debugMode || RENDER_INFO.rotationTurns) return;

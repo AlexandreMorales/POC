@@ -1,4 +1,4 @@
-import { BLOCKS } from "./blocks.js";
+import { BLOCKS } from "./_blocks.js";
 
 /**
  * @param {Block} block
