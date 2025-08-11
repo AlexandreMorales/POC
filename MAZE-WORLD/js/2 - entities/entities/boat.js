@@ -1,11 +1,13 @@
-import { ENTITY_TYPES, MOVEMENT } from "../_configs.js";
+import { ENTITY_TYPES, IMG_MAP_TYPES, MOVEMENT } from "../_configs.js";
 import { createEntity, moveEntityToCell } from "../entities.js";
 
 const BOAT_IMG_MAP = /** @type {ImageMap} */ ({
-  [MOVEMENT.UP]: "images/boat/up.png",
-  [MOVEMENT.DOWN]: "images/boat/down.png",
-  [MOVEMENT.LEFT]: "images/boat/left.png",
-  [MOVEMENT.RIGHT]: "images/boat/right.png",
+  [IMG_MAP_TYPES.DEFAULT]: {
+    [MOVEMENT.UP]: "images/boat/up.png",
+    [MOVEMENT.DOWN]: "images/boat/down.png",
+    [MOVEMENT.LEFT]: "images/boat/left.png",
+    [MOVEMENT.RIGHT]: "images/boat/right.png",
+  },
 });
 
 const BOAT_ENTITIES = /** @type {{ [k: string]: Entity }} */ ({});

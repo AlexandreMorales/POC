@@ -1,7 +1,7 @@
 import { getCell } from "../0 - grid/index.js";
 import { MENU_CONFIG, getPosByIndex } from "../1 - polygones/index.js";
 
-import { ENTITY_TYPES, MOVEMENT } from "./_configs.js";
+import { ENTITY_TYPES, IMG_MAP_TYPES, MOVEMENT } from "./_configs.js";
 import {
   createEntityImage,
   cutEntityImage,
@@ -139,7 +139,7 @@ export const makeEntityRun = (entity, direction) => {
   );
 
   if (!connectedEntities.length) {
-    updateEntityImage(entity, direction, true);
+    updateEntityImage(entity, direction, IMG_MAP_TYPES.RUNNING);
     return;
   }
 

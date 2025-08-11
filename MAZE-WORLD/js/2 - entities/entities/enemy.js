@@ -1,21 +1,24 @@
-import { ENTITY_TYPES, MOVEMENT } from "../_configs.js";
+import { ENTITY_TYPES, IMG_MAP_TYPES, MOVEMENT } from "../_configs.js";
 import { ENTITY_INFO } from "../_infos.js";
 import { createEntity } from "../entities.js";
 import { getInBoat } from "./boat.js";
 
 const ENEMY_IMG_MAP = /** @type {ImageMap} */ ({
-  [MOVEMENT.UP]: "images/enemies/zombie/up.png",
-  [MOVEMENT.DOWN]: "images/enemies/zombie/down.png",
-  [MOVEMENT.LEFT]: "images/enemies/zombie/left.png",
-  [MOVEMENT.RIGHT]: "images/enemies/zombie/right.png",
+  [IMG_MAP_TYPES.DEFAULT]: {
+    [MOVEMENT.UP]: "images/enemies/zombie/up.png",
+    [MOVEMENT.DOWN]: "images/enemies/zombie/down.png",
+    [MOVEMENT.LEFT]: "images/enemies/zombie/left.png",
+    [MOVEMENT.RIGHT]: "images/enemies/zombie/right.png",
+  },
 });
 
 const ENEMY_MIN_TIME = 40;
 
 /**
  * @param {Cell} cell
+ * @param {string} [defaultImgMapType]
  */
-export const addEnemy = (cell) => {
+export const addEnemy = (cell, defaultImgMapType) => {
   if (ENTITY_INFO.timeOfDay < ENEMY_MIN_TIME) return;
 
   const enemyEntity = createEntity(
@@ -25,6 +28,7 @@ export const addEnemy = (cell) => {
     ENEMY_IMG_MAP,
     {
       defaultDirection: MOVEMENT.DOWN,
+      defaultImgMapType,
       minTime: ENEMY_MIN_TIME,
       movementOptions: {
         speed: 1,

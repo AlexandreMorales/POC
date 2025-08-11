@@ -13,3 +13,10 @@ export const ENTITY_TYPES = {
   FIRE: "FIRE",
   RABBIT: "RABBIT",
 };
+
+export const IMG_MAP_TYPES = {
+  DEFAULT: "DEFAULT",
+  RUNNING: "RUNNING",
+  SNOW: "SNOW",
+  DESERT: "DESERT",
+};

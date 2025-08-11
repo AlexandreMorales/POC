@@ -1,5 +1,5 @@
 /**
- * @typedef {{ [k: symbol]: string }} ImageMap
+ * @typedef {{ [k1: string]: { [k2: symbol]: string } }} ImageMap
  */
 
 /**
@@ -16,13 +16,13 @@
  * @property {HTMLImageElement} img
  * @property {Cell | null} cell
  * @property {ImageMap} imageMap
- * @property {ImageMap} [imageRunningMap]
  * @property {symbol} [defaultDirection]
  * @property {{ [k: string]: Entity }} [connectedEntities]
  * @property {symbol[]} [movementsToCut]
  * @property {EntityMovementOptions} [movementOptions]
  * @property {number} [minTime] The min time that the entity can be spawn/live
  * @property {number} [zIndex]
+ * @property {string} [defaultImgMapType]
  * @property {boolean} [isGenerated]
  *
  * @property {boolean} [deleted]

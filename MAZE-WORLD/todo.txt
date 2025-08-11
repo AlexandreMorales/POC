@@ -1,11 +1,5 @@
 ------------------------------------- CURRENT -------------------------------------
 
-ADD ENTITY VARIATION IMG MAP (RUNNING, ICE, DESERT)
-
-
-
-------------------------------------- SPRINT -------------------------------------
-
 BIOMES V1
     TELEPORTATION ON MENU (NUMBER INPUTS)
     REMOVE MEDIUM_WATER REPLACE WITH SEASHORE, RENAME TO WATER
@@ -13,6 +7,10 @@ BIOMES V1
         TREES ARE PINE TREES
     DESERT (SAND) (X POSITIVE/NEGATIVE)
         TREES ARE CACTUS
+
+
+
+------------------------------------- SPRINT -------------------------------------
 
 AUDIO REFACTOR
     MAKE LOOP LAST 36 SECS (24 (BEATS) * 60 / 40 (BPM))

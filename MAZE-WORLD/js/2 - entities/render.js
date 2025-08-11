@@ -7,7 +7,7 @@ import {
 } from "../1 - polygones/index.js";
 
 import { isPointOutside } from "../_utils.js";
-import { MOVEMENT } from "./_configs.js";
+import { IMG_MAP_TYPES, MOVEMENT } from "./_configs.js";
 import { PLAYER_ENTITY } from "./entities/player.js";
 
 const CUT_MOVEMENTS_MAP = {
@@ -26,7 +26,10 @@ export const createEntityImage = (entity) => {
   const img = document.createElement("img");
   img.id = entity.id;
   img.style.zIndex = `${entity.zIndex || 2}`;
-  img.src = entity.imageMap[entity.defaultDirection || MOVEMENT.RIGHT];
+  img.src =
+    entity.imageMap[entity.defaultImgMapType || IMG_MAP_TYPES.DEFAULT][
+      entity.defaultDirection || MOVEMENT.RIGHT
+    ];
   container.appendChild(img);
   entity.img = img;
   setEntitySize(entity);
@@ -139,13 +142,13 @@ const verifyEntityHeight = (entity) => {
 /**
  * @param {Entity} entity
  * @param {symbol} direction
- * @param {boolean} [isRunning]
+ * @param {string} [imgMapType]
  */
-export const updateEntityImage = (entity, direction, isRunning) => {
+export const updateEntityImage = (entity, direction, imgMapType) => {
   if (!entity.img) return;
 
-  let map = entity.imageRunningMap;
-  if (!isRunning || !map) map = entity.imageMap;
+  let map = entity.imageMap[imgMapType];
+  if (!imgMapType || !map) map = entity.imageMap[IMG_MAP_TYPES.DEFAULT];
   const newSrc = map[direction] || entity.img.src;
   if (!entity.img.src.endsWith(newSrc)) entity.img.src = newSrc;
 

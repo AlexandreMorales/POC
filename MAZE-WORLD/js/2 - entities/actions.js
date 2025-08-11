@@ -6,7 +6,7 @@ import {
 } from "../1 - polygones/index.js";
 
 import { getMod, getPosDistance, getRandomFloat } from "../_utils.js";
-import { ENTITY_TYPES, MOVEMENT } from "./_configs.js";
+import { ENTITY_TYPES, IMG_MAP_TYPES, MOVEMENT } from "./_configs.js";
 import {
   cellIsBlocked,
   createEntity,
@@ -22,10 +22,12 @@ const ENTITY_ACTIONS_CONFIG = {
 };
 
 const FIRE_IMG_MAP = /** @type {ImageMap} */ ({
-  [MOVEMENT.UP]: "images/enemies/fire.png",
-  [MOVEMENT.DOWN]: "images/enemies/fire.png",
-  [MOVEMENT.LEFT]: "images/enemies/fire.png",
-  [MOVEMENT.RIGHT]: "images/enemies/fire.png",
+  [IMG_MAP_TYPES.DEFAULT]: {
+    [MOVEMENT.UP]: "images/enemies/fire.png",
+    [MOVEMENT.DOWN]: "images/enemies/fire.png",
+    [MOVEMENT.LEFT]: "images/enemies/fire.png",
+    [MOVEMENT.RIGHT]: "images/enemies/fire.png",
+  },
 });
 
 /**

@@ -1,18 +1,21 @@
-import { ENTITY_TYPES, MOVEMENT } from "../_configs.js";
+import { ENTITY_TYPES, IMG_MAP_TYPES, MOVEMENT } from "../_configs.js";
 import { createEntity } from "../entities.js";
 import { getInBoat } from "./boat.js";
 
 const RABBIT_IMG_MAP = /** @type {ImageMap} */ ({
-  [MOVEMENT.UP]: "images/map/rabbit.png",
-  [MOVEMENT.DOWN]: "images/map/rabbit-right.png",
-  [MOVEMENT.LEFT]: "images/map/rabbit.png",
-  [MOVEMENT.RIGHT]: "images/map/rabbit-right.png",
+  [IMG_MAP_TYPES.DEFAULT]: {
+    [MOVEMENT.UP]: "images/map/rabbit.png",
+    [MOVEMENT.DOWN]: "images/map/rabbit-right.png",
+    [MOVEMENT.LEFT]: "images/map/rabbit.png",
+    [MOVEMENT.RIGHT]: "images/map/rabbit-right.png",
+  },
 });
 
 /**
  * @param {Cell} cell
+ * @param {string} [defaultImgMapType]
  */
-export const addRabbit = (cell) => {
+export const addRabbit = (cell, defaultImgMapType) => {
   const rabbitEntity = createEntity(
     cell,
     `${cell.pos.i}_${cell.pos.j}`,
@@ -21,6 +24,7 @@ export const addRabbit = (cell) => {
     {
       isGenerated: true,
       movementOptions: { speed: 1, random: true },
+      defaultImgMapType,
     }
   );
   if (cell.block.isFluid) getInBoat(rabbitEntity);
