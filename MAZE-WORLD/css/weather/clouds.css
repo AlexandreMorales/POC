@@ -92,7 +92,7 @@
   margin-bottom: -18%;
 }
 .hex .cloud-shape::before {
-  content: " ";
+  content: "";
   width: 0;
   height: 0;
   position: absolute;

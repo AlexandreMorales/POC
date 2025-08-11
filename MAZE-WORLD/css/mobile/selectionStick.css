@@ -16,7 +16,7 @@
   position: absolute;
 }
 .selection-stick::before {
-  content: " ";
+  content: "";
   display: block;
   position: absolute;
 
@@ -31,7 +31,7 @@
   border: calc(var(--selection-stick-size) / 20) var(--action-color) solid;
 }
 .selection-stick::after {
-  content: " ";
+  content: "";
   position: absolute;
   width: 65%;
   height: 65%;
