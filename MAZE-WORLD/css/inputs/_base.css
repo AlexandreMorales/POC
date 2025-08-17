@@ -6,14 +6,20 @@
 
   --input-transition: all 100ms ease-out;
   --input-border-radius: 72px;
+
+  --input-height: 20px;
+  --input-width: 50px;
 }
 
 label {
   display: flex;
-  cursor: pointer;
 
   align-items: center;
   justify-content: space-between;
+}
+
+label[for] {
+  cursor: pointer;
 }
 
 label > * {

@@ -41,7 +41,7 @@ export const BLOCKS = /** @type {{ [k: string]: Block }} */ ({
     ],
     trackType: "TRACK4",
   },
-  MEDIUM_WATER: {
+  WATER: {
     color: hexToRgb("#2375b4"),
     layer: 0,
     isFluid: true,

@@ -72,7 +72,7 @@
   transform: rotate(135deg);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 360px) {
   .hide-mobile {
     display: none;
   }

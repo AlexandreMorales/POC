@@ -1,5 +1,4 @@
 :root {
-  --checkbox-height: 20px;
   --checkbox-width: 30px;
 
   --checkbox-check-size: 14px;
@@ -13,7 +12,7 @@
   flex-shrink: 0;
   position: relative;
 
-  height: var(--checkbox-height);
+  height: var(--input-height);
   max-width: var(--checkbox-width);
   border-radius: var(--input-border-radius);
 

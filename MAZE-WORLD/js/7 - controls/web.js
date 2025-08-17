@@ -39,12 +39,17 @@ const MOVEMENT_KEYS = Object.keys(KEY_MOVEMENT_MAP);
 
 document.onkeydown = (e) => {
   e = e || /** @type {KeyboardEvent} */ (window.event);
+  const targetElement = /** @type {Element} */ (e.target);
+
+  // Dont execute when typing (only if its the menu toggle)
+  if (targetElement.tagName === "INPUT" && targetElement.id !== "menuToggle")
+    return;
 
   if (e.code.startsWith("Arrow"))
     return moveBaseOnCode(ARROW_MOVEMENT_MAP[e.code]);
 
-  if (e.code.startsWith("Digit"))
-    return updateToolbarSelected(+e.code.replace("Digit", ""));
+  if (e.code.startsWith("Digit") || e.code.startsWith("Numpad"))
+    return updateToolbarSelected(+e.code.replace(/Numpad|Digit/gi, ""));
 
   if (MOVEMENT_KEYS.includes(e.code))
     return changeSelectedOnCode(KEY_MOVEMENT_MAP[e.code]);

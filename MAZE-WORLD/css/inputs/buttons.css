@@ -1,0 +1,17 @@
+button {
+  appearance: none;
+  background-color: var(--active-color);
+  border-style: none;
+  flex-shrink: 0;
+  position: relative;
+
+  height: var(--input-height);
+  max-width: var(--input-width);
+  border-radius: var(--input-border-radius);
+
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: var(--active-color-hover);
+}

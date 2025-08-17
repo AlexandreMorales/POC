@@ -1,0 +1,18 @@
+input[type="number"] {
+  appearance: none;
+  background-color: var(--input-empty-color);
+  border-style: none;
+  flex-shrink: 0;
+  position: relative;
+  outline: none;
+
+  height: var(--input-height);
+  max-width: var(--input-width);
+  border-radius: var(--input-border-radius);
+
+  padding: 0 5px;
+}
+
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
