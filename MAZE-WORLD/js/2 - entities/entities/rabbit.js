@@ -13,9 +13,8 @@ const RABBIT_IMG_MAP = /** @type {ImageMap} */ ({
 
 /**
  * @param {Cell} cell
- * @param {string} [defaultImgMapType]
  */
-export const addRabbit = (cell, defaultImgMapType) => {
+export const addRabbit = (cell) => {
   const rabbitEntity = createEntity(
     cell,
     `${cell.pos.i}_${cell.pos.j}`,
@@ -24,7 +23,7 @@ export const addRabbit = (cell, defaultImgMapType) => {
     {
       isGenerated: true,
       movementOptions: { speed: 1, random: true },
-      defaultImgMapType,
+      defaultImgMapType: cell.block?.defaultImgMapType,
     }
   );
   if (cell.block.isFluid) getInBoat(rabbitEntity);

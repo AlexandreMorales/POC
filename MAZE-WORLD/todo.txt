@@ -1,17 +1,13 @@
 ------------------------------------- CURRENT -------------------------------------
 
-BIOMES V1
-    SNOW (X POSITIVE/NEGATIVE)
-    DESERT (SAND) (X POSITIVE/NEGATIVE)
-
+AUDIO REFACTOR
+    INCREASE DESYNC FAILSAFE TO 4 (OR 2) SECS
+    SEAMLESS LOOP (https://stackoverflow.com/questions/46926033/create-seamless-loop-of-audio-web)
+    CONTROL VOLUME (https://stackoverflow.com/questions/43386277/how-to-control-the-sound-volume-of-audio-buffer-audiocontext)
+    AUDIO PAN (https://stackoverflow.com/questions/20287890/audiocontext-panning-audio-of-playing-media)
 
 
 ------------------------------------- SPRINT -------------------------------------
-
-AUDIO REFACTOR
-    MAKE LOOP LAST 36 SECS (24 (BEATS) * 60 / 40 (BPM))
-    REPLACE DEEP WATER BASS WITH DRUMS
-    AUDIO PAN (https://stackoverflow.com/questions/20287890/audiocontext-panning-audio-of-playing-media)
 
 TOOLBAR V2
     FISHING MINIGAME
@@ -47,6 +43,7 @@ COMBAT
 
 ------------------------------------- TECH DEBT -------------------------------------
 
+ADD CURRENT DIRECTION TO ENTITY (REMOVE DEFAULT)
 TRANSFORM CELL ENTITY TYPE INTO ARRAY?
 MOVE ALL documents/window TO SEPARATE FILE
 REMOVE PLAYER_ENTITY FROM ENTITIES/RENDER
@@ -131,6 +128,7 @@ BLACK CLOUDS FLAG
 
 ADD GPL 3.0 LICENSE
 UPDATE SPRITES
+    CHANGE RAIN ON DIFFERENT BIOMES
 
 DEBUG MODE TO CLICK/REMOVE ENEMY
 DEBUG MODE WITH ROTATION

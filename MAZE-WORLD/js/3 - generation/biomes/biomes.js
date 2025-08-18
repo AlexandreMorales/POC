@@ -11,8 +11,8 @@ const BIOMES_RAW = /** @type {{ [k: string]: Biome }} */ ({
   FOREST: {
     name: "FOREST",
     mapColor: BLOCKS.MID_GRASS.color,
-    maxValue: 0,
-    maxDistance: 50,
+    minValue: -1,
+    minDistance: 0,
     higherGroundBlock: BLOCKS.MID_GRASS,
     ranges: [
       addPropsToBlock(BLOCKS.WATER, { max: -0.4 }),
@@ -25,8 +25,8 @@ const BIOMES_RAW = /** @type {{ [k: string]: Biome }} */ ({
   OCEAN: {
     name: "OCEAN",
     mapColor: BLOCKS.WATER.color,
-    maxValue: Infinity,
-    maxDistance: Infinity,
+    minValue: -0.2,
+    minDistance: 100,
     higherGroundBlock: BLOCKS.MID_GRASS,
     ranges: [
       addPropsToBlock(BLOCKS.DEEP_WATER, { max: -0.1 }),
@@ -37,6 +37,37 @@ const BIOMES_RAW = /** @type {{ [k: string]: Biome }} */ ({
       addPropsToBlock(BLOCKS.DIRT, { max: 1 }),
     ],
   },
+  SNOW: {
+    name: "SNOW",
+    mapColor: BLOCKS.ICE.color,
+    minValue: 0.2,
+    minDistance: 300,
+    higherGroundBlock: BLOCKS.ICE,
+    negativeJ: false,
+    ranges: [
+      addPropsToBlock(BLOCKS.FROZEN_WATER, { max: -0.2 }),
+      addPropsToBlock(BLOCKS.FROZEN_SEA_SHORE, { max: 0 }),
+      addPropsToBlock(BLOCKS.SLUSH, { max: 0.1 }),
+      addPropsToBlock(BLOCKS.HIGH_ICE, { max: 1 }),
+    ],
+  },
+  DESERT: {
+    name: "DESERT",
+    mapColor: BLOCKS.SAND.color,
+    minValue: 0,
+    minDistance: 300,
+    higherGroundBlock: BLOCKS.TERRACOTA,
+    negativeJ: true,
+    ranges: [
+      addPropsToBlock(BLOCKS.DUST, { max: -0.4 }),
+      addPropsToBlock(BLOCKS.SAND, { max: -0.2 }),
+      addPropsToBlock(BLOCKS.DARK_SAND, { max: 0 }),
+      addPropsToBlock(BLOCKS.TERRACOTA, { max: 0.2 }),
+      addPropsToBlock(BLOCKS.HIGH_TERRACOTA, { max: 1 }),
+    ],
+  },
 });
 
-export const BIOMES = /** @type {Biome[]} */ (Object.values(BIOMES_RAW));
+export const BIOMES = Object.values(BIOMES_RAW).sort(
+  (a, b) => b.minDistance - a.minDistance
+);

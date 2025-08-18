@@ -26,10 +26,9 @@ export const createEntityImage = (entity) => {
   const img = document.createElement("img");
   img.id = entity.id;
   img.style.zIndex = `${entity.zIndex || 2}`;
-  img.src =
-    entity.imageMap[entity.defaultImgMapType || IMG_MAP_TYPES.DEFAULT][
-      entity.defaultDirection || MOVEMENT.RIGHT
-    ];
+  img.src = getImgMap(entity, entity.defaultImgMapType)[
+    entity.defaultDirection || MOVEMENT.RIGHT
+  ];
   container.appendChild(img);
   entity.img = img;
   setEntitySize(entity);
@@ -141,15 +140,20 @@ const verifyEntityHeight = (entity) => {
 
 /**
  * @param {Entity} entity
+ * @param {string} imgMapType
+ */
+const getImgMap = (entity, imgMapType) =>
+  entity.imageMap[imgMapType] || entity.imageMap[IMG_MAP_TYPES.DEFAULT];
+
+/**
+ * @param {Entity} entity
  * @param {symbol} direction
  * @param {string} [imgMapType]
  */
 export const updateEntityImage = (entity, direction, imgMapType) => {
   if (!entity.img) return;
 
-  let map = entity.imageMap[imgMapType];
-  if (!imgMapType || !map) map = entity.imageMap[IMG_MAP_TYPES.DEFAULT];
-  const newSrc = map[direction] || entity.img.src;
+  const newSrc = getImgMap(entity, imgMapType)[direction] || entity.img.src;
   if (!entity.img.src.endsWith(newSrc)) entity.img.src = newSrc;
 
   entity.img.style.marginTop = null;

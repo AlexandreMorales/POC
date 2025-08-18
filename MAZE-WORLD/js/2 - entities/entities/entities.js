@@ -6,15 +6,14 @@ import { addTree } from "./tree.js";
 /**
  * @param {string} entityType
  * @param {Cell} cell
- * @param {string} [defaultImgMapType]
  */
-export const spawnEntity = (entityType, cell, defaultImgMapType) => {
+export const spawnEntity = (entityType, cell) => {
   switch (entityType) {
     case ENTITY_TYPES.TREE:
-      return addTree(cell, defaultImgMapType);
+      return addTree(cell);
     case ENTITY_TYPES.RABBIT:
-      return addRabbit(cell, defaultImgMapType);
+      return addRabbit(cell);
     case ENTITY_TYPES.ENEMY:
-      return addEnemy(cell, defaultImgMapType);
+      return addEnemy(cell);
   }
 };

@@ -16,9 +16,8 @@ const ENEMY_MIN_TIME = 40;
 
 /**
  * @param {Cell} cell
- * @param {string} [defaultImgMapType]
  */
-export const addEnemy = (cell, defaultImgMapType) => {
+export const addEnemy = (cell) => {
   if (ENTITY_INFO.timeOfDay < ENEMY_MIN_TIME) return;
 
   const enemyEntity = createEntity(
@@ -28,7 +27,7 @@ export const addEnemy = (cell, defaultImgMapType) => {
     ENEMY_IMG_MAP,
     {
       defaultDirection: MOVEMENT.DOWN,
-      defaultImgMapType,
+      defaultImgMapType: cell.block?.defaultImgMapType,
       minTime: ENEMY_MIN_TIME,
       movementOptions: {
         speed: 1,

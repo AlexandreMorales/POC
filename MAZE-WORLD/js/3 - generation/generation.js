@@ -116,11 +116,15 @@ const getBiome = (pos) => {
   switch (MENU_CONFIG.mapGeneration) {
     case MAP_GENERATION.MIX:
       const biomeValue = getValue(pos.i, pos.j, VECTORS.BIOME);
-      return BIOMES.find((b) => biomeValue <= b.maxValue);
+      return BIOMES.find((b) => biomeValue >= b.minValue);
     default:
     case MAP_GENERATION.DISTANCE:
       const distance = getPosDistance(INITIAL_POS, pos);
-      return BIOMES.find((b) => distance <= b.maxDistance);
+      return BIOMES.filter(
+        (b) =>
+          (b.negativeJ === undefined || b.negativeJ === pos.j < 0) &&
+          (b.negativeI === undefined || b.negativeI === pos.i < 0)
+      ).find((b) => distance >= b.minDistance);
   }
 };
 
