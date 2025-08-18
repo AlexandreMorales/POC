@@ -21,15 +21,16 @@ const mapCanvas = /** @type {HTMLCanvasElement} */ (
 const mapContext = mapCanvas.getContext("2d");
 
 export const resetBiomeMap = () => {
+  let size = 0;
   if (fullMap) {
-    mapCanvas.width = window.innerWidth * 0.96;
-    mapCanvas.height = window.innerHeight * 0.96;
+    size = Math.min(window.innerWidth, window.innerHeight) * 0.96;
     MAP_CONFIG.currentPosRatio = MAP_CONFIG.fullScreenPosRatio;
   } else {
-    mapCanvas.width = mapCanvas.parentElement.offsetWidth;
-    mapCanvas.height = mapCanvas.parentElement.offsetHeight;
+    size = mapCanvas.parentElement.offsetWidth;
     MAP_CONFIG.currentPosRatio = MAP_CONFIG.posRatio;
   }
+  mapCanvas.width = size;
+  mapCanvas.height = size;
 
   MAP_CONFIG.xRatio = mapCanvas.width / (MAP_CONFIG.currentPosRatio * 2 + 1);
   MAP_CONFIG.yRatio = mapCanvas.height / (MAP_CONFIG.currentPosRatio * 2 + 1);
