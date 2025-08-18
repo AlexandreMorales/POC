@@ -30,7 +30,7 @@ export const updateMobileDivs = () => {
  * @typedef {Object} SelectStickInfo
  * @property {symbol} code
  * @property {boolean} useDiagonal
- * @property {number} [interval]
+ * @property {NodeJS.Timeout} [interval]
  */
 
 /**

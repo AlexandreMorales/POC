@@ -46,13 +46,13 @@ document.onkeydown = (e) => {
     return;
 
   if (e.code.startsWith("Arrow"))
-    return moveBaseOnCode(ARROW_MOVEMENT_MAP[e.code]);
+    return moveBaseOnCode(ARROW_MOVEMENT_MAP[e.code], e.altKey);
 
   if (e.code.startsWith("Digit") || e.code.startsWith("Numpad"))
     return updateToolbarSelected(+e.code.replace(/Numpad|Digit/gi, ""));
 
   if (MOVEMENT_KEYS.includes(e.code))
-    return changeSelectedOnCode(KEY_MOVEMENT_MAP[e.code]);
+    return changeSelectedOnCode(KEY_MOVEMENT_MAP[e.code], e.altKey);
 
   if (e.code === "KeyQ") return rotate(-1);
   if (e.code === "KeyE") return rotate(1);
