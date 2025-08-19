@@ -72,7 +72,7 @@
   transform: rotate(135deg);
 }
 
-@media (max-width: 360px) {
+@media (max-width: 450px) {
   .hide-mobile {
     display: none;
   }
@@ -86,7 +86,7 @@
   }
 }
 
-@media (max-height: 360px) {
+@media (max-height: 450px) {
   #toolbar {
     bottom: 15vh !important;
   }
