@@ -72,6 +72,11 @@ const DESERT_PROPS = {
   ],
 };
 
+export const EMPTY_BLOCK = /** @type {Block} */ ({
+  layer: 0,
+  color: { r: -1, g: -1, b: -1 },
+});
+
 // Adding space on the rgb color so VScode shows the color
 export const BLOCKS = /** @type {{ [k: string]: Block }} */ ({
   DEEP_WATER: {

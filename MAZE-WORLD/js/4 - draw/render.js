@@ -5,7 +5,7 @@ import {
   POLYGONS_IMAGES,
 } from "../1 - polygones/index.js";
 import { ENTITY_INFO } from "../2 - entities/index.js";
-import { GENERATION_CONFIG } from "../3 - generation/index.js";
+import { EMPTY_BLOCK, GENERATION_CONFIG } from "../3 - generation/index.js";
 
 import { DRAW_CONFIG } from "./_config.js";
 import { canvasContainer, drawContainer } from "./containers.js";
@@ -121,14 +121,12 @@ export const drawItem = (
  * @param {number} [modifier]
  * @return {string}
  */
-export const getFillStyle = (
-  { r, g, b },
-  shoulApplyDark = false,
-  modifier = 1
-) => {
+export const getFillStyle = (color, shoulApplyDark = false, modifier = 1) => {
+  if (color === EMPTY_BLOCK.color) return "transparent";
   if (ENTITY_INFO.timeOfDay && shoulApplyDark)
     modifier = (1 - ENTITY_INFO.timeOfDay / 100) * modifier;
 
+  const { r, g, b } = color;
   return `rgb(${r * modifier}, ${g * modifier}, ${b * modifier})`;
 };
 
@@ -153,12 +151,18 @@ const fillPolygon = (context, { x, y }, points) => {
  * @param {Point} point
  * @param {Point[]} points
  * @param {boolean[]} [map]
+ * @param {boolean} [ignoreLast]
  */
-const applyBorders = (context, { x, y }, points, map) => {
+export const applyBorders = (context, { x, y }, points, map, ignoreLast) => {
   for (let i = 0; i < points.length; i++) {
-    if (!map || map[i]) {
-      let point = points[i];
-      let nextPoint = points[i + 1] || points[0];
+    if (!map?.length || map[i]) {
+      const point = points[i];
+      let nextPoint = points[i + 1];
+
+      if (!nextPoint) {
+        if (ignoreLast) return;
+        nextPoint = points[0];
+      }
 
       context.beginPath();
       context.moveTo(x + point.x, y + point.y);

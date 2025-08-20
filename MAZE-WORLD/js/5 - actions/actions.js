@@ -267,6 +267,7 @@ export const useBoat = () => {
 
 // Called when zooming, creation, set PolySides
 export const resetMap = () => {
+  addBlockToToolbar(getNextBlockToPlace());
   setEntitiesSize();
   resetCanvas();
   moveCurrentCell(getCenterCell(), PLAYER_ENTITY.cell);

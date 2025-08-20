@@ -1,7 +1,8 @@
 import { getPolyInfo } from "../../1 - polygones/index.js";
 
-import { clearCanvas, drawWall, drawWallTop } from "../render.js";
+import { applyBorders, clearCanvas, drawWall, drawWallTop } from "../render.js";
 import { blockToWall } from "../_utils.js";
+import { EMPTY_BLOCK } from "../../3 - generation/index.js";
 
 const placeCanvas = /** @type {HTMLCanvasElement} */ (
   document.getElementById("place-canvas")
@@ -17,9 +18,10 @@ export const resetPlace = () => {
  * @param {CellBlock} block
  */
 export const addBlockToToolbar = (block) => {
+  const isEmptyBlock = !block;
   clearCanvas(placeCanvas);
 
-  if (!block) return;
+  if (isEmptyBlock) block = { color: EMPTY_BLOCK.color, block: EMPTY_BLOCK };
 
   const polyInfo = getPolyInfo();
 
@@ -30,5 +32,6 @@ export const addBlockToToolbar = (block) => {
   );
 
   drawWall(wall, placeContext);
+  applyBorders(placeContext, wall.point, wall.points, [], true);
   drawWallTop(wall, placeContext);
 };

@@ -71,14 +71,16 @@ const applyRotation = ({ x, y }, isInverted, baseCell) => {
  * @returns {Point[]}
  */
 const createWallPoints = (points, height) => {
-  let bottomPoints = points.filter((p) => p.y >= 0);
-  if (bottomPoints.length <= 1) bottomPoints = points.sort((a, b) => a.x - b.x);
-  const firstBottomPoint = bottomPoints[0];
-  const lastBottomPoint = bottomPoints[bottomPoints.length - 1];
+  let centerAndBottomPoints = points.filter((p) => p.y >= 0);
+  // only for inverted triangles
+  if (centerAndBottomPoints.length <= 1)
+    centerAndBottomPoints = points.sort((a, b) => a.x - b.x);
+  const firstPoint = centerAndBottomPoints[0];
+  const lastPoint = centerAndBottomPoints[centerAndBottomPoints.length - 1];
   return [
-    { x: firstBottomPoint.x, y: firstBottomPoint.y - height },
-    ...bottomPoints,
-    { x: lastBottomPoint.x, y: lastBottomPoint.y - height },
+    { x: firstPoint.x, y: firstPoint.y - height },
+    ...centerAndBottomPoints,
+    { x: lastPoint.x, y: lastPoint.y - height },
   ];
 };
 
