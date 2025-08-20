@@ -5,18 +5,11 @@ import { ENTITY_TYPES, IMG_MAP_TYPES } from "../../2 - entities/index.js";
  * @returns {Color}
  */
 const hexToRgb = (hexColor) => {
-  let hex = hexColor.slice(1);
+  let hex = hexColor.trim().slice(1);
   let r = parseInt(hex.substring(0, 2), 16);
   let g = parseInt(hex.substring(2, 4), 16);
   let b = parseInt(hex.substring(4, 6), 16);
   return { r, g, b };
-};
-
-const ENEMY_SPAWN = {
-  probability: 0.00001,
-  entityType: ENTITY_TYPES.ENEMY,
-  spawnOnMove: true,
-  increaseWithTime: true,
 };
 
 export const TRACK_TYPES = {
@@ -45,98 +38,110 @@ export const TRACK_TYPES = {
   TRACK16: "TRACK16",
 };
 
+const ENEMY_SPAWN = {
+  probability: 0.00001,
+  entityType: ENTITY_TYPES.ENEMY,
+  spawnOnMove: true,
+  increaseWithTime: true,
+};
+const WATER_SPAWNS = [
+  { probability: 0.0005, entityType: ENTITY_TYPES.TREE },
+  { probability: 0.0005, entityType: ENTITY_TYPES.RABBIT },
+  ENEMY_SPAWN,
+];
+const FOREST_SPAWNS = [
+  { probability: 0.01, entityType: ENTITY_TYPES.TREE },
+  { probability: 0.0005, entityType: ENTITY_TYPES.RABBIT },
+  ENEMY_SPAWN,
+];
 const SNOW_SPAWNS = [
   { probability: 0.01, entityType: ENTITY_TYPES.TREE },
   ENEMY_SPAWN,
 ];
 const DESERT_SPAWNS = [
-  { probability: 0.01, entityType: ENTITY_TYPES.TREE },
+  { probability: 0.001, entityType: ENTITY_TYPES.TREE },
   {
+    ...ENEMY_SPAWN,
     probability: 0.00005,
-    entityType: ENTITY_TYPES.ENEMY,
-    spawnOnMove: true,
-    increaseWithTime: true,
   },
 ];
 
+// Adding space on the rgb color so VScode shows the color
 export const BLOCKS = /** @type {{ [k: string]: Block }} */ ({
   DEEP_WATER: {
-    color: hexToRgb("#256299"),
+    color: hexToRgb(" #256299"),
     layer: 0,
     isFluid: true,
-    spawnableEntities: [
-      { probability: 0.0005, entityType: ENTITY_TYPES.TREE },
-      { probability: 0.0005, entityType: ENTITY_TYPES.RABBIT },
-      ENEMY_SPAWN,
-    ],
+    spawnableEntities: WATER_SPAWNS,
     trackType: TRACK_TYPES.TRACK5,
   },
   WATER: {
-    color: hexToRgb("#2375b4"),
+    color: hexToRgb(" #2375b4"),
     layer: 0,
     isFluid: true,
     trackType: TRACK_TYPES.TRACK4,
   },
   BEACH_SAND: {
-    color: hexToRgb("#ab976a"),
+    color: hexToRgb(" #ab976a"),
     layer: 0,
     spawnableEntities: [ENEMY_SPAWN],
     trackType: TRACK_TYPES.TRACK3,
   },
   LOW_GRASS: {
-    color: hexToRgb("#457950"),
+    color: hexToRgb(" #457950"),
     layer: 0,
+    spawnableEntities: FOREST_SPAWNS,
     trackType: TRACK_TYPES.TRACK2,
   },
   MID_GRASS: {
-    color: hexToRgb("#2d673e"),
+    color: hexToRgb(" #2d673e"),
     layer: 0,
-    spawnableEntities: [
-      { probability: 0.01, entityType: ENTITY_TYPES.TREE },
-      { probability: 0.0005, entityType: ENTITY_TYPES.RABBIT },
-      ENEMY_SPAWN,
-    ],
+    spawnableEntities: FOREST_SPAWNS,
     trackType: TRACK_TYPES.TRACK1,
   },
   HIGH_GRASS: {
-    color: hexToRgb("#2d673e"),
+    color: hexToRgb(" #2d673e"),
     layer: 1,
     trackType: TRACK_TYPES.TRACK1,
   },
-  DIRT: { color: hexToRgb("#3F573A"), layer: 1, trackType: TRACK_TYPES.TRACK6 },
-  ROCK: { color: hexToRgb("#CBC0BB"), layer: 1 },
+  DIRT: {
+    color: hexToRgb(" #3F573A"),
+    layer: 1,
+    trackType: TRACK_TYPES.TRACK6,
+  },
+  ROCK: { color: hexToRgb(" #CBC0BB"), layer: 1 },
 
   // Snow
   FROZEN_WATER: {
-    color: hexToRgb("#94F2F4"),
+    color: hexToRgb(" #94F2F4"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK11,
     defaultImgMapType: IMG_MAP_TYPES.SNOW,
     spawnableEntities: SNOW_SPAWNS,
   },
   FROZEN_SEA_SHORE: {
-    color: hexToRgb("#A0E6EC"),
+    color: hexToRgb(" #A0E6EC"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK8,
     defaultImgMapType: IMG_MAP_TYPES.SNOW,
     spawnableEntities: SNOW_SPAWNS,
   },
   SLUSH: {
-    color: hexToRgb("#D0ECEB"),
+    color: hexToRgb(" #D0ECEB"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK8,
     defaultImgMapType: IMG_MAP_TYPES.SNOW,
     spawnableEntities: SNOW_SPAWNS,
   },
   ICE: {
-    color: hexToRgb("#ECFFFD"),
+    color: hexToRgb(" #ECFFFD"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK7,
     defaultImgMapType: IMG_MAP_TYPES.SNOW,
     spawnableEntities: SNOW_SPAWNS,
   },
   HIGH_ICE: {
-    color: hexToRgb("#ECFFFD"),
+    color: hexToRgb(" #ECFFFD"),
     layer: 1,
     trackType: TRACK_TYPES.TRACK7,
     defaultImgMapType: IMG_MAP_TYPES.SNOW,
@@ -144,38 +149,37 @@ export const BLOCKS = /** @type {{ [k: string]: Block }} */ ({
 
   // Desert
   DUST: {
-    color: hexToRgb("#F26D1F"),
+    color: hexToRgb(" #DAA98B"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK16,
     defaultImgMapType: IMG_MAP_TYPES.DESERT,
     spawnableEntities: DESERT_SPAWNS,
   },
   SAND: {
-    color: hexToRgb("#E04217"),
+    color: hexToRgb(" #EC912E"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK14,
     defaultImgMapType: IMG_MAP_TYPES.DESERT,
     spawnableEntities: DESERT_SPAWNS,
   },
   DARK_SAND: {
-    color: hexToRgb("#C02B18"),
+    color: hexToRgb(" #CC7025"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK14,
     defaultImgMapType: IMG_MAP_TYPES.DESERT,
     spawnableEntities: DESERT_SPAWNS,
   },
   TERRACOTA: {
-    color: hexToRgb("#7C0300"),
+    color: hexToRgb(" #9F561A"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK15,
     defaultImgMapType: IMG_MAP_TYPES.DESERT,
     spawnableEntities: DESERT_SPAWNS,
   },
   HIGH_TERRACOTA: {
-    color: hexToRgb("#590000"),
+    color: hexToRgb(" #9F561A"),
     layer: 1,
     trackType: TRACK_TYPES.TRACK14,
     defaultImgMapType: IMG_MAP_TYPES.DESERT,
-    spawnableEntities: DESERT_SPAWNS,
   },
 });
