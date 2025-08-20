@@ -1,9 +1,11 @@
 :root {
   --rain-size: 200px;
+
+  --rain-img: none;
 }
 
 #rain-container {
-  background-image: url("../images/weather/rain.gif");
+  background-image: var(--rain-img);
   background-repeat: repeat;
   background-size: var(--rain-size) var(--rain-size);
   width: 100%;

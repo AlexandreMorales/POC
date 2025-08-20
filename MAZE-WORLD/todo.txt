@@ -1,7 +1,6 @@
 ------------------------------------- CURRENT -------------------------------------
 
 AUDIO REFACTOR
-    INCREASE DESYNC FAILSAFE TO 4 (OR 2) SECS
     SEAMLESS LOOP (https://stackoverflow.com/questions/46926033/create-seamless-loop-of-audio-web)
     CONTROL VOLUME (https://stackoverflow.com/questions/43386277/how-to-control-the-sound-volume-of-audio-buffer-audiocontext)
     AUDIO PAN (https://stackoverflow.com/questions/20287890/audiocontext-panning-audio-of-playing-media)
@@ -140,7 +139,6 @@ BLACK CLOUDS FLAG
 
 ADD GPL 3.0 LICENSE
 UPDATE SPRITES
-    CHANGE RAIN ON DIFFERENT BIOMES
 
 DEBUG MODE TO CLICK/REMOVE ENEMY
 DEBUG MODE WITH ROTATION

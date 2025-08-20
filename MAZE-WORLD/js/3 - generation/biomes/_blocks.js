@@ -1,4 +1,4 @@
-import { ENTITY_TYPES, IMG_MAP_TYPES } from "../../2 - entities/index.js";
+import { BIOME_TYPES, ENTITY_TYPES } from "../../2 - entities/index.js";
 
 /**
  * @param {string} hexColor
@@ -54,17 +54,23 @@ const FOREST_SPAWNS = [
   { probability: 0.0005, entityType: ENTITY_TYPES.RABBIT },
   ENEMY_SPAWN,
 ];
-const SNOW_SPAWNS = [
-  { probability: 0.01, entityType: ENTITY_TYPES.TREE },
-  ENEMY_SPAWN,
-];
-const DESERT_SPAWNS = [
-  { probability: 0.001, entityType: ENTITY_TYPES.TREE },
-  {
-    ...ENEMY_SPAWN,
-    probability: 0.00005,
-  },
-];
+const SNOW_PROPS = {
+  biomeType: BIOME_TYPES.SNOW,
+  spawnableEntities: [
+    { probability: 0.01, entityType: ENTITY_TYPES.TREE },
+    ENEMY_SPAWN,
+  ],
+};
+const DESERT_PROPS = {
+  biomeType: BIOME_TYPES.DESERT,
+  spawnableEntities: [
+    { probability: 0.001, entityType: ENTITY_TYPES.TREE },
+    {
+      ...ENEMY_SPAWN,
+      probability: 0.00005,
+    },
+  ],
+};
 
 // Adding space on the rgb color so VScode shows the color
 export const BLOCKS = /** @type {{ [k: string]: Block }} */ ({
@@ -116,35 +122,31 @@ export const BLOCKS = /** @type {{ [k: string]: Block }} */ ({
     color: hexToRgb(" #94F2F4"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK11,
-    defaultImgMapType: IMG_MAP_TYPES.SNOW,
-    spawnableEntities: SNOW_SPAWNS,
+    ...SNOW_PROPS,
   },
   FROZEN_SEA_SHORE: {
     color: hexToRgb(" #A0E6EC"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK8,
-    defaultImgMapType: IMG_MAP_TYPES.SNOW,
-    spawnableEntities: SNOW_SPAWNS,
+    ...SNOW_PROPS,
   },
   SLUSH: {
     color: hexToRgb(" #D0ECEB"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK8,
-    defaultImgMapType: IMG_MAP_TYPES.SNOW,
-    spawnableEntities: SNOW_SPAWNS,
+    ...SNOW_PROPS,
   },
   ICE: {
     color: hexToRgb(" #ECFFFD"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK7,
-    defaultImgMapType: IMG_MAP_TYPES.SNOW,
-    spawnableEntities: SNOW_SPAWNS,
+    ...SNOW_PROPS,
   },
   HIGH_ICE: {
     color: hexToRgb(" #ECFFFD"),
     layer: 1,
     trackType: TRACK_TYPES.TRACK7,
-    defaultImgMapType: IMG_MAP_TYPES.SNOW,
+    ...SNOW_PROPS,
   },
 
   // Desert
@@ -152,34 +154,30 @@ export const BLOCKS = /** @type {{ [k: string]: Block }} */ ({
     color: hexToRgb(" #DAA98B"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK16,
-    defaultImgMapType: IMG_MAP_TYPES.DESERT,
-    spawnableEntities: DESERT_SPAWNS,
+    ...DESERT_PROPS,
   },
   SAND: {
     color: hexToRgb(" #EC912E"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK14,
-    defaultImgMapType: IMG_MAP_TYPES.DESERT,
-    spawnableEntities: DESERT_SPAWNS,
+    ...DESERT_PROPS,
   },
   DARK_SAND: {
     color: hexToRgb(" #CC7025"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK14,
-    defaultImgMapType: IMG_MAP_TYPES.DESERT,
-    spawnableEntities: DESERT_SPAWNS,
+    ...DESERT_PROPS,
   },
   TERRACOTA: {
     color: hexToRgb(" #9F561A"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK15,
-    defaultImgMapType: IMG_MAP_TYPES.DESERT,
-    spawnableEntities: DESERT_SPAWNS,
+    ...DESERT_PROPS,
   },
   HIGH_TERRACOTA: {
     color: hexToRgb(" #9F561A"),
     layer: 1,
     trackType: TRACK_TYPES.TRACK14,
-    defaultImgMapType: IMG_MAP_TYPES.DESERT,
+    ...DESERT_PROPS,
   },
 });

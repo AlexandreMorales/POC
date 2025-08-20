@@ -17,6 +17,9 @@ export const ENTITY_TYPES = {
 export const IMG_MAP_TYPES = {
   DEFAULT: "DEFAULT",
   RUNNING: "RUNNING",
+};
+
+export const BIOME_TYPES = {
   SNOW: "SNOW",
   DESERT: "DESERT",
 };

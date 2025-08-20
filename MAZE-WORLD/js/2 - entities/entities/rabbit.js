@@ -23,7 +23,7 @@ export const addRabbit = (cell) => {
     {
       isGenerated: true,
       movementOptions: { speed: 1, random: true },
-      defaultImgMapType: cell.block?.defaultImgMapType,
+      defaultImgMapType: cell.block?.biomeType,
     }
   );
   if (cell.block.isFluid) getInBoat(rabbitEntity);

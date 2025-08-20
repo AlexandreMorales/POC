@@ -13,7 +13,7 @@
  * @property {boolean} [isFluid]
  * @property {SpawnableEntities[]} [spawnableEntities]
  * @property {string} [trackType]
- * @property {string} [defaultImgMapType]
+ * @property {string} [biomeType]
  */
 
 /**

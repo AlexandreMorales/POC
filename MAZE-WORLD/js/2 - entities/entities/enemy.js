@@ -27,7 +27,7 @@ export const addEnemy = (cell) => {
     ENEMY_IMG_MAP,
     {
       defaultDirection: MOVEMENT.DOWN,
-      defaultImgMapType: cell.block?.defaultImgMapType,
+      defaultImgMapType: cell.block?.biomeType,
       minTime: ENEMY_MIN_TIME,
       movementOptions: {
         speed: 1,
