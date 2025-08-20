@@ -1,8 +1,8 @@
 import { getPolyInfo, MENU_CONFIG } from "../1 - polygones/index.js";
 import { TRACK_TYPES } from "../3 - generation/index.js";
 
-const AUDIO_DURATION = 36;
-const audios = /** @type {{ [k: string]: HTMLAudioElement }} */ ({});
+const audios =
+  /** @type {{ [k: string]: { srcNode: AudioBufferSourceNode, gainNode: GainNode } }} */ ({});
 
 const TRACK_FILES = {
   [TRACK_TYPES.TRACK1]: "sounds/blocks/track1.wav",
@@ -24,17 +24,36 @@ const TRACK_FILES = {
 };
 
 Object.entries(TRACK_FILES).forEach(([track, path]) => {
-  const audio = new Audio(path);
-  audio.volume = 0;
-  audios[track] = audio;
+  const pan = +track.replace("TRACK", "") % 2 ? -1 : 1;
+  const ctx = new AudioContext();
+  const srcNode = ctx.createBufferSource();
+
+  const gainNode = ctx.createGain();
+  gainNode.gain.value = 0;
+  gainNode.connect(ctx.destination);
+
+  const ambientPan = ctx.createStereoPanner();
+  ambientPan.pan.value = pan;
+  ambientPan.connect(gainNode);
+
+  audios[track] = { srcNode, gainNode };
+
+  fetch(path, { mode: "cors" })
+    .then((resp) => resp.arrayBuffer())
+    .then((buffer) =>
+      ctx.decodeAudioData(buffer, (abuffer) => {
+        srcNode.buffer = abuffer;
+        srcNode.connect(ambientPan);
+        srcNode.loop = true;
+      })
+    );
 });
 
 const audiosList = Object.values(audios);
 
 const TRACK_LIST = Object.keys(TRACK_FILES);
 
-let audiosInterval = null;
-let audiosTime = 0;
+let audioStarted = false;
 
 /**
  * @param {{ [k: string]: number }} tracksCount
@@ -42,23 +61,19 @@ let audiosTime = 0;
 export const updateTracks = (tracksCount) => {
   if (MENU_CONFIG.music) {
     const polyInfo = getPolyInfo();
-    if (!audiosInterval) {
-      audiosList.forEach((a) => a.play());
-      audiosTime = 0;
-      audiosInterval = setInterval(() => {
-        audiosTime++;
-        if (audiosTime >= AUDIO_DURATION) audiosTime = 0;
-        // Prevent desync
-        audiosList.forEach((a) => (a.currentTime = audiosTime));
-      }, 1000);
+    if (!audioStarted) {
+      audioStarted = true;
+      audiosList.forEach((a) => a.srcNode.start());
     }
-    const max = polyInfo.rows * polyInfo.columns;
+    const max = polyInfo.rows * polyInfo.columns * 1.2;
     TRACK_LIST.forEach((track) => {
-      audios[track].volume = (tracksCount[track] || 0) / max;
+      const { gainNode } = audios[track];
+      gainNode.gain.value = (tracksCount[track] || 0) / max;
     });
   } else {
-    if (audios) audiosList.forEach((a) => a.pause());
-    clearInterval(audiosInterval);
-    audiosInterval = null;
+    if (audioStarted) {
+      audioStarted = false;
+      audiosList.forEach((a) => a.srcNode.stop());
+    }
   }
 };

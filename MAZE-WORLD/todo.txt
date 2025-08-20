@@ -1,13 +1,5 @@
 ------------------------------------- CURRENT -------------------------------------
 
-AUDIO REFACTOR
-    SEAMLESS LOOP (https://stackoverflow.com/questions/46926033/create-seamless-loop-of-audio-web)
-    CONTROL VOLUME (https://stackoverflow.com/questions/43386277/how-to-control-the-sound-volume-of-audio-buffer-audiocontext)
-    AUDIO PAN (https://stackoverflow.com/questions/20287890/audiocontext-panning-audio-of-playing-media)
-
-
-------------------------------------- SPRINT -------------------------------------
-
 TOOLBAR V2
     FISHING MINIGAME
         REFACTOR GRID TO BE AGNOSTIC OF MAP (TO BE USED BY THE LABYRINTH)
@@ -18,6 +10,10 @@ TOOLBAR V2
         FISHING SPOTS ARE GIF ENTITIES (SPAWN ON MOVE)  
     PLACE (CYCLE THROUGH BLOCKS)
         SHOW EMPTY BLOCK (ONLY BORDERS) WHEN NO BLOCK IS SELECTED
+
+
+
+------------------------------------- SPRINT -------------------------------------
 
 LOCK SCREEN MENU OPTION
     DONT MOVE CLOUDS HORIZONTALLY
