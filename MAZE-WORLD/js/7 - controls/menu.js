@@ -24,6 +24,7 @@ document.querySelectorAll("#menu label").forEach((l) => {
       MENU_CONFIG[config] = check.checked;
       updateCanvasCss();
       drawEveryCell(PLAYER_ENTITY);
+      check.blur();
     };
   } else if (element.tagName === "SELECT") {
     const select = /** @type {HTMLSelectElement} */ (element);
@@ -37,19 +38,25 @@ document.querySelectorAll("#menu label").forEach((l) => {
     select.onchange = () => {
       MENU_CONFIG[config] = select.value;
       start();
+      select.blur();
     };
   }
 });
 
-document.getElementById("teleport").onclick = () => {
-  const i = +(
-    /** @type {HTMLInputElement} */ (document.getElementById("teleportation-i"))
-      .value
-  );
-  const j = +(
-    /** @type {HTMLInputElement} */ (document.getElementById("teleportation-j"))
-      .value
-  );
+const teleportationIElement = /** @type {HTMLInputElement} */ (
+  document.getElementById("teleportation-i")
+);
+const teleportationJElement = /** @type {HTMLInputElement} */ (
+  document.getElementById("teleportation-j")
+);
+const teleportationBtn = /** @type {HTMLButtonElement} */ (
+  document.getElementById("teleport")
+);
+
+teleportationBtn.onclick = () => {
+  const i = +teleportationIElement.value;
+  const j = +teleportationJElement.value;
 
   move(loadAndGetCell({ i, j }));
+  teleportationBtn.blur();
 };

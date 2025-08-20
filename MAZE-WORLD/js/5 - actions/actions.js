@@ -214,7 +214,7 @@ export const place = () => {
   if (!PLAYER_ENTITY.pickedCells.length) return;
 
   const selectedCell = updateAndGetSelectedCell();
-  if (selectedCell?.wall) return;
+  if (selectedCell?.wall || selectedCell.entityType) return;
 
   digAudio.play();
   placeBlock(selectedCell);
