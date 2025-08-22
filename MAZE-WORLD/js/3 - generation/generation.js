@@ -67,6 +67,15 @@ const getAdjacentPos = ({ i, j }, isInverted) => {
 
 /**
  * @param {Pos} pos
+ * @returns {CellProps}
+ */
+export const createCellProps = (pos) => {
+  const isInverted = isCellInverted(pos);
+  return { pos, isInverted, adjacentPos: getAdjacentPos(pos, isInverted) };
+};
+
+/**
+ * @param {Pos} pos
  * @param {Block} block
  * @returns {Cell}
  */
@@ -75,7 +84,6 @@ const createCell = (pos, block) => {
   if (!cell) {
     cell = /** @type {Cell} */ ({});
 
-    cell.pos = pos;
     cell.entityType = null;
 
     if (block) {
@@ -85,10 +93,7 @@ const createCell = (pos, block) => {
     }
   }
 
-  cell.isInverted = isCellInverted(cell.pos);
-  cell.adjacentPos = getAdjacentPos(cell.pos, cell.isInverted);
-
-  return cell;
+  return { ...createCellProps(pos), ...cell };
 };
 
 /**

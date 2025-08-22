@@ -106,9 +106,10 @@ const getXFn = (polySides, polySide, xSide) => {
 
 /**
  * @param {number} polySides
+ * @param {number} cellHeight
  * @returns {PolyInfoProp}
  */
-const configPoly = (polySides) => {
+export const configPoly = (polySides, cellHeight) => {
   let radiusFromSide = 0;
   let radiusFromCorner = 0;
   /**
@@ -117,13 +118,11 @@ const configPoly = (polySides) => {
   let polySide = 0;
   const hasInverted = polySides % 2 === 1;
 
-  const ySide = correctRoundError(RENDER_INFO.cellHeight / 2);
+  const ySide = correctRoundError(cellHeight / 2);
 
   if (hasInverted) {
     // Pythagoras of (height² + (side/2)² = side²)
-    polySide = correctRoundError(
-      Math.sqrt(RENDER_INFO.cellHeight ** 2 / (1 - 1 / 4))
-    );
+    polySide = correctRoundError(Math.sqrt(cellHeight ** 2 / (1 - 1 / 4)));
     // (1/2)a cot(π/n);
     radiusFromSide = correctRoundError(
       (polySide / 2) * (1 / Math.tan(Math.PI / polySides))
@@ -143,9 +142,7 @@ const configPoly = (polySides) => {
 
   const shouldIntercalate = polySides > KNOWN_POLYGONS.SQUARE;
 
-  const yCoeficient = hasInverted
-    ? correctRoundError(-RENDER_INFO.cellHeight / 6)
-    : 0;
+  const yCoeficient = hasInverted ? correctRoundError(-cellHeight / 6) : 0;
   const coeficient = (polySides / 2 + 1) / 2;
   const points = [];
 
@@ -175,7 +172,7 @@ const configPoly = (polySides) => {
   );
 
   const { innerHeight, innerWidth } = window;
-  const rows = Math.floor(innerHeight / RENDER_INFO.cellHeight);
+  const rows = Math.floor(innerHeight / cellHeight);
   let columns = innerWidth / (xSide * 2);
   if (hasInverted) columns = ((innerWidth - 2) * 2 - polySide) / polySide;
   if (shouldIntercalate)
@@ -216,6 +213,6 @@ const configPoly = (polySides) => {
 
 export const configPolys = () => {
   for (const p of KNOWN_POLYGONS_VALUES) {
-    POLYS_INFO[p] = configPoly(p);
+    POLYS_INFO[p] = configPoly(p, RENDER_INFO.cellHeight);
   }
 };

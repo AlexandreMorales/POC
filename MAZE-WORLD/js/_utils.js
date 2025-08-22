@@ -69,3 +69,9 @@ export const getPosDistance = (pos1, pos2) =>
  * @returns {number}
  */
 export const getRandomFloat = (min, max) => Math.random() * (max - min) + min;
+
+/**
+ * @param {number} max
+ * @returns {number}
+ */
+export const getRandomInt = (max) => Math.floor(getRandomFloat(0, max));

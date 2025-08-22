@@ -24,14 +24,18 @@
 
 /**
  * @typedef {Object} CellProps
- * @property {number} layer
  * @property {Pos} pos
- * @property {CellBlock} wall The block above this one
  * @property {{ [k: number]: Pos[] }} adjacentPos Pos of adjacent cells
  * @property {boolean} isInverted Only used for triangles
+ */
+
+/**
+ * @typedef {Object} CellWorldProps
+ * @property {number} layer
+ * @property {CellBlock} wall The block above this one
  * @property {string} entityType The type of the entity on top of the cell
  */
 
 /**
- * @typedef {CellBlock & CellProps} Cell
+ * @typedef {CellProps & CellBlock & CellWorldProps} Cell
  */

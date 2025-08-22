@@ -5,7 +5,7 @@ import {
   RENDER_INFO,
 } from "../1 - polygones/index.js";
 
-import { getMod, getPosDistance, getRandomFloat } from "../_utils.js";
+import { getMod, getPosDistance, getRandomInt } from "../_utils.js";
 import { ENTITY_TYPES, IMG_MAP_TYPES, MOVEMENT } from "./_configs.js";
 import {
   cellIsBlocked,
@@ -101,7 +101,7 @@ export const moveEntities = (baseCell) => {
         nextIndex = nextCellInfo.index;
         if (!nextCell) return;
       } else if (random) {
-        nextIndex = Math.floor(getRandomFloat(0, RENDER_INFO.currentPoly));
+        nextIndex = getRandomInt(RENDER_INFO.currentPoly);
         const aPos = nextCell.adjacentPos[RENDER_INFO.currentPoly];
         nextCell = getCell(aPos[nextIndex]);
 
