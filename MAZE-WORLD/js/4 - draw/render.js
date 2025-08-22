@@ -135,7 +135,7 @@ export const getFillStyle = (color, shoulApplyDark = false, modifier = 1) => {
  * @param {Point} point
  * @param {Point[]} points
  */
-const fillPolygon = (context, { x, y }, points) => {
+export const fillPolygon = (context, { x, y }, points) => {
   context.beginPath();
 
   for (const point of points) {

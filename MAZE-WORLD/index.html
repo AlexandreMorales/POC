@@ -92,6 +92,12 @@
           </label>
         </li>
         <li>
+          <label for="fishingMazeSolved"
+            >Show solved path on maze
+            <input type="checkbox" class="checkbox" id="fishingMazeSolved" />
+          </label>
+        </li>
+        <li>
           <label for="mapGeneration"
             >Map Generation
             <select id="mapGeneration"></select>
@@ -159,6 +165,9 @@
         <div id="rain-container" class="hide"></div>
         <div id="clouds-container"></div>
       </div>
+      <div id="tools">
+        <canvas id="fishing-canvas" class="hide"></canvas>
+      </div>
     </div>
     <div id="widgets">
       <div id="clock-container">
@@ -224,12 +233,16 @@
         <p class="hide-mobile">2</p>
         <canvas id="place-canvas"></canvas>
       </div>
-      <div id="toolbar-boat">
+      <div id="toolbar-fishing">
         <p class="hide-mobile">3</p>
+        <img src="images/tools/fishing-rod.png" />
+      </div>
+      <div id="toolbar-boat">
+        <p class="hide-mobile">4</p>
         <img src="images/boat/left.png" />
       </div>
       <div id="toolbar-map">
-        <p class="hide-mobile">4</p>
+        <p class="hide-mobile">5</p>
         <canvas id="map-canvas"></canvas>
       </div>
     </div>

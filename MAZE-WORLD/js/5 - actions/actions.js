@@ -31,6 +31,7 @@ import {
   updateCompass,
   COMPASS_CONFIG,
   addBlockToToolbar,
+  startFishing,
 } from "../4 - draw/index.js";
 import { getMod } from "../_utils.js";
 
@@ -263,6 +264,10 @@ export const useBoat = () => {
   } else if (canMove) {
     addBoat(selectedCell, PLAYER_ENTITY);
   }
+};
+
+export const useFishingRod = () => {
+  startFishing();
 };
 
 // Called when zooming, creation, set PolySides

@@ -11,6 +11,7 @@ import {
   rotate,
   stopMoving,
   useBoat,
+  useFishingRod,
 } from "../5 - actions/index.js";
 import { resetSize } from "../6 - boot/index.js";
 
@@ -32,6 +33,7 @@ const TOOLBAR_ACTIONS = [
   undefined,
   document.getElementById("toolbar-dig"),
   document.getElementById("toolbar-place"),
+  document.getElementById("toolbar-fishing"),
   document.getElementById("toolbar-boat"),
   document.getElementById("toolbar-map"),
 ];
@@ -95,8 +97,9 @@ const updateToolbarSelected = (keyIndex) => {
 
 TOOLBAR_ACTIONS[1].onclick = () => dig();
 TOOLBAR_ACTIONS[2].onclick = () => place();
-TOOLBAR_ACTIONS[3].onclick = () => useBoat();
-TOOLBAR_ACTIONS[4].onclick = () => toggleFullMap();
+TOOLBAR_ACTIONS[3].onclick = () => useFishingRod();
+TOOLBAR_ACTIONS[4].onclick = () => useBoat();
+TOOLBAR_ACTIONS[5].onclick = () => toggleFullMap();
 
 document.onwheel = (e) => {
   e = e || /** @type {WheelEvent} */ (window.event);

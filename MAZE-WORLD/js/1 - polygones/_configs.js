@@ -29,5 +29,6 @@ export const MENU_CONFIG = {
   clouds: true,
   digitalClock: false,
   music: false,
+  fishingMazeSolved: false,
   mapGeneration: MAP_GENERATION.DISTANCE,
 };
