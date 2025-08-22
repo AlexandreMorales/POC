@@ -160,8 +160,12 @@
   background-color: var(--digital-color);
   border-radius: 50%;
   opacity: 0.08;
+
+  animation: blinkColon 1.5s infinite step-end;
 }
-#digital-clock-colons.active::before,
-#digital-clock-colons.active::after {
-  opacity: 1;
+
+@keyframes blinkColon {
+  50% {
+    opacity: 1;
+  }
 }

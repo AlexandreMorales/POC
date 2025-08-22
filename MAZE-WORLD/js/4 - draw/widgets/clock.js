@@ -22,11 +22,6 @@ const minuteUnitsSegments = document.querySelectorAll(
   "#digital-clock-minutes .digit-units .segment"
 );
 
-const colons = document.getElementById("digital-clock-colons");
-setInterval(() => {
-  colons.classList.toggle("active");
-}, 750);
-
 export const updateClock = () => {
   const { hour, hour24, minute } = getTime();
 

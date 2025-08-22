@@ -15,12 +15,6 @@ const CLOUDS_CONFIG = {
   offset: 0,
 };
 
-const POLYGONS_CLASS_MAP = {
-  [KNOWN_POLYGONS.TRIANGLE]: "triangle",
-  [KNOWN_POLYGONS.SQUARE]: "square",
-  [KNOWN_POLYGONS.HEXAGON]: "hex",
-};
-
 const CLOUDS_DIRECTION_MAP = {
   [MOVEMENT.RIGHT]: -CLOUDS_CONFIG.offsetSize,
   [MOVEMENT.LEFT]: CLOUDS_CONFIG.offsetSize,
@@ -53,7 +47,7 @@ const setCloudShape = () => {
     cloudsContainer.offsetWidth /
       (CLOUDS_CONFIG.num * CLOUDS_CONFIG.columns * 1.5)
   );
-  cloudsContainer.className = POLYGONS_CLASS_MAP[currentPoly];
+  cloudsContainer.className = `p${currentPoly}`;
   cloudsContainer.style.setProperty("--clouds-default-size", `${size}px`);
 };
 
