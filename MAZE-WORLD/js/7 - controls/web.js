@@ -1,6 +1,6 @@
-import { RENDER_INFO } from "../1 - polygones/index.js";
+import { MENU_CONFIG, RENDER_INFO } from "../1 - polygones/index.js";
 import { MOVEMENT } from "../2 - entities/index.js";
-import { toggleFullMap } from "../4 - draw/index.js";
+import { canvasContainer, toggleFullMap } from "../4 - draw/index.js";
 import {
   changePolySides,
   changeSelectedOnCode,
@@ -16,6 +16,7 @@ import {
 import { resetSize } from "../6 - boot/index.js";
 
 import { CONTROLS_CONFIG } from "./_configs.js";
+import { addDebugBlockToPoint } from "./debug.js";
 
 const KEY_MOVEMENT_MAP = {
   ["KeyW"]: MOVEMENT.UP,
@@ -38,6 +39,11 @@ const TOOLBAR_ACTIONS = [
   document.getElementById("toolbar-map"),
 ];
 const MOVEMENT_KEYS = Object.keys(KEY_MOVEMENT_MAP);
+
+const menuToggle = /** @type {HTMLInputElement} */ (
+  document.getElementById("menuToggle")
+);
+const closeDebugMenu = () => (menuToggle.checked = false);
 
 document.onkeydown = (e) => {
   e = e || /** @type {KeyboardEvent} */ (window.event);
@@ -65,7 +71,10 @@ document.onkeydown = (e) => {
 
   if (e.code === "Space") return move();
 
-  if (e.code === "Escape") return toggleFullMap(false);
+  if (e.code === "Escape") {
+    closeDebugMenu();
+    toggleFullMap(false);
+  }
 };
 
 document.onkeyup = () => {
@@ -104,4 +113,15 @@ TOOLBAR_ACTIONS[5].onclick = () => toggleFullMap();
 document.onwheel = (e) => {
   e = e || /** @type {WheelEvent} */ (window.event);
   updateToolbarSelected(e.deltaY < 0 ? selectedIndex - 1 : selectedIndex + 1);
+};
+
+canvasContainer.onclick = (e) => {
+  e = e || /** @type {MouseEvent} */ (window.event);
+  if (MENU_CONFIG.debugMode) {
+    const { left, top } = canvasContainer.getBoundingClientRect();
+    const x = e.clientX - left;
+    const y = e.clientY - top;
+    addDebugBlockToPoint({ x, y });
+  }
+  closeDebugMenu();
 };

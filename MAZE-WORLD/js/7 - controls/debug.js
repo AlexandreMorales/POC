@@ -7,15 +7,14 @@ import {
 } from "../1 - polygones/index.js";
 import { PLAYER_ENTITY } from "../2 - entities/index.js";
 import { BLOCKS } from "../3 - generation/index.js";
-import { drawEveryCell, canvasContainer } from "../4 - draw/index.js";
+import { drawEveryCell } from "../4 - draw/index.js";
 import { placeBlock } from "../5 - actions/index.js";
 
-canvasContainer.onclick = (e) => {
+/**
+ * @param {Point} point
+ */
+export const addDebugBlockToPoint = ({ x, y }) => {
   if (!MENU_CONFIG.debugMode || RENDER_INFO.rotationTurns) return;
-  e = e || /** @type {Event} */ (window.event);
-  const { left, top } = canvasContainer.getBoundingClientRect();
-  let x = e.clientX - left;
-  let y = e.clientY - top;
   if (MENU_CONFIG.usePerspective) {
     x -= 175;
     y += 60;
@@ -70,7 +69,7 @@ const calcI = (y, ySide, shouldIntercalate, evenJ) => {
 };
 
 /**
- * @param {Point} pos
+ * @param {Point} point
  * @return {Pos}
  */
 const calculatePosBasedOnPoint = ({ x, y }) => {
