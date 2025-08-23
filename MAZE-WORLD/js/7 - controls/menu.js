@@ -5,58 +5,60 @@ import { drawEveryCell, updateCanvasCss } from "../4 - draw/index.js";
 import { move } from "../5 - actions/index.js";
 import { start } from "../6 - boot/index.js";
 
-const SELECT_OPTIONS = {
-  mapGeneration: Object.entries(MAP_GENERATION),
-};
+(() => {
+  const SELECT_OPTIONS = {
+    mapGeneration: Object.entries(MAP_GENERATION),
+  };
 
-document.querySelectorAll("#menu label").forEach((l) => {
-  const config = /** @type {HTMLLabelElement} */ (l).htmlFor;
-  const element = /** @type {HTMLInputElement | HTMLSelectElement} */ (
-    document.getElementById(config)
+  document.querySelectorAll("#menu label").forEach((l) => {
+    const config = /** @type {HTMLLabelElement} */ (l).htmlFor;
+    const element = /** @type {HTMLInputElement | HTMLSelectElement} */ (
+      document.getElementById(config)
+    );
+
+    if (!element) return;
+
+    if (element.type === "checkbox") {
+      const check = /** @type {HTMLInputElement} */ (element);
+      check.checked = MENU_CONFIG[config];
+      check.onchange = () => {
+        MENU_CONFIG[config] = check.checked;
+        updateCanvasCss();
+        drawEveryCell(PLAYER_ENTITY);
+        check.blur();
+      };
+    } else if (element.tagName === "SELECT") {
+      const select = /** @type {HTMLSelectElement} */ (element);
+      SELECT_OPTIONS[config].forEach(([key, value]) => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.innerHTML = key;
+        select.appendChild(option);
+      });
+      select.value = MENU_CONFIG[config];
+      select.onchange = () => {
+        MENU_CONFIG[config] = select.value;
+        start();
+        select.blur();
+      };
+    }
+  });
+
+  const teleportationIElement = /** @type {HTMLInputElement} */ (
+    document.getElementById("teleportation-i")
+  );
+  const teleportationJElement = /** @type {HTMLInputElement} */ (
+    document.getElementById("teleportation-j")
+  );
+  const teleportationBtn = /** @type {HTMLButtonElement} */ (
+    document.getElementById("teleport")
   );
 
-  if (!element) return;
+  teleportationBtn.onclick = () => {
+    const i = +teleportationIElement.value;
+    const j = +teleportationJElement.value;
 
-  if (element.type === "checkbox") {
-    const check = /** @type {HTMLInputElement} */ (element);
-    check.checked = MENU_CONFIG[config];
-    check.onchange = () => {
-      MENU_CONFIG[config] = check.checked;
-      updateCanvasCss();
-      drawEveryCell(PLAYER_ENTITY);
-      check.blur();
-    };
-  } else if (element.tagName === "SELECT") {
-    const select = /** @type {HTMLSelectElement} */ (element);
-    SELECT_OPTIONS[config].forEach(([key, value]) => {
-      const option = document.createElement("option");
-      option.value = value;
-      option.innerHTML = key;
-      select.appendChild(option);
-    });
-    select.value = MENU_CONFIG[config];
-    select.onchange = () => {
-      MENU_CONFIG[config] = select.value;
-      start();
-      select.blur();
-    };
-  }
-});
-
-const teleportationIElement = /** @type {HTMLInputElement} */ (
-  document.getElementById("teleportation-i")
-);
-const teleportationJElement = /** @type {HTMLInputElement} */ (
-  document.getElementById("teleportation-j")
-);
-const teleportationBtn = /** @type {HTMLButtonElement} */ (
-  document.getElementById("teleport")
-);
-
-teleportationBtn.onclick = () => {
-  const i = +teleportationIElement.value;
-  const j = +teleportationJElement.value;
-
-  move(loadAndGetCell({ i, j }));
-  teleportationBtn.blur();
-};
+    move(loadAndGetCell({ i, j }));
+    teleportationBtn.blur();
+  };
+})();

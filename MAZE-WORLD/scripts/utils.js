@@ -19,7 +19,7 @@ const writeMinFile = (filePath, extension, output) => {
       // Remove exports
       .replaceAll("export ", "")
       // Remove imports
-      .replaceAll(/import.+?from ".+?";/gs, "")
+      .replaceAll(/import.+?".+?";/gs, "")
       // Remove JSDocs
       .replaceAll(/\/\*\*.+?\*\//gs, "")
       // Remove comments
