@@ -29,9 +29,10 @@ export const createEntityImage = (entity) => {
   img.src = getImgMap(entity, entity.defaultImgMapType)[
     entity.defaultDirection || MOVEMENT.RIGHT
   ];
+  img.className = "image";
   container.appendChild(img);
+  setEntitySize(img);
   entity.img = img;
-  setEntitySize(entity);
 };
 
 /**
@@ -74,23 +75,32 @@ export const updateEntityPoint = (entity, parentPoint) => {
 };
 
 /**
+ * @param {number} [ySide]
  * @return {number}
  */
-const getEntitySize = () => Math.round(getPolyInfo().ySide * 2.5);
+const getEntitySize = (ySide) =>
+  Math.round((ySide || getPolyInfo().ySide) * 2.5);
 
 /**
- * @param {Entity} entity
+ * @param {HTMLImageElement} img
+ * @param {number} [ySide]
  */
-export const setEntitySize = (entity) =>
-  entity.img?.style.setProperty("--entity-size", `${getEntitySize()}px`);
+export const setEntitySize = (img, ySide) =>
+  img?.style.setProperty("--entity-size", `${getEntitySize(ySide)}px`);
 
 /**
  * @param {HTMLImageElement} img
  * @param {Point} point
+ * @param {boolean} [shouldCenter]
+ * @param {number} [ySide]
  */
-const setImagePoint = (img, point) => {
-  const entitySize = getEntitySize();
-  img.style.setProperty("--entity-top", `${point.y - entitySize / 1.25}px`);
+export const setImagePoint = (img, point, shouldCenter, ySide) => {
+  if (!point) return;
+  const entitySize = getEntitySize(ySide);
+  img.style.setProperty(
+    "--entity-top",
+    `${point.y - entitySize / (shouldCenter ? 2 : 1.25)}px`
+  );
   img.style.setProperty("--entity-left", `${point.x - entitySize / 2}px`);
 };
 
@@ -111,8 +121,7 @@ const verifyEntityHeight = (entity) => {
 
   if (!downCell) return;
 
-  while (entity.img.classList.length > 0)
-    entity.img.classList.remove(entity.img.classList.item(0));
+  entity.img.className = "image";
 
   const connectedEntities = /** @type {Entity[]} */ (
     Object.values(entity.connectedEntities)

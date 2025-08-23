@@ -65,10 +65,8 @@ export const createMazeObj = (mazeInfos, mazeCircleInfos) => {
    */
   const getMazeCell = ({ i, j }) => MAZE_GRID[i]?.[j];
 
-  const resetMazeGrid = () => (MAZE_GRID = []);
-
   const createMazeGrid = () => {
-    resetMazeGrid();
+    MAZE_GRID = [];
     const rows = getMazeRows();
 
     for (let i = 0; i < rows; i++) {
@@ -153,11 +151,42 @@ export const createMazeObj = (mazeInfos, mazeCircleInfos) => {
     const bottomLeftAngle = bottomAngle + leftBorder;
     const bottomRightAngle = bottomAngle + rightBorder;
 
+    const topLeftPoint = getMazePoint(
+      CIRCLE_INFO.center,
+      topRadius,
+      topLeftAngle
+    );
+    const topRightPoint = getMazePoint(
+      CIRCLE_INFO.center,
+      topRadius,
+      topRightAngle
+    );
+    const bottomLeftPoint = getMazePoint(
+      CIRCLE_INFO.center,
+      bottomRadius,
+      bottomLeftAngle
+    );
+    const bottomRightPoint = getMazePoint(
+      CIRCLE_INFO.center,
+      bottomRadius,
+      bottomRightAngle
+    );
+    const points = [
+      topLeftPoint,
+      topRightPoint,
+      bottomLeftPoint,
+      bottomRightPoint,
+    ];
+
+    const x = points.reduce((acc, p) => acc + p.x, 0) / points.length;
+    const y = points.reduce((acc, p) => acc + p.y, 0) / points.length;
+
+    cell.point = getMazePoint({ x, y }, CIRCLE_INFO.cellHeight, topAngle);
     cell.circleProps = {
-      topLeftPoint: getMazePoint(topRadius, topLeftAngle),
-      topRightPoint: getMazePoint(topRadius, topRightAngle),
-      bottomLeftPoint: getMazePoint(bottomRadius, bottomLeftAngle),
-      bottomRightPoint: getMazePoint(bottomRadius, bottomRightAngle),
+      topLeftPoint,
+      topRightPoint,
+      bottomLeftPoint,
+      bottomRightPoint,
       topRadius,
       bottomRadius,
       topLeftAngle,
@@ -172,33 +201,25 @@ export const createMazeObj = (mazeInfos, mazeCircleInfos) => {
   };
 
   /**
+   * @param {Point} center
    * @param {number} radius
    * @param {number} angle
    * @returns {Point}
    */
-  const getMazePoint = (radius, angle) => ({
-    x: CIRCLE_INFO.center.x + Math.cos(angle) * radius,
-    y: CIRCLE_INFO.center.y + Math.sin(angle) * radius,
+  const getMazePoint = (center, radius, angle) => ({
+    x: center.x + Math.cos(angle) * radius,
+    y: center.y + Math.sin(angle) * radius,
   });
 
   // BUILD
   const buildMaze = () => {
     createMazeGrid();
-    setCurrentCell(getMazeCell(INITIAL_POS));
+    MAZE_INFO.currentCell = getMazeCell(INITIAL_POS);
 
     while (MAZE_INFO.currentCell)
-      setCurrentCell(buildCellMaze(MAZE_INFO.currentCell));
+      MAZE_INFO.currentCell = buildCellMaze(MAZE_INFO.currentCell);
 
-    setCurrentCell(getMazeCell(INITIAL_POS));
-  };
-
-  /**
-   * @param {CellMaze} cell
-   */
-  const setCurrentCell = (cell) => {
-    if (MAZE_INFO.currentCell) MAZE_INFO.currentCell.active = false;
-    MAZE_INFO.currentCell = cell;
-    if (MAZE_INFO.currentCell) MAZE_INFO.currentCell.active = true;
+    MAZE_INFO.currentCell = getMazeCell(INITIAL_POS);
   };
 
   /**
@@ -218,19 +239,21 @@ export const createMazeObj = (mazeInfos, mazeCircleInfos) => {
     return nextCell;
   };
 
+  const getLastMazeCell = () =>
+    getMazeCell({ i: MAZE_INFO.rows - 1, j: MAZE_INFO.columns - 1 });
+
   const isMazeSolved = () =>
     !MAZE_INFO.currentCell ||
     (MAZE_INFO.isCircle
       ? MAZE_INFO.currentCell.pos.i === CIRCLE_INFO.rows - 1
-      : MAZE_INFO.currentCell.pos.i === MAZE_INFO.rows - 1 &&
-        MAZE_INFO.currentCell.pos.j === MAZE_INFO.columns - 1);
+      : MAZE_INFO.currentCell === getLastMazeCell());
 
   const solveMaze = () => {
     while (!isMazeSolved())
-      setCurrentCell(solveCellMaze(MAZE_INFO.currentCell));
+      MAZE_INFO.currentCell = solveCellMaze(MAZE_INFO.currentCell);
 
     solveCellMaze(MAZE_INFO.currentCell);
-    setCurrentCell(getMazeCell(INITIAL_POS));
+    MAZE_INFO.currentCell = getMazeCell(INITIAL_POS);
   };
 
   /**
@@ -303,20 +326,20 @@ export const createMazeObj = (mazeInfos, mazeCircleInfos) => {
   // MOVEMENT
   /**
    * @param {number} posIndex
-   * @returns {boolean}
+   * @returns {CellMaze}
    */
   const mazeMove = (posIndex) => {
     if (posIndex === undefined || MAZE_INFO.currentCell.borders[posIndex])
       return;
 
-    const adjacentPos = getAdjPos(MAZE_INFO.currentCell);
+    const nextPos = getAdjPos(MAZE_INFO.currentCell)[posIndex];
+    if (!nextPos) return;
 
-    const nextCell = getMazeCell(adjacentPos[posIndex]);
-
+    const nextCell = getMazeCell(nextPos);
     if (!nextCell) return;
 
     const oldCell = MAZE_INFO.currentCell;
-    setCurrentCell(nextCell);
+    MAZE_INFO.currentCell = nextCell;
 
     const prevCell = MAZE_INFO.queue[MAZE_INFO.queue.length - 1];
 
@@ -328,7 +351,7 @@ export const createMazeObj = (mazeInfos, mazeCircleInfos) => {
       MAZE_INFO.queue.push(oldCell.pos);
     }
 
-    return isMazeSolved();
+    return MAZE_INFO.currentCell;
   };
 
   // CONFIGURE
@@ -377,11 +400,14 @@ export const createMazeObj = (mazeInfos, mazeCircleInfos) => {
     mazeMove,
     buildMaze,
     solveMaze,
+    isMazeSolved,
     setIsCircle: (isCircle) => (MAZE_INFO.isCircle = isCircle),
-    getCirclePoint: () => (MAZE_INFO.isCircle ? CIRCLE_INFO.center : null),
+    getCirclePoint: () => CIRCLE_INFO.center,
     getMazeRows,
     getNumCellsPerMazeRow,
     getMazeCell,
+    getCurrentMazeCell: () => MAZE_INFO.currentCell,
+    getLastMazeCell,
     getMazePolyInfo,
   };
 };

@@ -32,6 +32,9 @@ import {
   COMPASS_CONFIG,
   addBlockToToolbar,
   startFishing,
+  IS_FISHING_ACTIVE,
+  toggleFullMap,
+  moveFishing,
 } from "../4 - draw/index.js";
 import { getMod } from "../_utils.js";
 
@@ -47,7 +50,7 @@ let canRotate = true;
  * @param {number} orientation
  */
 export const rotate = (orientation) => {
-  if (canRotate) {
+  if (!IS_FISHING_ACTIVE && canRotate) {
     canRotate = false;
     RENDER_INFO.rotationTurns = PLAYER_ENTITY.selectedCellIndex = getMod(
       RENDER_INFO.rotationTurns + orientation,
@@ -88,6 +91,7 @@ const getNextCellIndexBasedOnCode = (code, useDiagonal) => {
 
 let lastMovement = /** @type {symbol} */ (null);
 let lastSelection = /** @type {symbol} */ (null);
+let blockMovement = false;
 
 /**
  * @param {symbol} direction
@@ -96,6 +100,13 @@ let lastSelection = /** @type {symbol} */ (null);
 export const moveBaseOnCode = (direction, useDiagonal) => {
   if (!direction) return;
 
+  if (IS_FISHING_ACTIVE) {
+    moveFishing(direction, useDiagonal);
+    blockMovement = true;
+  }
+
+  if (blockMovement) return;
+
   if (lastMovement !== direction) {
     lastMovement = direction;
     makeEntityRun(PLAYER_ENTITY, lastMovement);
@@ -103,6 +114,7 @@ export const moveBaseOnCode = (direction, useDiagonal) => {
 
   const aModI = getNextCellIndexBasedOnCode(direction, useDiagonal);
   if (aModI === undefined) return;
+
   const nextPos = getPosByIndex(PLAYER_ENTITY.cell, aModI);
 
   if (!nextPos) return;
@@ -117,6 +129,7 @@ export const moveBaseOnCode = (direction, useDiagonal) => {
 
 export const MOVEMENT_VALUES = Object.values(MOVEMENT);
 export const stopMoving = () => {
+  blockMovement = false;
   if (lastMovement) {
     if (getPolyInfo().hasInverted) {
       const movementMap = getMovementMap(PLAYER_ENTITY.cell);
@@ -138,7 +151,7 @@ export const stopMoving = () => {
  * @param {boolean} [useDiagonal]
  */
 export const changeSelectedOnCode = (direction, useDiagonal) => {
-  if (!direction) return;
+  if (IS_FISHING_ACTIVE || !direction) return;
 
   lastSelection = direction;
   const aModI = getNextCellIndexBasedOnCode(direction, useDiagonal);
@@ -150,9 +163,15 @@ export const changeSelectedOnCode = (direction, useDiagonal) => {
   updateEntityDirection(PLAYER_ENTITY, lastSelection);
 };
 
+/**
+ * @returns {CellBlock}
+ */
 const getNextBlockToPlace = () =>
   PLAYER_ENTITY.pickedCells[PLAYER_ENTITY.pickedCells.length - 1];
 
+/**
+ * @returns {number}
+ */
 export const getNextPolygon = () =>
   KNOWN_POLYGONS_VALUES[
     (KNOWN_POLYGONS_VALUES.indexOf(RENDER_INFO.currentPoly) + 1) %
@@ -160,6 +179,8 @@ export const getNextPolygon = () =>
   ];
 
 export const changePolySides = () => {
+  if (IS_FISHING_ACTIVE) return;
+
   RENDER_INFO.currentPoly = getNextPolygon();
 
   RENDER_INFO.rotationTurns = 0;
@@ -185,6 +206,8 @@ const updateAndGetSelectedCell = () => {
 };
 
 export const dig = () => {
+  if (IS_FISHING_ACTIVE) return;
+
   const selectedCell = updateAndGetSelectedCell();
 
   if (!selectedCell?.block) return;
@@ -212,7 +235,7 @@ export const dig = () => {
 };
 
 export const place = () => {
-  if (!PLAYER_ENTITY.pickedCells.length) return;
+  if (IS_FISHING_ACTIVE || !PLAYER_ENTITY.pickedCells.length) return;
 
   const selectedCell = updateAndGetSelectedCell();
   if (selectedCell?.wall || selectedCell.entityType) return;
@@ -247,6 +270,8 @@ export const placeBlock = (cell, block, color) => {
 };
 
 export const useBoat = () => {
+  if (IS_FISHING_ACTIVE) return;
+
   const selectedCell = updateAndGetSelectedCell();
   const canMove = !selectedCell.wall && selectedCell.block;
 
@@ -266,8 +291,17 @@ export const useBoat = () => {
   }
 };
 
+/**
+ * @param {boolean} [toggle]
+ */
+export const useMap = (toggle) => {
+  if (IS_FISHING_ACTIVE) return;
+  toggleFullMap(toggle);
+};
+
 export const useFishingRod = () => {
-  startFishing();
+  const selectedCell = updateAndGetSelectedCell();
+  if (selectedCell?.block?.isFluid) startFishing();
 };
 
 // Called when zooming, creation, set PolySides

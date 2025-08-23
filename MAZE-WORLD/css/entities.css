@@ -6,7 +6,7 @@
   --entity-left: 0px;
 }
 
-#entities img {
+.image {
   position: absolute;
   object-fit: cover;
   object-position: 0 0;

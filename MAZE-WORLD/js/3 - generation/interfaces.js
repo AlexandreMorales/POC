@@ -22,14 +22,17 @@
 /**
  * @typedef {Object} MazeObj
  * @property {() => { height: number, width: number  }} getMazeSize
- * @property {(posIndex: number) => boolean} mazeMove
+ * @property {(posIndex: number) => CellMaze} mazeMove
  * @property {() => void} buildMaze
  * @property {() => void} solveMaze
+ * @property {() => boolean} isMazeSolved
  * @property {(isCircle: boolean) => void} setIsCircle
  * @property {() => Point} getCirclePoint
  * @property {() => number} getMazeRows
  * @property {(index: number) => number} getNumCellsPerMazeRow
  * @property {(pos: Pos) => CellMaze} getMazeCell
+ * @property {() => CellMaze} getCurrentMazeCell
+ * @property {() => CellMaze} getLastMazeCell
  * @property {() => PolyInfoProp} getMazePolyInfo
  */
 
@@ -52,7 +55,6 @@
  * @typedef {Object} CellMazeProps
  * @property {Point} point
  * @property {boolean[]} borders
- * @property {boolean} active
  * @property {boolean} visited
  * @property {boolean} solved
  * @property {boolean} path

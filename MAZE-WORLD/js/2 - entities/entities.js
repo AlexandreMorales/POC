@@ -85,13 +85,11 @@ export const createEntity = (cell, id, type, imageMap, entityParams = {}) => {
   return entity;
 };
 
-export const setEntitiesSize = () => ENTITIES.forEach(setEntitySize);
+export const setEntitiesSize = () =>
+  ENTITIES.forEach((e) => setEntitySize(e?.img));
 
-export const removeGeneratedEntities = () => {
-  ENTITIES.forEach((e) => {
-    if (e.isGenerated) removeEntity(e);
-  });
-};
+export const removeGeneratedEntities = () =>
+  ENTITIES.forEach((e) => e.isGenerated && removeEntity(e));
 
 export const updateEntities = () =>
   ENTITIES.forEach((e) => updateEntityPoint(e));

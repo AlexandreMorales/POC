@@ -122,21 +122,33 @@ export const moveEntities = (baseCell) => {
 };
 
 /**
- * @param {Cell} baseCell
+ * @param {CellProps} baseCell
  * @param {boolean} [useDiagonal]
+ * @param {number} [rotationTurns]
+ * @param {number} [currentPoly]
+ * @param {boolean} [hasInverted]
  * @returns {{ moveToIndex: { [k: symbol]: number }, indexToMove: { [k: number]: symbol } }}
  */
-const getMovementMaps = (baseCell, useDiagonal) => {
-  let topI = RENDER_INFO.rotationTurns;
-  let bottomI = topI + Math.floor(RENDER_INFO.currentPoly / 2);
+const getMovementMaps = (
+  baseCell,
+  useDiagonal,
+  rotationTurns,
+  currentPoly,
+  hasInverted
+) => {
+  currentPoly = currentPoly ?? RENDER_INFO.currentPoly;
+  hasInverted = hasInverted ?? getPolyInfo().hasInverted;
 
-  let topLeftI = topI + RENDER_INFO.currentPoly - 1;
+  let topI = rotationTurns ?? RENDER_INFO.rotationTurns;
+  let bottomI = topI + Math.floor(currentPoly / 2);
+
+  let topLeftI = topI + currentPoly - 1;
   let topRightI = topI + 1;
 
   let bottomLeftI = bottomI + 1;
   let bottomRightI = bottomI - 1;
 
-  if (getPolyInfo().hasInverted) {
+  if (hasInverted) {
     const isInverted = baseCell.isInverted;
     topLeftI = bottomLeftI = topI + (isInverted ? 1 : 2);
     topRightI = bottomRightI = topI + (isInverted ? 2 : 1);
@@ -163,12 +175,27 @@ const getMovementMaps = (baseCell, useDiagonal) => {
 };
 
 /**
- * @param {Cell} baseCell
+ * @param {CellProps} baseCell
  * @param {boolean} [useDiagonal]
+ * @param {number} [rotationTurns]
+ * @param {number} [currentPoly]
+ * @param {boolean} [hasInverted]
  * @returns {{ [k: symbol]: number }}
  */
-export const getMovementMap = (baseCell, useDiagonal) =>
-  getMovementMaps(baseCell, useDiagonal).moveToIndex;
+export const getMovementMap = (
+  baseCell,
+  useDiagonal,
+  rotationTurns,
+  currentPoly,
+  hasInverted
+) =>
+  getMovementMaps(
+    baseCell,
+    useDiagonal,
+    rotationTurns,
+    currentPoly,
+    hasInverted
+  ).moveToIndex;
 
 export const killEntitiesByTimeOfDay = () => {
   // If its raining the enemies wont burn

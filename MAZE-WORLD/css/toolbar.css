@@ -1,3 +1,8 @@
+:root {
+  --fishing-progress-bar-init-height: none;
+  --fishing-progress-bar-height: none;
+}
+
 #toolbar {
   position: absolute;
   bottom: 7vh;
@@ -68,13 +73,40 @@
   transform: translate(-50%, -90%);
 }
 
-#fishing-canvas {
+#fishing-container {
   position: fixed;
   top: 50%;
   left: 50%;
   z-index: calc(var(--player-z-index) + 2);
-  background-color: var(--background-color);
-  border-radius: var(--action-border-radius);
+  background-color: transparent;
   opacity: 1;
   transform: translate(-50%, -50%);
+
+  display: flex;
+}
+
+#fishing-canvas-container {
+  position: relative;
+}
+
+#fishing-progress-bar {
+  width: max(2.5vw, 40px);
+  height: 100%;
+  border-radius: var(--action-border-radius);
+  mask: linear-gradient(#fff 0 0);
+  margin-top: auto;
+
+  height: var(--fishing-progress-bar-height);
+  margin-right: max(0.75vw, 10px);
+}
+#fishing-progress-bar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: linear-gradient(to top, red, green);
+
+  height: var(--fishing-progress-bar-init-height);
 }

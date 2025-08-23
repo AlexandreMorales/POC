@@ -2,9 +2,9 @@ import { applyBorders, fillPolygon } from "./render.js";
 
 const MAZE_CANVAS_CONFIG = {
   strokeColor: "black",
-  defaultColor: "white",
-  visitedColor: "grey",
-  pathColor: "green",
+  defaultColor: "transparent",
+  visitedColor: "#cdcdcd",
+  pathColor: "#6e79d6",
   currentColor: "cyan",
 };
 
@@ -34,10 +34,11 @@ const drawCellMaze = (context, mazeObj, cell) => {
 
   if (cell.visited) context.fillStyle = MAZE_CANVAS_CONFIG.visitedColor;
   if (cell.path) context.fillStyle = MAZE_CANVAS_CONFIG.pathColor;
-  if (cell.active) context.fillStyle = MAZE_CANVAS_CONFIG.currentColor;
+  if (cell === mazeObj.getCurrentMazeCell())
+    context.fillStyle = MAZE_CANVAS_CONFIG.currentColor;
 
-  const circlePoint = mazeObj.getCirclePoint();
-  if (circlePoint) drawCellMazeCircle(context, cell, circlePoint);
+  if (cell.circleProps)
+    drawCellMazeCircle(context, cell, mazeObj.getCirclePoint());
   else drawCellMazePolygon(context, mazeObj, cell);
 };
 
