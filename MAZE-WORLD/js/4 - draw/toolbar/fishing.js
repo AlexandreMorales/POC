@@ -1,4 +1,4 @@
-import { KNOWN_POLYGONS, MENU_CONFIG } from "../../1 - polygones/_configs.js";
+import { KNOWN_POLYGONS } from "../../1 - polygones/_configs.js";
 import {
   setEntitySize,
   setImagePoint,
@@ -90,7 +90,6 @@ const initFishingMazeObj = () => {
 
   fishingMazeObj.setIsCircle(FISHING_IS_CIRCLE);
   fishingMazeObj.buildMaze();
-  if (MENU_CONFIG.fishingMazeSolved) fishingMazeObj.solveMaze();
 };
 
 /**
