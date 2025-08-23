@@ -1,9 +1,13 @@
 import { KNOWN_POLYGONS, MENU_CONFIG } from "../../1 - polygones/_configs.js";
-import { RENDER_INFO } from "../../1 - polygones/_infos.js";
-import { getMovementMap } from "../../2 - entities/index.js";
-import { setEntitySize, setImagePoint } from "../../2 - entities/render.js";
-import { createMazeObj } from "../../3 - generation/index.js";
-import { drawMaze } from "../drawMaze.js";
+import {
+  setEntitySize,
+  setImagePoint,
+  getMovementMap,
+} from "../../2 - entities/index.js";
+import { BLOCKS, createMazeObj } from "../../3 - generation/index.js";
+import { tweakColor } from "../../_utils.js";
+import { DRAW_CONFIG } from "../_config.js";
+import { drawCellMaze } from "../drawMaze.js";
 
 export const fishingCanvas = /** @type {HTMLCanvasElement} */ (
   document.getElementById("fishing-canvas")
@@ -20,10 +24,10 @@ const fishingFishImg = /** @type {HTMLImageElement} */ (
 
 const FISHING_CONFIG = {
   mazeSize: 7,
-  cellHeight: 30,
+  cellHeight: 45,
   circleMazeSize: 5,
-  circleCellHeight: 30,
-  isCircleProbability: 0.01,
+  circleCellHeight: 45,
+  isCircleProbability: 0.05,
   secondsToFish: 15,
   timerDelay: 100,
   timer: null,
@@ -117,6 +121,31 @@ const initFishingTimer = (height) => {
   }, FISHING_CONFIG.timerDelay);
 };
 
+let fishingFluidInterval = null;
+
+/**
+ * @param {MazeObj} mazeObj
+ */
+const initFishingDraw = (mazeObj) => {
+  clearInterval(fishingFluidInterval);
+
+  const cells = /** @type {CellMaze[]} */ ([]);
+
+  for (const pos of mazeObj.iterateOverMaze()) {
+    const cell = mazeObj.getMazeCell(pos);
+    cells.push(cell);
+    drawCellMaze(fishingContext, mazeObj, cell, tweakColor(BLOCKS.WATER.color));
+  }
+
+  if (!cells.length) return;
+
+  fishingFluidInterval = setInterval(() => {
+    cells.forEach((c) =>
+      drawCellMaze(fishingContext, mazeObj, c, tweakColor(BLOCKS.WATER.color))
+    );
+  }, DRAW_CONFIG.fluidSpeed);
+};
+
 export const startFishing = () => {
   if (IS_FISHING_ACTIVE) return stopFishing();
   IS_FISHING_ACTIVE = true;
@@ -125,15 +154,16 @@ export const startFishing = () => {
   initFishingMazeObj();
 
   const size = fishingMazeObj.getMazeSize();
+  // Prevent hex to cut last border
+  size.height += FISHING_CONFIG.cellHeight / 9;
   setFishingCanvasSize(size);
-
-  drawMaze(fishingContext, fishingMazeObj);
-  drawMaze(fishingContext, fishingMazeObj);
 
   initFishingImages();
 
   fishingContainer.classList.remove("hide");
   initFishingTimer(size.height);
+
+  initFishingDraw(fishingMazeObj);
 };
 
 /**
@@ -148,7 +178,7 @@ export const moveFishing = (code, useDiagonal) => {
     useDiagonal,
     0,
     FISHING_IS_CIRCLE ? KNOWN_POLYGONS.SQUARE : null,
-    hasInverted
+    !FISHING_IS_CIRCLE && hasInverted
   )[code];
 
   const nextCell = fishingMazeObj.mazeMove(aIndex);
@@ -158,5 +188,4 @@ export const moveFishing = (code, useDiagonal) => {
   if (fishingMazeObj.isMazeSolved()) stopFishing();
 
   setImagePoint(fishingFishImg, nextCell.point, true, ySide);
-  drawMaze(fishingContext, fishingMazeObj);
 };

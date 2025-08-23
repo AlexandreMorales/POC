@@ -65,16 +65,25 @@ export const createMazeObj = (mazeInfos, mazeCircleInfos) => {
    */
   const getMazeCell = ({ i, j }) => MAZE_GRID[i]?.[j];
 
-  const createMazeGrid = () => {
-    MAZE_GRID = [];
+  /**
+   * @return {Generator<Pos>}
+   */
+  function* iterateOverMaze() {
     const rows = getMazeRows();
-
     for (let i = 0; i < rows; i++) {
       const numCells = getNumCellsPerMazeRow(i);
       for (let j = 0; j < numCells; j++) {
-        MAZE_GRID[i] = MAZE_GRID[i] || [];
-        MAZE_GRID[i][j] = createCellMaze({ i, j });
+        yield { i, j };
       }
+    }
+  }
+
+  const createMazeGrid = () => {
+    MAZE_GRID = [];
+
+    for (const { i, j } of iterateOverMaze()) {
+      MAZE_GRID[i] = MAZE_GRID[i] || [];
+      MAZE_GRID[i][j] = createCellMaze({ i, j });
     }
   };
 
@@ -151,37 +160,19 @@ export const createMazeObj = (mazeInfos, mazeCircleInfos) => {
     const bottomLeftAngle = bottomAngle + leftBorder;
     const bottomRightAngle = bottomAngle + rightBorder;
 
-    const topLeftPoint = getMazePoint(
-      CIRCLE_INFO.center,
-      topRadius,
-      topLeftAngle
-    );
-    const topRightPoint = getMazePoint(
-      CIRCLE_INFO.center,
-      topRadius,
-      topRightAngle
-    );
-    const bottomLeftPoint = getMazePoint(
-      CIRCLE_INFO.center,
-      bottomRadius,
-      bottomLeftAngle
-    );
-    const bottomRightPoint = getMazePoint(
-      CIRCLE_INFO.center,
-      bottomRadius,
-      bottomRightAngle
-    );
+    const topLeftPoint = getMazePoint(topRadius, topLeftAngle);
+    const topRightPoint = getMazePoint(topRadius, topRightAngle);
+    const bottomLeftPoint = getMazePoint(bottomRadius, bottomLeftAngle);
+    const bottomRightPoint = getMazePoint(bottomRadius, bottomRightAngle);
     const points = [
-      topLeftPoint,
-      topRightPoint,
-      bottomLeftPoint,
-      bottomRightPoint,
+      getMazePoint(topRadius + CIRCLE_INFO.cellHeight / 2, topLeftAngle),
+      getMazePoint(topRadius + CIRCLE_INFO.cellHeight / 2, topRightAngle),
     ];
 
     const x = points.reduce((acc, p) => acc + p.x, 0) / points.length;
     const y = points.reduce((acc, p) => acc + p.y, 0) / points.length;
 
-    cell.point = getMazePoint({ x, y }, CIRCLE_INFO.cellHeight, topAngle);
+    cell.point = { x, y };
     cell.circleProps = {
       topLeftPoint,
       topRightPoint,
@@ -201,41 +192,67 @@ export const createMazeObj = (mazeInfos, mazeCircleInfos) => {
   };
 
   /**
-   * @param {Point} center
    * @param {number} radius
    * @param {number} angle
    * @returns {Point}
    */
-  const getMazePoint = (center, radius, angle) => ({
-    x: center.x + Math.cos(angle) * radius,
-    y: center.y + Math.sin(angle) * radius,
+  const getMazePoint = (radius, angle) => ({
+    x: CIRCLE_INFO.center.x + Math.cos(angle) * radius,
+    y: CIRCLE_INFO.center.y + Math.sin(angle) * radius,
   });
 
   // BUILD
   const buildMaze = () => {
     createMazeGrid();
+    MAZE_INFO.queue = [];
     MAZE_INFO.currentCell = getMazeCell(INITIAL_POS);
+    const lastCell = getLastMazeCell();
 
     while (MAZE_INFO.currentCell)
-      MAZE_INFO.currentCell = buildCellMaze(MAZE_INFO.currentCell);
+      MAZE_INFO.currentCell = buildCellMaze(MAZE_INFO.currentCell, lastCell);
+
+    if (!MAZE_INFO.isCircle && lastCell) {
+      openBorderForCellMaze(lastCell, getMazeCell(getAdjPos(lastCell)[0]));
+      lastCell.visited = true;
+    }
+
+    if (!MAZE_INFO.isCircle && getMazePolyInfo().hasInverted) {
+      for (const pos of iterateOverMaze()) {
+        const cell = getMazeCell(pos);
+        cell.invertedBorders = [...cell.borders].reverse();
+      }
+    }
 
     MAZE_INFO.currentCell = getMazeCell(INITIAL_POS);
   };
 
   /**
    * @param {CellMaze} cell
+   * @param {CellMaze} nextCell
    */
-  const buildCellMaze = (cell) => {
-    cell.visited = true;
-    const nextCell = getNextCellMaze(cell, (c) => !!c && !c.visited, true);
-
-    if (!nextCell) return null;
-
+  const openBorderForCellMaze = (cell, nextCell) => {
     const adjacentIndex = getNextCellMazeAdjacentIndex(cell, nextCell);
     const nextAdjacentIndex = getNextCellMazeAdjacentIndex(nextCell, cell);
     cell.borders[adjacentIndex] = false;
     nextCell.borders[nextAdjacentIndex] = false;
+  };
 
+  /**
+   * @param {CellMaze} cell
+   * @param {CellMaze} lastCell
+   */
+  const buildCellMaze = (cell, lastCell) => {
+    cell.visited = true;
+
+    // Make so we only allow the top cell to access the last cell
+    const nextCell = getNextCellMaze(
+      cell,
+      (c) => !!c && !c.visited && c !== lastCell,
+      true
+    );
+
+    if (!nextCell) return null;
+    openBorderForCellMaze(cell, nextCell);
     return nextCell;
   };
 
@@ -403,8 +420,7 @@ export const createMazeObj = (mazeInfos, mazeCircleInfos) => {
     isMazeSolved,
     setIsCircle: (isCircle) => (MAZE_INFO.isCircle = isCircle),
     getCirclePoint: () => CIRCLE_INFO.center,
-    getMazeRows,
-    getNumCellsPerMazeRow,
+    iterateOverMaze,
     getMazeCell,
     getCurrentMazeCell: () => MAZE_INFO.currentCell,
     getLastMazeCell,

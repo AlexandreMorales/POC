@@ -164,12 +164,23 @@ export const applyBorders = (context, { x, y }, points, map, ignoreLast) => {
         nextPoint = points[0];
       }
 
-      context.beginPath();
-      context.moveTo(x + point.x, y + point.y);
-      context.lineTo(x + nextPoint.x, y + nextPoint.y);
-      context.stroke();
+      const pointA = { x: x + point.x, y: y + point.y };
+      const pointB = { x: x + nextPoint.x, y: y + nextPoint.y };
+      drawLine(context, pointA, pointB);
     }
   }
+};
+
+/**
+ * @param {CanvasRenderingContext2D} context
+ * @param {Point} pointA
+ * @param {Point} pointB
+ */
+export const drawLine = (context, pointA, pointB) => {
+  context.beginPath();
+  context.moveTo(pointA.x, pointA.y);
+  context.lineTo(pointB.x, pointB.y);
+  context.stroke();
 };
 
 /**
@@ -179,7 +190,7 @@ export const applyBorders = (context, { x, y }, points, map, ignoreLast) => {
  * @param {boolean} isInverted
  * @param {number} ySide
  */
-const showPos = (context, pos, point, isInverted, ySide) => {
+export const showPos = (context, pos, point, isInverted, ySide) => {
   context.fillStyle = "black";
   context.font = `bold ${ySide / 2}px Arial`;
   context.textAlign = "center";

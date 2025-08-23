@@ -28,8 +28,7 @@
  * @property {() => boolean} isMazeSolved
  * @property {(isCircle: boolean) => void} setIsCircle
  * @property {() => Point} getCirclePoint
- * @property {() => number} getMazeRows
- * @property {(index: number) => number} getNumCellsPerMazeRow
+ * @property {() => Generator<Pos>} iterateOverMaze
  * @property {(pos: Pos) => CellMaze} getMazeCell
  * @property {() => CellMaze} getCurrentMazeCell
  * @property {() => CellMaze} getLastMazeCell
@@ -55,6 +54,7 @@
  * @typedef {Object} CellMazeProps
  * @property {Point} point
  * @property {boolean[]} borders
+ * @property {boolean[]} invertedBorders
  * @property {boolean} visited
  * @property {boolean} solved
  * @property {boolean} path

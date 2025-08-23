@@ -27,10 +27,6 @@ import { updateBiomeMap } from "./toolbar/index.js";
 import { updateWeather } from "./weather/index.js";
 import { updateWidgets } from "./widgets/index.js";
 
-const CANVAS_CONFIG = {
-  fluidSpeed: 500,
-};
-
 export const resetCanvas = () => {
   const polyInfo = getPolyInfo();
   setCanvasSize(polyInfo.canvasHeight, polyInfo.canvasWidth);
@@ -114,8 +110,8 @@ const tweakFluids = debounce(() => {
         color: tweakColor(fluid.color),
       });
     });
-  }, CANVAS_CONFIG.fluidSpeed);
-}, CANVAS_CONFIG.fluidSpeed);
+  }, DRAW_CONFIG.fluidSpeed);
+}, DRAW_CONFIG.fluidSpeed);
 
 /**
  * @param {Cell} cell

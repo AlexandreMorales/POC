@@ -1,11 +1,8 @@
-import { applyBorders, fillPolygon } from "./render.js";
+import { MENU_CONFIG } from "../1 - polygones/index.js";
+import { applyBorders, fillPolygon, getFillStyle, showPos } from "./render.js";
 
 const MAZE_CANVAS_CONFIG = {
-  strokeColor: "black",
-  defaultColor: "transparent",
-  visitedColor: "#cdcdcd",
-  pathColor: "#6e79d6",
-  currentColor: "cyan",
+  defaultColor: "#cdcdcd",
 };
 
 /**
@@ -13,14 +10,8 @@ const MAZE_CANVAS_CONFIG = {
  * @param {MazeObj} mazeObj
  */
 export const drawMaze = (context, mazeObj) => {
-  context.strokeStyle = MAZE_CANVAS_CONFIG.strokeColor;
-  context.lineWidth = 1;
-
-  const rows = mazeObj.getMazeRows();
-  for (let i = 0; i < rows; i++) {
-    const numCells = mazeObj.getNumCellsPerMazeRow(i);
-    for (let j = 0; j < numCells; j++)
-      drawCellMaze(context, mazeObj, mazeObj.getMazeCell({ i, j }));
+  for (const pos of mazeObj.iterateOverMaze()) {
+    drawCellMaze(context, mazeObj, mazeObj.getMazeCell(pos));
   }
 };
 
@@ -28,14 +19,12 @@ export const drawMaze = (context, mazeObj) => {
  * @param {CanvasRenderingContext2D} context
  * @param {MazeObj} mazeObj
  * @param {CellMaze} cell
+ * @param {Color} [color]
  */
-const drawCellMaze = (context, mazeObj, cell) => {
-  context.fillStyle = MAZE_CANVAS_CONFIG.defaultColor;
-
-  if (cell.visited) context.fillStyle = MAZE_CANVAS_CONFIG.visitedColor;
-  if (cell.path) context.fillStyle = MAZE_CANVAS_CONFIG.pathColor;
-  if (cell === mazeObj.getCurrentMazeCell())
-    context.fillStyle = MAZE_CANVAS_CONFIG.currentColor;
+export const drawCellMaze = (context, mazeObj, cell, color) => {
+  context.fillStyle = color
+    ? getFillStyle(color)
+    : MAZE_CANVAS_CONFIG.defaultColor;
 
   if (cell.circleProps)
     drawCellMazeCircle(context, cell, mazeObj.getCirclePoint());
@@ -49,13 +38,18 @@ const drawCellMaze = (context, mazeObj, cell) => {
  */
 const drawCellMazePolygon = (context, mazeObj, cell) => {
   const polyInfo = mazeObj.getMazePolyInfo();
-  const points =
-    polyInfo.hasInverted && cell.isInverted
-      ? polyInfo.invertedPoints
-      : polyInfo.points;
+  const isInverted = polyInfo.hasInverted && cell.isInverted;
+  const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;
+  const borders =
+    polyInfo.hasInverted && !cell.isInverted
+      ? cell.invertedBorders
+      : cell.borders;
 
   fillPolygon(context, cell.point, points);
-  applyBorders(context, cell.point, points, cell.borders);
+  applyBorders(context, cell.point, points, borders);
+
+  if (MENU_CONFIG.showPos && cell.pos)
+    showPos(context, cell.pos, cell.point, isInverted, polyInfo.ySide);
 };
 
 /**
