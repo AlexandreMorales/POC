@@ -11,7 +11,7 @@ import { getPosDistance, tweakColor } from "../_utils.js";
 
 import { GENERATION_CONFIG } from "./_configs.js";
 import { getChunkStart } from "./_utils.js";
-import { getValue, VECTORS } from "./perlin.js";
+import { getValue, PERLIN_VECTORS } from "./perlin.js";
 import { addBiomeToMap, BIOMES } from "./biomes/index.js";
 
 /**
@@ -120,7 +120,7 @@ const createEntitiesForCell = (cell, onMove = false) => {
 const getBiome = (pos) => {
   switch (MENU_CONFIG.mapGeneration) {
     case MAP_GENERATION.MIX:
-      const biomeValue = getValue(pos.i, pos.j, VECTORS.BIOME);
+      const biomeValue = getValue(pos.i, pos.j, PERLIN_VECTORS.BIOME);
       return BIOMES.find((b) => biomeValue >= b.minValue);
     default:
     case MAP_GENERATION.DISTANCE:
@@ -153,7 +153,7 @@ const loadChunk = (initialPos) => {
 
       const biome = getBiome(pos);
       biomeMap[biome.name] = (biomeMap[biome.name] || 0) + 1;
-      const value = getValue(nI, nJ, VECTORS.BLOCK);
+      const value = getValue(nI, nJ, PERLIN_VECTORS.BLOCK);
       const originalBlock = biome.ranges.find((r) => value <= r.max);
       const isHighBlock = originalBlock.layer > 0;
       const cellBlock = isHighBlock ? biome.higherGroundBlock : originalBlock;

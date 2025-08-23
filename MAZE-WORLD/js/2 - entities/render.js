@@ -123,9 +123,7 @@ const verifyEntityHeight = (entity) => {
 
   entity.img.className = "image";
 
-  const connectedEntities = /** @type {Entity[]} */ (
-    Object.values(entity.connectedEntities)
-  );
+  const connectedEntities = Object.values(entity.connectedEntities);
   if (hasInverted && !entity.cell.isInverted) {
     const rightCell = downCell;
 

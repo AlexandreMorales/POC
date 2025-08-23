@@ -132,9 +132,7 @@ export const updateEntityDirection = (entity, direction) => {
  * @param {symbol} direction
  */
 export const makeEntityRun = (entity, direction) => {
-  const connectedEntities = /** @type {Entity[]} */ (
-    Object.values(entity.connectedEntities)
-  );
+  const connectedEntities = Object.values(entity.connectedEntities);
 
   if (!connectedEntities.length) {
     updateEntityImage(entity, direction, IMG_MAP_TYPES.RUNNING);
