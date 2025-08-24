@@ -1,6 +1,6 @@
 import { MENU_CONFIG, RENDER_INFO } from "../1 - polygones/index.js";
 import { MOVEMENT } from "../2 - entities/index.js";
-import { canvasContainer } from "../4 - draw/index.js";
+import { canvasContainer, movePlaceBlocks } from "../4 - draw/index.js";
 import {
   changePolySides,
   changeSelectedOnCode,
@@ -55,6 +55,8 @@ import { addDebugBlockToPoint } from "./debug.js";
     if (targetElement.tagName === "INPUT" && targetElement.id !== "menuToggle")
       return;
 
+    if (e.code === "KeyR") movePlaceBlocks(e.altKey ? -1 : 1);
+
     if (e.code.startsWith("Arrow"))
       return moveBaseOnCode(ARROW_MOVEMENT_MAP[e.code], e.altKey);
 
@@ -67,7 +69,7 @@ import { addDebugBlockToPoint } from "./debug.js";
     if (e.code === "KeyQ") return rotate(-1);
     if (e.code === "KeyE") return rotate(1);
 
-    if (e.code === "KeyF") return TOOLBAR_ACTIONS[selectedIndex].click();
+    if (e.code === "KeyF") return TOOLBAR_ACTIONS[selectedIndex].onclick(null);
 
     if (e.code.includes("Shift")) return changePolySides();
 
@@ -107,7 +109,17 @@ import { addDebugBlockToPoint } from "./debug.js";
   };
 
   TOOLBAR_ACTIONS[1].onclick = () => dig();
-  TOOLBAR_ACTIONS[2].onclick = () => place();
+  const toolbarPlace = document.getElementById("toolbar-place");
+  TOOLBAR_ACTIONS[2].onclick = (e) => {
+    if (e) {
+      const { top } = toolbarPlace.getBoundingClientRect();
+      const y = e.clientY - top;
+      if (y < 0) return movePlaceBlocks(-1);
+      if (y > toolbarPlace.offsetHeight) return movePlaceBlocks(1);
+    }
+
+    place();
+  };
   TOOLBAR_ACTIONS[3].onclick = () => useFishingRod();
   TOOLBAR_ACTIONS[4].onclick = () => useBoat();
   TOOLBAR_ACTIONS[5].onclick = () => useMap();

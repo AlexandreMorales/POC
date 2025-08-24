@@ -29,5 +29,4 @@
  * @property {boolean} [isConnected]
  *
  * @property {number} [selectedCellIndex] Cell in which the player can interact
- * @property {CellBlock[]} [pickedCells] Cells that the play dug
  */

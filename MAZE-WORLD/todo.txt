@@ -1,17 +1,12 @@
 ------------------------------------- CURRENT -------------------------------------
 
-TOOLBAR V2
-    FISHING
-        REMOVE SOLVE FLAG
-    PLACE (CYCLE THROUGH BLOCKS)
+LOCK SCREEN MENU OPTION
+    DONT MOVE CLOUDS HORIZONTALLY
+    LOAD NEW BLOCKS WHEN MOVING OUTSIDE
 
 
 
 ------------------------------------- SPRINT -------------------------------------
-
-LOCK SCREEN MENU OPTION
-    DONT MOVE CLOUDS HORIZONTALLY
-    LOAD NEW BLOCKS WHEN MOVING OUTSIDE
 
 ADD DAY TIME OPACITY TO ENTITIES
 

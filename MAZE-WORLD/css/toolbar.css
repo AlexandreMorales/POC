@@ -1,6 +1,8 @@
 :root {
   --fishing-progress-bar-init-height: none;
   --fishing-progress-bar-height: none;
+
+  --toolbar-item-size: max(3vw, 50px);
 }
 
 #toolbar {
@@ -18,8 +20,8 @@
 
 #toolbar > * {
   background-color: #8b8b8b;
-  height: max(3vw, 50px);
-  width: max(3vw, 50px);
+  height: var(--toolbar-item-size);
+  width: var(--toolbar-item-size);
   position: relative;
   border: 5px transparent solid;
 
@@ -28,6 +30,8 @@
   overflow: hidden;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+
+  counter-increment: toolbar-item;
 }
 #toolbar > *:not(:first-child) {
   margin-left: max(0.75vw, 10px);
@@ -37,13 +41,15 @@
   border: 5px var(--background-color-border) solid;
 }
 
-#toolbar > * > p {
+#toolbar > *:before {
+  content: counter(toolbar-item);
   position: absolute;
   top: max(0.1vw, 2px);
   left: max(0.1vw, 2px);
   font-size: max(0.75vw, 15px);
 
   user-select: none;
+  z-index: 5;
 }
 
 #toolbar > * > img {
@@ -61,6 +67,29 @@
   width: max(2.5vw, 40px);
 
   user-select: none;
+}
+
+#toolbar-place {
+  overflow: visible;
+}
+#place-canvas-container {
+  position: relative;
+  transform-style: preserve-3d;
+  height: 100%;
+  width: 100%;
+  transition: transform 1s;
+  transform: rotateX(var(--place-rotate-container));
+}
+#place-canvas-container > * {
+  position: absolute;
+  transition: opacity 1s;
+
+  opacity: 0;
+  cursor: pointer;
+  border-radius: var(--action-border-radius);
+
+  transform: rotateX(var(--place-rotate-canvas))
+    translateZ(var(--toolbar-item-size));
 }
 
 #map-canvas.full-screen {
@@ -84,11 +113,9 @@
 
   display: flex;
 }
-
 #fishing-canvas-container {
   position: relative;
 }
-
 #fishing-progress-bar {
   width: max(2.5vw, 40px);
   height: 100%;

@@ -30,11 +30,13 @@ import {
   updateWeather,
   updateCompass,
   COMPASS_CONFIG,
-  addBlockToToolbar,
+  addBlockToPlace,
   startFishing,
   IS_FISHING_ACTIVE,
   toggleFullMap,
   moveFishing,
+  resetPlace,
+  getSelectedBlockToPlace,
 } from "../4 - draw/index.js";
 import { getMod } from "../_utils.js";
 
@@ -164,12 +166,6 @@ export const changeSelectedOnCode = (direction, useDiagonal) => {
 };
 
 /**
- * @returns {CellBlock}
- */
-const getNextBlockToPlace = () =>
-  PLAYER_ENTITY.pickedCells[PLAYER_ENTITY.pickedCells.length - 1];
-
-/**
  * @returns {number}
  */
 export const getNextPolygon = () =>
@@ -189,7 +185,6 @@ export const changePolySides = () => {
   updateCompass();
   resetDirection();
   resetMap();
-  addBlockToToolbar(getNextBlockToPlace());
 };
 
 export const resetDirection = () => {
@@ -220,8 +215,7 @@ export const dig = () => {
   if (selectedCell.block.isFluid) return;
 
   const pickedBlock = { ...(selectedCell.wall || selectedCell) };
-  PLAYER_ENTITY.pickedCells.push(pickedBlock);
-  addBlockToToolbar(pickedBlock);
+  addBlockToPlace(pickedBlock);
 
   digAudio.play();
   if (selectedCell.wall) {
@@ -235,12 +229,11 @@ export const dig = () => {
 };
 
 export const place = () => {
-  if (IS_FISHING_ACTIVE || !PLAYER_ENTITY.pickedCells.length) return;
+  if (IS_FISHING_ACTIVE) return;
 
   const selectedCell = updateAndGetSelectedCell();
   if (selectedCell?.wall || selectedCell.entityType) return;
 
-  digAudio.play();
   placeBlock(selectedCell);
 
   move();
@@ -255,11 +248,14 @@ export const placeBlock = (cell, block, color) => {
   if (!cell || !!cell.entityType) return;
 
   if (!block) {
-    const cellBlock = PLAYER_ENTITY.pickedCells.pop();
+    const cellBlock = getSelectedBlockToPlace();
+    if (!cellBlock) return;
+
     block = cellBlock.block;
     color = cellBlock.color;
-    addBlockToToolbar(getNextBlockToPlace());
   }
+
+  digAudio.play();
 
   if (cell.block && !cell.block.isFluid) {
     cell.wall = { block: block, color: color };
@@ -306,7 +302,7 @@ export const useFishingRod = () => {
 
 // Called when zooming, creation, set PolySides
 export const resetMap = () => {
-  addBlockToToolbar(getNextBlockToPlace());
+  resetPlace();
   setEntitiesSize();
   resetCanvas();
   moveCurrentCell(getCenterCell(), PLAYER_ENTITY.cell);

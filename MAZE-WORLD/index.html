@@ -137,6 +137,15 @@
             <p><bold>1,2,3,4</bold> - Dig, Place, Boat, Map</p>
           </li>
           <li>
+            <p><bold>Q/E</bold> - Rotate Left/Right</p>
+          </li>
+          <li>
+            <p>
+              <bold>R/R+Alt</bold> - Rotate Picked up Blocks Clock/Counte-Clock
+              wise
+            </p>
+          </li>
+          <li>
             <p><bold>F</bold> - Use Item</p>
           </li>
           <li>
@@ -231,23 +240,18 @@
     </div>
     <div id="toolbar">
       <div id="toolbar-dig" class="toolbar-selected">
-        <p class="hide-mobile">1</p>
         <img src="images/tools/picaxe.png" />
       </div>
       <div id="toolbar-place">
-        <p class="hide-mobile">2</p>
-        <canvas id="place-canvas"></canvas>
+        <div id="place-canvas-container"></div>
       </div>
       <div id="toolbar-fishing">
-        <p class="hide-mobile">3</p>
         <img src="images/tools/fishing-rod.png" />
       </div>
       <div id="toolbar-boat">
-        <p class="hide-mobile">4</p>
         <img src="images/boat/left.png" />
       </div>
       <div id="toolbar-map">
-        <p class="hide-mobile">5</p>
         <canvas id="map-canvas"></canvas>
       </div>
     </div>

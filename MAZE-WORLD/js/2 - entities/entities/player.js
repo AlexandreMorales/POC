@@ -23,5 +23,4 @@ export const PLAYER_ENTITY = /** @type {Entity} */ ({
   img: document.getElementById("player"),
   connectedEntities: {},
   selectedCellIndex: 0,
-  pickedCells: [],
 });

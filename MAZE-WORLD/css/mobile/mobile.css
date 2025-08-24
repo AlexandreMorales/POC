@@ -84,6 +84,9 @@
   #toolbar > * {
     border: none !important;
   }
+  #toolbar > *::before {
+    display: none;
+  }
 }
 
 @media (max-height: 450px) {

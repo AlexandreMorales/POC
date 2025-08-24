@@ -4,10 +4,11 @@ import { getPolyInfo } from "../1 - polygones/index.js";
  * @param {CellBlock} block
  * @param {Point} point
  * @param {Partial<Wall> & { layer?: number }} [wallParams]
+ * @param {PolyInfoProp} [polyInfo]
  * @return {Wall}
  */
-export const blockToWall = (block, point, wallParams = {}) => {
-  const polyInfo = getPolyInfo();
+export const blockToWall = (block, point, wallParams = {}, polyInfo) => {
+  polyInfo = polyInfo || getPolyInfo();
   const points = wallParams.isInverted
     ? polyInfo.invertedPoints
     : polyInfo.points;
