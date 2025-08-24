@@ -26,9 +26,9 @@ const FISHING_CONFIG = {
   mazeSize: 7,
   cellHeight: 45,
   circleMazeSize: 5,
-  circleCellHeight: 45,
+  circleCellHeight: 30,
   isCircleProbability: 0.05,
-  secondsToFish: 15,
+  secondsToFish: 20,
   timerDelay: 100,
   timer: null,
 };
@@ -67,7 +67,7 @@ const initFishingImages = () => {
   );
 };
 
-const stopFishing = () => {
+export const stopFishing = () => {
   clearInterval(FISHING_CONFIG.timer);
   fishingContainer.classList.add("hide");
   IS_FISHING_ACTIVE = false;
@@ -165,26 +165,34 @@ export const startFishing = () => {
   initFishingDraw(fishingMazeObj);
 };
 
+let canMoveFishing = true;
 /**
  * @param {symbol} code
  * @param {boolean} [useDiagonal]
  */
 export const moveFishing = (code, useDiagonal) => {
-  const { ySide, hasInverted } = fishingMazeObj.getMazePolyInfo();
-  const currentCell = fishingMazeObj.getCurrentMazeCell();
-  const aIndex = getMovementMap(
-    currentCell,
-    useDiagonal,
-    0,
-    FISHING_IS_CIRCLE ? KNOWN_POLYGONS.SQUARE : null,
-    !FISHING_IS_CIRCLE && hasInverted
-  )[code];
+  if (canMoveFishing) {
+    const { ySide, hasInverted, polySides } = fishingMazeObj.getMazePolyInfo();
+    const currentCell = fishingMazeObj.getCurrentMazeCell();
+    const aIndex = getMovementMap(
+      currentCell,
+      useDiagonal,
+      0,
+      polySides,
+      !FISHING_IS_CIRCLE && hasInverted
+    )[code];
 
-  const nextCell = fishingMazeObj.mazeMove(aIndex);
+    const nextCell = fishingMazeObj.mazeMove(aIndex);
 
-  if (!nextCell) return;
+    if (!nextCell) return;
 
-  if (fishingMazeObj.isMazeSolved()) stopFishing();
+    if (fishingMazeObj.isMazeSolved()) stopFishing();
 
-  setImagePoint(fishingFishImg, nextCell.point, true, ySide);
+    setImagePoint(fishingFishImg, nextCell.point, true, ySide);
+
+    canMoveFishing = false;
+    setTimeout(() => {
+      canMoveFishing = true;
+    }, 100);
+  }
 };

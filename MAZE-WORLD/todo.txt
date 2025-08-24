@@ -1,17 +1,13 @@
 ------------------------------------- CURRENT -------------------------------------
 
-LOCK SCREEN MENU OPTION
-    DONT MOVE CLOUDS HORIZONTALLY
-    LOAD NEW BLOCKS WHEN MOVING OUTSIDE
-
-
-
-------------------------------------- SPRINT -------------------------------------
-
 ADD DAY TIME OPACITY TO ENTITIES
 
 EXPAND GRADIENT LIGHT TO ADJECENT OF ADJACENT OF ADJACENT 
     LOWERING 50% EACH STEP
+
+
+
+------------------------------------- SPRINT -------------------------------------
 
 HORROR MODE MENU OPTION
     NO MUSIC
@@ -79,6 +75,10 @@ FIX ADD ANIMATION ON COMPASS
 
 
 ------------------------------------- BACKLOG -------------------------------------
+
+LOCK SCREEN MENU OPTION
+    DONT MOVE CLOUDS HORIZONTALLY
+    LOAD NEW BLOCKS WHEN MOVING OUTSIDE
 
 CIRCLE MAZE WITH TRIANGLES?
 

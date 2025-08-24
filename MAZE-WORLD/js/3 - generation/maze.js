@@ -410,6 +410,14 @@ export const createMazeObj = (mazeInfos, mazeCircleInfos) => {
     return { height, width };
   };
 
+  /**
+   * @param {boolean} isCircle
+   */
+  const setIsCircle = (isCircle) => {
+    MAZE_INFO.isCircle = isCircle;
+    if (MAZE_INFO.isCircle) RENDER_INFO.currentPoly = KNOWN_POLYGONS.SQUARE;
+  };
+
   initMaze();
 
   return {
@@ -418,7 +426,7 @@ export const createMazeObj = (mazeInfos, mazeCircleInfos) => {
     buildMaze,
     solveMaze,
     isMazeSolved,
-    setIsCircle: (isCircle) => (MAZE_INFO.isCircle = isCircle),
+    setIsCircle,
     getCirclePoint: () => CIRCLE_INFO.center,
     iterateOverMaze,
     getMazeCell,

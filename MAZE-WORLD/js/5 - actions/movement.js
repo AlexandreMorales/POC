@@ -10,7 +10,7 @@ import { loadAndGetCell, spawnEntities } from "../3 - generation/index.js";
 import { drawEveryCell, passTime } from "../4 - draw/index.js";
 
 const MOVEMENT_CONFIG = {
-  velocity: 25,
+  velocity: 10,
 };
 
 /**

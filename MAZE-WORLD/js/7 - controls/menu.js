@@ -1,9 +1,15 @@
-import { MAP_GENERATION, MENU_CONFIG } from "../1 - polygones/index.js";
+import {
+  MAP_GENERATION,
+  MENU_CONFIG,
+  RENDER_INFO,
+} from "../1 - polygones/index.js";
 import { PLAYER_ENTITY } from "../2 - entities/index.js";
 import { loadAndGetCell } from "../3 - generation/index.js";
 import { drawEveryCell, updateCanvasCss } from "../4 - draw/index.js";
+import { setMusicVolume } from "../4 - draw/sounds.js";
 import { move } from "../5 - actions/index.js";
-import { start } from "../6 - boot/index.js";
+import { resetSize, start } from "../6 - boot/index.js";
+import { CONTROLS_CONFIG } from "./_configs.js";
 
 (() => {
   const SELECT_OPTIONS = {
@@ -61,4 +67,27 @@ import { start } from "../6 - boot/index.js";
     move(loadAndGetCell({ i, j }));
     teleportationBtn.blur();
   };
+
+  const zoomSlider = /** @type {HTMLInputElement} */ (
+    document.getElementById("zoom")
+  );
+  zoomSlider.value = `${RENDER_INFO.cellHeight}`;
+  zoomSlider.min = `${CONTROLS_CONFIG.minZoom}`;
+  zoomSlider.max = `${CONTROLS_CONFIG.maxZoom}`;
+  zoomSlider.oninput = () => {
+    resetSize(+zoomSlider.value);
+    zoomSlider.blur();
+  };
+
+  const musicVolumeSlider = /** @type {HTMLInputElement} */ (
+    document.getElementById("musicVolume")
+  );
+  musicVolumeSlider.value = `50`;
+  musicVolumeSlider.min = `0`;
+  musicVolumeSlider.max = `100`;
+  musicVolumeSlider.oninput = () => {
+    setMusicVolume(+musicVolumeSlider.value);
+    musicVolumeSlider.blur();
+  };
+  setMusicVolume(+musicVolumeSlider.value);
 })();

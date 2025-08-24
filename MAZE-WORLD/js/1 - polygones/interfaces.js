@@ -20,6 +20,7 @@
 /**
  * @typedef {Object} PolyInfoProp
  * @property {number} polySide The length of the side of the polygon
+ * @property {number} polySides The number of sides
  * @property {number} xSide The half of the horizontal length of the polygon
  * @property {number} ySide The half of the vertical length of the polygon
  * @property {Point[]} points List of points of the polygon

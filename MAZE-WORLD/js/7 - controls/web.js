@@ -1,6 +1,10 @@
-import { MENU_CONFIG, RENDER_INFO } from "../1 - polygones/index.js";
+import { MENU_CONFIG } from "../1 - polygones/index.js";
 import { MOVEMENT } from "../2 - entities/index.js";
-import { canvasContainer, movePlaceBlocks } from "../4 - draw/index.js";
+import {
+  canvasContainer,
+  movePlaceBlocks,
+  stopFishing,
+} from "../4 - draw/index.js";
 import {
   changePolySides,
   changeSelectedOnCode,
@@ -14,9 +18,7 @@ import {
   useFishingRod,
   useMap,
 } from "../5 - actions/index.js";
-import { resetSize } from "../6 - boot/index.js";
 
-import { CONTROLS_CONFIG } from "./_configs.js";
 import { addDebugBlockToPoint } from "./debug.js";
 
 (() => {
@@ -32,6 +34,8 @@ import { addDebugBlockToPoint } from "./debug.js";
     ["ArrowDown"]: MOVEMENT.DOWN,
     ["ArrowRight"]: MOVEMENT.RIGHT,
   };
+
+  let selectedToolbarIndex = 1;
   const TOOLBAR_ACTIONS = [
     undefined,
     document.getElementById("toolbar-dig"),
@@ -69,7 +73,8 @@ import { addDebugBlockToPoint } from "./debug.js";
     if (e.code === "KeyQ") return rotate(-1);
     if (e.code === "KeyE") return rotate(1);
 
-    if (e.code === "KeyF") return TOOLBAR_ACTIONS[selectedIndex].onclick(null);
+    if (e.code === "KeyF")
+      return TOOLBAR_ACTIONS[selectedToolbarIndex].onclick(null);
 
     if (e.code.includes("Shift")) return changePolySides();
 
@@ -85,28 +90,23 @@ import { addDebugBlockToPoint } from "./debug.js";
     stopMoving();
   };
 
-  const heightSlider = /** @type {HTMLInputElement} */ (
-    document.getElementById("zoom")
-  );
-  heightSlider.value = `${RENDER_INFO.cellHeight}`;
-  heightSlider.min = `${CONTROLS_CONFIG.minZoom}`;
-  heightSlider.max = `${CONTROLS_CONFIG.maxZoom}`;
-  heightSlider.oninput = () => {
-    resetSize(+heightSlider.value);
-    heightSlider.blur();
-  };
-
-  let selectedIndex = 1;
   /**
    * @param {number} keyIndex
    */
   const updateToolbarSelected = (keyIndex) => {
     const element = TOOLBAR_ACTIONS[keyIndex];
     if (!element) return;
-    TOOLBAR_ACTIONS[selectedIndex].classList.remove("toolbar-selected");
-    selectedIndex = keyIndex;
+    TOOLBAR_ACTIONS[selectedToolbarIndex].classList.remove("toolbar-selected");
+    selectedToolbarIndex = keyIndex;
     element.classList.add("toolbar-selected");
   };
+  document.onwheel = (e) => {
+    e = e || /** @type {WheelEvent} */ (window.event);
+    updateToolbarSelected(
+      e.deltaY < 0 ? selectedToolbarIndex - 1 : selectedToolbarIndex + 1
+    );
+  };
+  updateToolbarSelected(selectedToolbarIndex);
 
   TOOLBAR_ACTIONS[1].onclick = () => dig();
   const toolbarPlace = document.getElementById("toolbar-place");
@@ -124,11 +124,6 @@ import { addDebugBlockToPoint } from "./debug.js";
   TOOLBAR_ACTIONS[4].onclick = () => useBoat();
   TOOLBAR_ACTIONS[5].onclick = () => useMap();
 
-  document.onwheel = (e) => {
-    e = e || /** @type {WheelEvent} */ (window.event);
-    updateToolbarSelected(e.deltaY < 0 ? selectedIndex - 1 : selectedIndex + 1);
-  };
-
   canvasContainer.onclick = (e) => {
     e = e || /** @type {MouseEvent} */ (window.event);
     if (MENU_CONFIG.debugMode) {
@@ -138,5 +133,6 @@ import { addDebugBlockToPoint } from "./debug.js";
       addDebugBlockToPoint({ x, y });
     }
     closeDebugMenu();
+    stopFishing();
   };
 })();

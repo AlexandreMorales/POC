@@ -90,6 +90,21 @@
 }
 
 @media (max-height: 450px) {
+  .hide-mobile {
+    display: none;
+  }
+
+  #mobile-hud {
+    display: block;
+  }
+
+  #toolbar > * {
+    border: none !important;
+  }
+  #toolbar > *::before {
+    display: none;
+  }
+
   #toolbar {
     bottom: 15vh !important;
   }
