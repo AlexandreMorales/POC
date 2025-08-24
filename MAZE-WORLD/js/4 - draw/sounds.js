@@ -2,7 +2,9 @@ import { getPolyInfo, MENU_CONFIG } from "../1 - polygones/index.js";
 import { TRACK_TYPES } from "../3 - generation/index.js";
 
 const audios =
-  /** @type {{ [k: string]: { srcNode: AudioBufferSourceNode, gainNode: GainNode } }} */ ({});
+  /** @type {{ [k: string]: { srcNode: AudioBufferSourceNode, gainNode: GainNode, volume: number } }} */ ({});
+
+let MUSIC_VOLUME = 1;
 
 const TRACK_FILES = {
   [TRACK_TYPES.TRACK1]: "sounds/blocks/track1.wav",
@@ -36,7 +38,7 @@ Object.entries(TRACK_FILES).forEach(([track, path]) => {
   ambientPan.pan.value = pan;
   ambientPan.connect(gainNode);
 
-  audios[track] = { srcNode, gainNode };
+  audios[track] = { srcNode, gainNode, volume: 0 };
 
   fetch(path, { mode: "cors" })
     .then((resp) => resp.arrayBuffer())
@@ -45,6 +47,7 @@ Object.entries(TRACK_FILES).forEach(([track, path]) => {
         srcNode.buffer = abuffer;
         srcNode.connect(ambientPan);
         srcNode.loop = true;
+        srcNode.loopEnd = 35.99;
       })
     );
 });
@@ -52,7 +55,6 @@ Object.entries(TRACK_FILES).forEach(([track, path]) => {
 const audiosList = Object.values(audios);
 
 const TRACK_LIST = Object.keys(TRACK_FILES);
-
 let audioStarted = false;
 
 /**
@@ -61,19 +63,31 @@ let audioStarted = false;
 export const updateTracks = (tracksCount) => {
   if (MENU_CONFIG.music) {
     const polyInfo = getPolyInfo();
-    if (!audioStarted) {
-      audioStarted = true;
-      audiosList.forEach((a) => a.srcNode.start());
-    }
     const max = polyInfo.rows * polyInfo.columns * 1.2;
     TRACK_LIST.forEach((track) => {
-      const { gainNode } = audios[track];
-      gainNode.gain.value = (tracksCount[track] || 0) / max;
+      const audio = audios[track];
+      audio.volume = (tracksCount[track] || 0) / max;
+      updateTrackVolume(audio);
+      if (!audioStarted) audio.srcNode.start();
     });
+    audioStarted = true;
   } else {
-    if (audioStarted) {
-      audioStarted = false;
-      audiosList.forEach((a) => a.srcNode.stop());
-    }
+    audiosList.forEach((a) => (a.gainNode.gain.value = 0));
   }
+};
+
+/**
+ * @param {number} volume
+ */
+export const setMusicVolume = (volume) => {
+  MUSIC_VOLUME = volume;
+  TRACK_LIST.forEach((track) => updateTrackVolume(audios[track]));
+};
+
+/**
+ * @param {{ srcNode: AudioBufferSourceNode, gainNode: GainNode, volume: number }} audio
+ */
+const updateTrackVolume = (audio) => {
+  const { gainNode, volume } = audio;
+  gainNode.gain.value = (MUSIC_VOLUME * volume) / 100;
 };
