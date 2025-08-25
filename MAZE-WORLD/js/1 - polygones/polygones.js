@@ -202,6 +202,7 @@ export const configPoly = (polySides, cellHeight) => {
     columns,
     canvasHeight,
     canvasWidth,
+    polySides,
     calcX: getXFn(polySides, polySide, xSide),
     calcY: (i) => i * ySide * 2 + ySide,
     cx: correctRoundError(canvasWidth / 2),

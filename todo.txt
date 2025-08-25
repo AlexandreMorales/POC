@@ -6,6 +6,7 @@ HURDLE https://hurdle.iancanderson.com/
 REAL TIME CHAT
 ALGORITHM VISUALIZER
 QR CODE GENERATION
+CRACK CODE GENERATOR (https://www.reddit.com/r/puzzles/comments/1378fsg/code_puzzle/)
 
 UPDATE PORTIFOLIO
 UPDATE XANDELIER

@@ -77,9 +77,8 @@ const drawPolygon = (cell, x, y) => {
  * @param {number} y
  * @param {import("./infos.js").Cell} cell
  * @param {import("./infos.js").PolyInfoProp} polyInfo
- * @param {boolean} [isAbove]
  */
-function drawPolyCell(x, y, cell, polyInfo, isAbove = false) {
+function drawPolyCell(x, y, cell, polyInfo) {
   const isInverted = CONFIG.polySides % 2 && cell.isInverted;
   const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;
 
