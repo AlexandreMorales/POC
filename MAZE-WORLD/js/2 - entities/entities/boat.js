@@ -1,14 +1,5 @@
-import { ENTITY_TYPES, IMG_MAP_TYPES, MOVEMENT } from "../_configs.js";
+import { ENTITY_TYPES, MOVEMENT } from "../_configs.js";
 import { createEntity, moveEntityToCell } from "../entities.js";
-
-const BOAT_IMG_MAP = /** @type {ImageMap} */ ({
-  [IMG_MAP_TYPES.DEFAULT]: {
-    [MOVEMENT.UP]: "images/boat/up.png",
-    [MOVEMENT.DOWN]: "images/boat/down.png",
-    [MOVEMENT.LEFT]: "images/boat/left.png",
-    [MOVEMENT.RIGHT]: "images/boat/right.png",
-  },
-});
 
 const BOAT_ENTITIES = /** @type {{ [k: string]: Entity }} */ ({});
 
@@ -43,10 +34,10 @@ export const addBoat = (cell, entity) => {
       cell,
       entity.id,
       ENTITY_TYPES.BOAT,
-      BOAT_IMG_MAP,
       {
         zIndex: 1,
         movementsToCut: [MOVEMENT.UP, MOVEMENT.DOWN],
+        currentDirection: MOVEMENT.RIGHT,
       }
     );
 
