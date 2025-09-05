@@ -92,7 +92,6 @@ const getNextCellIndexBasedOnCode = (code, useDiagonal) => {
 };
 
 let lastMovement = /** @type {symbol} */ (null);
-let lastSelection = /** @type {symbol} */ (null);
 let blockMovement = false;
 
 /**
@@ -132,15 +131,14 @@ export const moveBaseOnCode = (direction, useDiagonal) => {
 export const MOVEMENT_VALUES = Object.values(MOVEMENT);
 export const stopMoving = () => {
   blockMovement = false;
+  let lastSelection = PLAYER_ENTITY.currentDirection;
   if (lastMovement) {
-    if (getPolyInfo().hasInverted) {
-      const movementMap = getMovementMap(PLAYER_ENTITY.cell);
+    const movementMap = getMovementMap(PLAYER_ENTITY.cell);
 
-      for (const movement of MOVEMENT_VALUES) {
-        if (movementMap[movement] === PLAYER_ENTITY.selectedCellIndex) {
-          lastSelection = movement;
-          break;
-        }
+    for (const movement of MOVEMENT_VALUES) {
+      if (movementMap[movement] === PLAYER_ENTITY.selectedCellIndex) {
+        lastSelection = movement;
+        break;
       }
     }
     updateEntityDirection(PLAYER_ENTITY, lastSelection);
@@ -155,14 +153,13 @@ export const stopMoving = () => {
 export const changeSelectedOnCode = (direction, useDiagonal) => {
   if (IS_FISHING_ACTIVE || !direction) return;
 
-  lastSelection = direction;
   const aModI = getNextCellIndexBasedOnCode(direction, useDiagonal);
   if (aModI === undefined || aModI === PLAYER_ENTITY.selectedCellIndex) return;
 
   PLAYER_ENTITY.selectedCellIndex = aModI;
 
   if (MENU_CONFIG.showSelectedCell) drawEveryCell(PLAYER_ENTITY);
-  updateEntityDirection(PLAYER_ENTITY, lastSelection);
+  updateEntityDirection(PLAYER_ENTITY, direction);
 };
 
 /**
@@ -187,16 +184,14 @@ export const changePolySides = () => {
   resetMap();
 };
 
-export const resetDirection = () => {
-  lastSelection = MOVEMENT.UP;
-  updateEntityDirection(PLAYER_ENTITY, lastSelection);
-};
+export const resetDirection = () =>
+  updateEntityDirection(PLAYER_ENTITY, MOVEMENT.UP);
 
 /**
  * @returns {Cell}
  */
 const updateAndGetSelectedCell = () => {
-  updateEntityDirection(PLAYER_ENTITY, lastSelection);
+  updateEntityDirection(PLAYER_ENTITY, PLAYER_ENTITY.currentDirection);
   return getSelectedCell(PLAYER_ENTITY);
 };
 
