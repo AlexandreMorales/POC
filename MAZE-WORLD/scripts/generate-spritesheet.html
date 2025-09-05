@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <canvas id="spritesheet"></canvas>
+
+    <script type="text/javascript">
+      const IMG_SIZE = 16;
+
+      const canvas = /** @type {HTMLCanvasElement} */ (
+        document.getElementById("spritesheet")
+      );
+      const context = canvas.getContext("2d");
+      const IMG_OBJ = {};
+
+      /**
+       * @param {string} url
+       * @param {string} doc
+       * @return {Promise<void>}
+       */
+      async function parseDoc(url, doc) {
+        const urls = [
+          ...doc.matchAll(new RegExp(`href="(${url}.+?)"`, "gi")),
+        ].map(([_, newUrl]) => newUrl);
+
+        let [images, folders] = /** @type {string[][]} */ (
+          urls.reduce(
+            (acc, u) => {
+              acc[u.endsWith(".png") ? 0 : 1].push(u);
+              return acc;
+            },
+            [[], []]
+          )
+        );
+
+        images = images.filter((i) => i && !i.includes("spritesheet"));
+
+        if (images.length)
+          IMG_OBJ[url.split("/").at(-1)] = await Promise.all(
+            images.map(loadImage)
+          );
+
+        for (const f of folders) {
+          await loadDoc(f);
+        }
+      }
+
+      /**
+       * @param {string} url
+       * @return {Promise<void>}
+       */
+      async function loadDoc(url) {
+        return new Promise((resolve) => {
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = async function () {
+            if (this.readyState == 4 && this.status == 200) {
+              await parseDoc(url, this.responseText);
+              resolve();
+            }
+          };
+          xhttp.open("GET", url, true);
+          xhttp.send();
+        });
+      }
+
+      /**
+       * @param {string} url
+       * @return {Promise<HTMLImageElement>}
+       */
+      async function loadImage(url) {
+        return new Promise((r) => {
+          let i = new Image();
+          i.onload = () => r(i);
+          i.src = url;
+        });
+      }
+
+      loadDoc(window.location.pathname.replace(/scripts.+/, "images")).then(
+        () => {
+          const images = /** @type {HTMLImageElement[][]} */ (
+            Object.values(IMG_OBJ)
+          );
+
+          canvas.height = images.length * IMG_SIZE;
+          canvas.width =
+            images.reduce((acc, i) => Math.max(acc, i.length), 0) * IMG_SIZE;
+
+          for (let i = 0; i < images.length; i++) {
+            for (let j = 0; j < images[i].length; j++) {
+              context.drawImage(
+                images[i][j],
+                j * IMG_SIZE,
+                i * IMG_SIZE,
+                IMG_SIZE,
+                IMG_SIZE
+              );
+            }
+          }
+        }
+      );
+    </script>
+  </body>
+</html>
