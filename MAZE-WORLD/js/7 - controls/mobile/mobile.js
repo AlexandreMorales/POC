@@ -1,4 +1,5 @@
-import { POLYGONS_IMAGES, RENDER_INFO } from "../../1 - polygones/index.js";
+import { POLYGONS_ENTITY_POS, RENDER_INFO } from "../../1 - polygones/index.js";
+import { setImagePos } from "../../2 - entities/index.js";
 import { canvasContainer } from "../../4 - draw/index.js";
 import {
   changePolySides,
@@ -64,15 +65,16 @@ import { CONTROLS_CONFIG } from "../_configs.js";
   document.getElementById("rotate-left").onclick = () => rotate(-1);
   document.getElementById("rotate-right").onclick = () => rotate(1);
 
-  const currentPoly = /** @type {HTMLImageElement} */ (
+  const currentPoly = /** @type {HTMLElement} */ (
     document.getElementById("current-poly")
   );
-  const nextPoly = /** @type {HTMLImageElement} */ (
+  const nextPoly = /** @type {HTMLElement} */ (
     document.getElementById("next-poly")
   );
+
   const updatePolyImages = () => {
-    currentPoly.src = POLYGONS_IMAGES[RENDER_INFO.currentPoly];
-    nextPoly.src = POLYGONS_IMAGES[getNextPolygon()];
+    setImagePos(currentPoly, POLYGONS_ENTITY_POS[RENDER_INFO.currentPoly]);
+    setImagePos(nextPoly, POLYGONS_ENTITY_POS[getNextPolygon()]);
   };
   updatePolyImages();
 })();

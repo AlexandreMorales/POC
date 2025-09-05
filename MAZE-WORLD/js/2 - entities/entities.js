@@ -2,6 +2,7 @@ import { getCell } from "../0 - grid/index.js";
 import { MENU_CONFIG, getPosByIndex } from "../1 - polygones/index.js";
 
 import { ENTITY_TYPES, IMG_MAP_TYPES, MOVEMENT } from "./_configs.js";
+import { ENTITY_INFO } from "./_infos.js";
 import {
   createEntityImage,
   cutEntityImage,
@@ -67,16 +68,18 @@ export const removeEntitiesFromCell = (cell) => {
  * @param {Cell} cell
  * @param {string} id
  * @param {string} type
- * @param {ImageMap} imageMap
  * @param {Partial<Entity>} entityParams
  * @returns {Entity}
  */
-export const createEntity = (cell, id, type, imageMap, entityParams = {}) => {
+export const createEntity = (cell, id, type, entityParams = {}) => {
+  if (entityParams.minTime && ENTITY_INFO.timeOfDay < entityParams.minTime)
+    return;
+
   const entity = /** @type {Entity} */ ({
     id: `${type}_${id}`,
     type,
-    imageMap,
     connectedEntities: {},
+    currentImgType: cell.block?.biomeType,
     ...entityParams,
   });
   createEntityImage(entity);
@@ -85,8 +88,7 @@ export const createEntity = (cell, id, type, imageMap, entityParams = {}) => {
   return entity;
 };
 
-export const setEntitiesSize = () =>
-  ENTITIES.forEach((e) => setEntitySize(e?.img));
+export const setEntitiesSize = () => ENTITIES.forEach((e) => setEntitySize(e));
 
 export const removeGeneratedEntities = () =>
   ENTITIES.forEach((e) => e.isGenerated && removeEntity(e));
@@ -134,6 +136,7 @@ export const updateEntityDirection = (entity, direction) => {
 export const makeEntityRun = (entity, direction) => {
   const connectedEntities = Object.values(entity.connectedEntities);
 
+  // If it is connected to an entity dont call the running function (e.g. inside boat)
   if (!connectedEntities.length) {
     updateEntityImage(entity, direction, IMG_MAP_TYPES.RUNNING);
     return;

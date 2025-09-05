@@ -6,7 +6,7 @@ import {
 } from "../1 - polygones/index.js";
 
 import { getMod, getPosDistance, getRandomInt } from "../_utils.js";
-import { ENTITY_TYPES, IMG_MAP_TYPES, MOVEMENT } from "./_configs.js";
+import { ENTITY_TYPES, MOVEMENT } from "./_configs.js";
 import {
   cellIsBlocked,
   createEntity,
@@ -20,15 +20,6 @@ import { updateEntityImage } from "./render.js";
 const ENTITY_ACTIONS_CONFIG = {
   delayToBurn: 1000,
 };
-
-const FIRE_IMG_MAP = /** @type {ImageMap} */ ({
-  [IMG_MAP_TYPES.DEFAULT]: {
-    [MOVEMENT.UP]: "images/enemies/fire.png",
-    [MOVEMENT.DOWN]: "images/enemies/fire.png",
-    [MOVEMENT.LEFT]: "images/enemies/fire.png",
-    [MOVEMENT.RIGHT]: "images/enemies/fire.png",
-  },
-});
 
 /**
  * @param {Entity} entity
@@ -211,13 +202,9 @@ export const killEntitiesByTimeOfDay = () => {
     )
       return;
 
-    const fireEntity = createEntity(
-      e.cell,
-      e.id,
-      ENTITY_TYPES.FIRE,
-      FIRE_IMG_MAP,
-      { zIndex: 3 }
-    );
+    const fireEntity = createEntity(e.cell, e.id, ENTITY_TYPES.FIRE, {
+      zIndex: e.zIndex + 1,
+    });
     e.connectedEntities[ENTITY_TYPES.FIRE] = fireEntity;
     e.deleted = true;
 

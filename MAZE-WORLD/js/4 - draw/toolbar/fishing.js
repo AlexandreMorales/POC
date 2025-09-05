@@ -1,6 +1,5 @@
-import { KNOWN_POLYGONS } from "../../1 - polygones/_configs.js";
 import {
-  setEntitySize,
+  setEntityImageSize,
   setImagePoint,
   getMovementMap,
 } from "../../2 - entities/index.js";
@@ -9,16 +8,16 @@ import { tweakColor } from "../../_utils.js";
 import { DRAW_CONFIG } from "../_config.js";
 import { drawCellMaze } from "../drawMaze.js";
 
-export const fishingCanvas = /** @type {HTMLCanvasElement} */ (
+const fishingCanvas = /** @type {HTMLCanvasElement} */ (
   document.getElementById("fishing-canvas")
 );
 const fishingContext = fishingCanvas.getContext("2d");
 
 const fishingContainer = document.getElementById("fishing-container");
-const fishingRodImg = /** @type {HTMLImageElement} */ (
+const fishingRodImg = /** @type {HTMLElement} */ (
   document.getElementById("fishing-rod")
 );
-const fishingFishImg = /** @type {HTMLImageElement} */ (
+const fishingFishImg = /** @type {HTMLElement} */ (
   document.getElementById("fishing-fish")
 );
 
@@ -49,8 +48,8 @@ const setFishingCanvasSize = ({ height, width }) => {
 const initFishingImages = () => {
   const { ySide } = fishingMazeObj.getMazePolyInfo();
 
-  setEntitySize(fishingFishImg, ySide);
-  setEntitySize(fishingRodImg, ySide);
+  setEntityImageSize(fishingFishImg, ySide);
+  setEntityImageSize(fishingRodImg, ySide);
   setImagePoint(
     fishingFishImg,
     fishingMazeObj.getCurrentMazeCell().point,

@@ -7,14 +7,14 @@ import {
 } from "../1 - polygones/index.js";
 
 import { isPointOutside } from "../_utils.js";
-import { IMG_MAP_TYPES, MOVEMENT } from "./_configs.js";
+import { ENTITY_IMAGES_MAP, IMG_MAP_TYPES, MOVEMENT } from "./_configs.js";
 import { PLAYER_ENTITY } from "./entities/player.js";
 
 const CUT_MOVEMENTS_MAP = {
-  [MOVEMENT.UP]: "marginTop",
   [MOVEMENT.DOWN]: "marginTop",
   [MOVEMENT.LEFT]: "marginLeft",
   [MOVEMENT.RIGHT]: "marginRight",
+  [MOVEMENT.UP]: "marginTop",
 };
 
 const container = document.getElementById("entities");
@@ -23,16 +23,14 @@ const container = document.getElementById("entities");
  * @param {Entity} entity
  */
 export const createEntityImage = (entity) => {
-  const img = document.createElement("img");
+  const img = document.createElement("div");
   img.id = entity.id;
   img.style.zIndex = `${entity.zIndex || 2}`;
-  img.src = getImgMap(entity, entity.defaultImgMapType)[
-    entity.defaultDirection || MOVEMENT.RIGHT
-  ];
   img.className = "image";
   container.appendChild(img);
-  setEntitySize(img);
+
   entity.img = img;
+  setEntitySize(entity);
 };
 
 /**
@@ -82,14 +80,53 @@ const getEntitySize = (ySide) =>
   Math.round((ySide || getPolyInfo().ySide) * 2.5);
 
 /**
- * @param {HTMLImageElement} img
- * @param {number} [ySide]
+ * @param {HTMLElement} img
+ * @param {Pos} pos
  */
-export const setEntitySize = (img, ySide) =>
-  img?.style.setProperty("--entity-size", `${getEntitySize(ySide)}px`);
+export const setImagePos = (img, pos) => {
+  img.style.setProperty("--entity-position-i", `${pos.i}`);
+  img.style.setProperty("--entity-position-j", `${pos.j}`);
+};
 
 /**
- * @param {HTMLImageElement} img
+ * @param {HTMLElement} img
+ * @param {number} [ySide]
+ */
+export const setEntityImageSize = (img, ySide) => {
+  if (!img) return;
+  const size = getEntitySize(ySide);
+  img.style.setProperty("--entity-size", `${size}px`);
+};
+
+/**
+ * @param {Entity} entity
+ * @param {number} [ySide]
+ */
+export const setEntitySize = (entity, ySide) => {
+  if (!entity?.img) return;
+  setEntityImageSize(entity.img, ySide);
+  setEntityImageInfo(entity);
+};
+
+/**
+ * @param {Entity} entity
+ */
+const setEntityImageInfo = (entity) => {
+  const imgInfo = getEntityImageInfo(entity);
+
+  if (imgInfo.pos) {
+    entity.img.style.removeProperty("--entity-img");
+    entity.img.classList.remove("dont-use-spritesheet");
+    setImagePos(entity.img, imgInfo.pos);
+  } else if (imgInfo.src) {
+    entity.img.style.setProperty("--entity-img", `url(${imgInfo.src})`);
+    entity.img.classList.add("dont-use-spritesheet");
+    setImagePos(entity.img, { i: 0, j: 0 });
+  }
+};
+
+/**
+ * @param {HTMLElement} img
  * @param {Point} point
  * @param {boolean} [shouldCenter]
  * @param {number} [ySide]
@@ -121,9 +158,11 @@ const verifyEntityHeight = (entity) => {
 
   if (!downCell) return;
 
-  entity.img.className = "image";
+  entity.img.classList.remove("not-inverted-both-walls");
+  entity.img.classList.remove("not-inverted-right-wall");
+  entity.img.classList.remove("not-inverted-left-wall");
+  entity.img.classList.remove("behind-wall");
 
-  const connectedEntities = Object.values(entity.connectedEntities);
   if (hasInverted && !entity.cell.isInverted) {
     const rightCell = downCell;
 
@@ -142,15 +181,21 @@ const verifyEntityHeight = (entity) => {
     entity.img.classList.add("behind-wall");
   }
 
-  if (connectedEntities.length) entity.img.classList.add("behind-wall");
+  if (Object.values(entity.connectedEntities).length)
+    entity.img.classList.add("behind-wall");
 };
 
 /**
  * @param {Entity} entity
- * @param {string} imgMapType
+ * @returns {ImageInfo}
  */
-const getImgMap = (entity, imgMapType) =>
-  entity.imageMap[imgMapType] || entity.imageMap[IMG_MAP_TYPES.DEFAULT];
+const getEntityImageInfo = (entity) => {
+  const typeMap = ENTITY_IMAGES_MAP[entity.type];
+  const mapType =
+    typeMap[entity.currentImgType] || typeMap[IMG_MAP_TYPES.DEFAULT];
+
+  return mapType[entity.currentDirection || MOVEMENT.DOWN];
+};
 
 /**
  * @param {Entity} entity
@@ -158,10 +203,11 @@ const getImgMap = (entity, imgMapType) =>
  * @param {string} [imgMapType]
  */
 export const updateEntityImage = (entity, direction, imgMapType) => {
-  if (!entity.img) return;
+  if (!entity?.img) return;
 
-  const newSrc = getImgMap(entity, imgMapType)[direction] || entity.img.src;
-  if (!entity.img.src.endsWith(newSrc)) entity.img.src = newSrc;
+  entity.currentImgType = imgMapType;
+  entity.currentDirection = direction;
+  setEntityImageInfo(entity);
 
   entity.img.style.marginTop = null;
   entity.img.style.marginLeft = null;

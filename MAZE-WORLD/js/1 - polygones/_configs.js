@@ -5,9 +5,15 @@ export const KNOWN_POLYGONS = {
 };
 
 export const POLYGONS_IMAGES = {
-  [KNOWN_POLYGONS.TRIANGLE]: "images/tools/triangle.png",
-  [KNOWN_POLYGONS.SQUARE]: "images/tools/square.png",
-  [KNOWN_POLYGONS.HEXAGON]: "images/tools/hexagon.png",
+  [KNOWN_POLYGONS.TRIANGLE]: "images/polys/triangle.png",
+  [KNOWN_POLYGONS.SQUARE]: "images/polys/square.png",
+  [KNOWN_POLYGONS.HEXAGON]: "images/polys/hexagon.png",
+};
+
+export const POLYGONS_ENTITY_POS = {
+  [KNOWN_POLYGONS.TRIANGLE]: /** @type {Pos} */ { i: 5, j: 2 },
+  [KNOWN_POLYGONS.SQUARE]: /** @type {Pos} */ { i: 5, j: 1 },
+  [KNOWN_POLYGONS.HEXAGON]: /** @type {Pos} */ { i: 5, j: 0 },
 };
 
 export const KNOWN_POLYGONS_VALUES = Object.values(KNOWN_POLYGONS);
