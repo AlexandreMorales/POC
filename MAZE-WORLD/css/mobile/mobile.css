@@ -25,13 +25,14 @@
   right: 0;
 }
 
-#mobile-hud > img {
+#mobile-hud > .image {
+  --entity-size: 46px;
+
+  top: auto;
   bottom: 0;
-  width: 46px;
-  height: 46px;
   transition: bottom 50ms ease-out;
 }
-#mobile-hud > img:active {
+#mobile-hud > .image:active {
   bottom: -16px;
 }
 
@@ -39,6 +40,7 @@
   left: 0;
 }
 #rotate-right {
+  left: auto;
   right: 0;
 }
 
@@ -55,11 +57,11 @@
   justify-content: space-between;
   align-items: center;
 }
-#change-poly > img {
-  width: 16px;
-  height: 16px;
+#change-poly > .image {
+  --entity-size: 16px;
+  position: relative;
 }
-#change-poly > img:not(:first-child) {
+#change-poly > .image:not(:first-child) {
   margin-left: 5px;
 }
 

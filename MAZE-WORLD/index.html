@@ -169,7 +169,7 @@
       <div id="draw-container">
         <div id="canvas-container"></div>
         <div id="entities">
-          <img id="player" src="images/player/up.png" />
+          <div id="player" class="image"></div>
         </div>
       </div>
       <div id="weather">
@@ -181,12 +181,16 @@
           <div id="fishing-progress-bar"></div>
           <div id="fishing-canvas-container">
             <canvas id="fishing-canvas"></canvas>
-            <img
+            <div
               class="image"
               id="fishing-rod"
-              src="images/tools/fishing-rod.png"
-            />
-            <img class="image" id="fishing-fish" src="images/map/fish.png" />
+              style="--entity-position-i: 6; --entity-position-j: 0"
+            ></div>
+            <div
+              class="image"
+              id="fishing-fish"
+              style="--entity-position-i: 2; --entity-position-j: 1"
+            ></div>
           </div>
         </div>
       </div>
@@ -248,16 +252,25 @@
     </div>
     <div id="toolbar">
       <div id="toolbar-dig">
-        <img src="images/tools/picaxe.png" />
+        <div
+          class="image"
+          style="--entity-position-i: 6; --entity-position-j: 1"
+        ></div>
       </div>
       <div id="toolbar-place">
         <div id="place-canvas-container"></div>
       </div>
       <div id="toolbar-fishing">
-        <img src="images/tools/fishing-rod.png" />
+        <div
+          class="image"
+          style="--entity-position-i: 6; --entity-position-j: 0"
+        ></div>
       </div>
       <div id="toolbar-boat">
-        <img src="images/boat/left.png" />
+        <div
+          class="image"
+          style="--entity-position-i: 0; --entity-position-j: 2"
+        ></div>
       </div>
       <div id="toolbar-map">
         <canvas id="map-canvas"></canvas>
@@ -266,13 +279,21 @@
     <div id="mobile-hud">
       <div id="selection-stick-left" class="selection-stick"></div>
       <div id="selection-stick-right" class="selection-stick"></div>
-      <img id="rotate-left" src="images/tools/rotate_left.png" />
+      <div
+        id="rotate-left"
+        class="image"
+        style="--entity-position-i: 6; --entity-position-j: 2"
+      ></div>
       <div id="change-poly">
-        <img id="current-poly" />
+        <div id="current-poly" class="image"></div>
         <div class="long-arrow-right"></div>
-        <img id="next-poly" />
+        <div id="next-poly" class="image"></div>
       </div>
-      <img id="rotate-right" src="images/tools/rotate_right.png" />
+      <div
+        id="rotate-right"
+        class="image"
+        style="--entity-position-i: 6; --entity-position-j: 3"
+      ></div>
     </div>
   </body>
   <script type="text/javascript" src="dist/min.js"></script>

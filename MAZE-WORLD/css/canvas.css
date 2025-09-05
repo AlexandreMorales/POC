@@ -38,12 +38,12 @@
 }
 
 #draw-container,
-#entities img {
+#entities > * {
   transition-property: scale;
   transition-duration: var(--transition-duration);
 }
 #draw-container.rotate,
-#entities.rotate img {
+#entities.rotate > * {
   transition-property: transform, scale;
   transform: rotate(var(--rotate-deg));
 }

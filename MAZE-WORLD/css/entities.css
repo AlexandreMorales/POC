@@ -4,9 +4,16 @@
   --entity-size: 16px;
   --entity-top: 0px;
   --entity-left: 0px;
+
+  --entity-img: url(../images/spritesheet.png);
+  --entity-spritesheet-width: 4;
 }
 
 .image {
+  --entity-background-size: calc(
+    var(--entity-spritesheet-width) * var(--entity-size)
+  );
+
   position: absolute;
   object-fit: cover;
   object-position: 0 0;
@@ -18,18 +25,28 @@
 
   top: var(--entity-top);
   left: var(--entity-left);
+
+  background-repeat: no-repeat;
+  background-image: var(--entity-img);
+  background-size: var(--entity-background-size);
+  background-position: calc(var(--entity-position-j) * var(--entity-size) * -1)
+    calc(var(--entity-position-i) * var(--entity-size) * -1);
 }
 
-#entities img.not-inverted-both-walls {
+.image.dont-use-spritesheet {
+  --entity-background-size: var(--entity-size);
+}
+
+#entities .image.not-inverted-both-walls {
   clip-path: polygon(0 0, 50% 75%, 100% 0);
 }
-#entities img.not-inverted-right-wall {
+#entities .image.not-inverted-right-wall {
   clip-path: polygon(0 0, 0 100%, 35% 100%, 100% 0);
 }
-#entities img.not-inverted-left-wall {
+#entities .image.not-inverted-left-wall {
   clip-path: polygon(0 0, 65% 100%, 100% 100%, 100% 0);
 }
-#entities img.behind-wall {
+#entities .image.behind-wall {
   height: calc(var(--entity-size) * 0.8);
 }
 

@@ -2,9 +2,9 @@ const CACHE_NAME = "cache-v1";
 const urlsToCache = [
   "/POC/MAZE-WORLD/",
   "/POC/MAZE-WORLD/index.html",
-  "/POC/MAZE-WORLD/css/index.css",
-  "/POC/MAZE-WORLD/js/start.js",
-  "/POC/MAZE-WORLD/images/player/down.png",
+  "/POC/MAZE-WORLD/dist/min.css",
+  "/POC/MAZE-WORLD/dist/min.js",
+  "/POC/MAZE-WORLD/images/spritesheet.png",
 ];
 
 self.addEventListener("install", (e) => {
