@@ -1,0 +1,57 @@
+:root {
+  --toolbar-item-size: 50px;
+}
+
+#toolbar {
+  position: absolute;
+  bottom: 7vh;
+  left: 50%;
+  transform: translate(-50%);
+  z-index: calc(var(--player-z-index) + 2);
+
+  display: flex;
+  background-color: var(--background-color);
+  padding: 10px;
+  border-radius: var(--action-border-radius);
+}
+
+#toolbar > * {
+  background-color: #8b8b8b;
+  height: var(--toolbar-item-size);
+  width: var(--toolbar-item-size);
+  position: relative;
+  border: 5px transparent solid;
+
+  cursor: pointer;
+  border-radius: var(--action-border-radius);
+  overflow: hidden;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  counter-increment: toolbar-item;
+}
+#toolbar > *:not(:first-child) {
+  margin-left: 10px;
+}
+
+#toolbar > *.toolbar-selected {
+  border: 5px var(--background-color-border) solid;
+}
+
+#toolbar > *:before {
+  content: counter(toolbar-item);
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  font-size: 15px;
+
+  user-select: none;
+}
+
+#toolbar > * > .image {
+  --entity-size: 40px;
+  --entity-top: 50%;
+  --entity-left: 50%;
+
+  transform: translate(-50%, -50%);
+}

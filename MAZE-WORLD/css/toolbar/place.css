@@ -1,0 +1,24 @@
+#toolbar-place {
+  overflow: visible;
+}
+
+#place-canvas-container {
+  position: relative;
+  transform-style: preserve-3d;
+  height: 100%;
+  width: 100%;
+  transition: transform 1s;
+  transform: rotateX(var(--place-rotate-container));
+}
+
+#place-canvas-container > * {
+  position: absolute;
+  transition: opacity 1s;
+
+  opacity: 0;
+  cursor: pointer;
+  border-radius: var(--action-border-radius);
+
+  transform: rotateX(var(--place-rotate-canvas))
+    translateZ(var(--toolbar-item-size));
+}
