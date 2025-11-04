@@ -73,6 +73,18 @@ export const updateEntityPoint = (entity, parentPoint) => {
 };
 
 /**
+ * @param {Entity} entity
+ */
+export const updateEntityOpacity = (entity) => {
+  if (!entity?.img || entity?.deleted) return;
+
+  entity.img.style.setProperty(
+    "--entity-opacity",
+    `${entity.cell.modifier || 1}`
+  );
+};
+
+/**
  * @param {number} [ySide]
  * @return {number}
  */

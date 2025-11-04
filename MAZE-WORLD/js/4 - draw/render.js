@@ -7,16 +7,8 @@ import {
 import { ENTITY_INFO } from "../2 - entities/index.js";
 import { EMPTY_BLOCK, GENERATION_CONFIG } from "../3 - generation/index.js";
 
-import { DRAW_CONFIG } from "./_config.js";
+import { DRAW_CONFIG, RENDER_CONFIG } from "./_config.js";
 import { canvasContainer, drawContainer } from "./containers.js";
-
-const RENDER_CONFIG = {
-  selectedBorderColor: "white",
-  borderColor: "black",
-  emptyColor: "black",
-  lineWidth: 1,
-  wallDarkness: 0.5,
-};
 
 export const canvasLayers = /** @type {HTMLCanvasElement[]} */ ([]);
 export const contextsLayers = /** @type {CanvasRenderingContext2D[]} */ ([]);
@@ -66,7 +58,7 @@ export const clearCanvas = (canvas) => {
 export const drawWall = (wall, context) => {
   // Only draw if there is a gap, if is sorrounded by walls it doesnt need
   if (!wall.borderMap || wall.borderMap.find((b) => !!b))
-    drawItem(context, wall, RENDER_CONFIG.wallDarkness);
+    drawItem(context, wall);
 };
 
 /**
@@ -91,15 +83,13 @@ export const drawWallTop = (wall, context) => {
 /**
  * @param {CanvasRenderingContext2D} context
  * @param {Drawable} drawable
- * @param {number} [modifier]
  */
 export const drawItem = (
   context,
-  { point, points, pos, isInverted, color, shoulApplyDark, isSelectedCell },
-  modifier
+  { point, points, pos, isInverted, color, modifier, isSelectedCell }
 ) => {
   context.fillStyle = color
-    ? getFillStyle(color, shoulApplyDark, modifier)
+    ? getFillStyle(color, modifier)
     : RENDER_CONFIG.emptyColor;
 
   fillPolygon(context, point, points);
@@ -117,18 +107,23 @@ export const drawItem = (
 
 /**
  * @param {Color} color
- * @param {boolean} [shoulApplyDark]
  * @param {number} [modifier]
  * @return {string}
  */
-export const getFillStyle = (color, shoulApplyDark = false, modifier = 1) => {
-  if (color === EMPTY_BLOCK.color) return "transparent";
-  if (ENTITY_INFO.timeOfDay && shoulApplyDark)
-    modifier = (1 - ENTITY_INFO.timeOfDay / 100) * modifier;
+export const getFillStyle = (color, modifier = 1) =>
+  color === EMPTY_BLOCK.color
+    ? "transparent"
+    : `rgb(` +
+      `${color.r * modifier}, ` +
+      `${color.g * modifier}, ` +
+      `${color.b * modifier})`;
 
-  const { r, g, b } = color;
-  return `rgb(${r * modifier}, ${g * modifier}, ${b * modifier})`;
-};
+/**
+ * @param {boolean} [shoulApplyDark]
+ * @return {number}
+ */
+export const getStyleModifier = (shoulApplyDark = false) =>
+  ENTITY_INFO.timeOfDay && shoulApplyDark ? 1 - ENTITY_INFO.timeOfDay / 100 : 1;
 
 /**
  * @param {CanvasRenderingContext2D} context

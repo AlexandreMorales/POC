@@ -21,6 +21,7 @@ import {
   setCanvasSize,
   setFavicon,
   updateConfigs,
+  getStyleModifier,
 } from "./render.js";
 import { updateTracks } from "./sounds.js";
 import { updateBiomeMap } from "./toolbar/index.js";
@@ -129,10 +130,11 @@ const drawCell = (cell, context, baseEntity) => {
 
   const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;
   const aCells = cell.adjacentPos[RENDER_INFO.currentPoly].map(getCell);
-  const shoulApplyDark =
-    cell !== baseEntity.cell && aCells.every((c) => c !== baseEntity.cell);
   const isSelectedCell =
     MENU_CONFIG.showSelectedCell && cell === getSelectedCell(baseEntity);
+  cell.modifier = getStyleModifier(
+    cell !== baseEntity.cell && aCells.every((c) => c !== baseEntity.cell)
+  );
 
   addToTrackCount(cell.wall?.block || cell.block);
 
@@ -147,7 +149,7 @@ const drawCell = (cell, context, baseEntity) => {
       blockToWall(cell.wall, point, {
         layer: cell.layer,
         isInverted,
-        shoulApplyDark,
+        modifier: cell.modifier,
         isSelectedCell,
         pos: cell.pos,
         borderMap: aCells.reduce((acc, c, i) => {
@@ -178,7 +180,7 @@ const drawCell = (cell, context, baseEntity) => {
     isInverted,
     pos: cell.pos,
     color: cell.color,
-    shoulApplyDark,
+    modifier: cell.modifier,
     isSelectedCell,
   });
 

@@ -1,4 +1,5 @@
 import { getPolyInfo } from "../1 - polygones/index.js";
+import { RENDER_CONFIG } from "./_config.js";
 
 /**
  * @param {CellBlock} block
@@ -22,7 +23,6 @@ export const blockToWall = (block, point, wallParams = {}, polyInfo) => {
 
   const commonInfos = {
     color: block.color,
-    shoulApplyDark: wallParams.shoulApplyDark,
     pos: wallParams.pos,
     isInverted: wallParams.isInverted,
     isSelectedCell: wallParams.isSelectedCell,
@@ -36,7 +36,9 @@ export const blockToWall = (block, point, wallParams = {}, polyInfo) => {
       ...commonInfos,
       point: { x: point.x, y: point.y - polyInfo.ySide * wallLayer },
       points,
+      modifier: wallParams.modifier,
     },
     borderMap: wallParams.borderMap,
+    modifier: wallParams.modifier * RENDER_CONFIG.wallDarkness,
   };
 };

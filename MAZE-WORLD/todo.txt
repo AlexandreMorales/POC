@@ -1,7 +1,5 @@
 ------------------------------------- CURRENT -------------------------------------
 
-ADD DAY TIME OPACITY TO ENTITIES
-
 EXPAND GRADIENT LIGHT TO ADJECENT OF ADJACENT OF ADJACENT 
     LOWERING 50% EACH STEP
 

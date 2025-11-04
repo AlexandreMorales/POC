@@ -20,6 +20,7 @@
  * @typedef {Object} CellBlock
  * @property {Block} block
  * @property {Color} color
+ * @property {number} [modifier]
  */
 
 /**

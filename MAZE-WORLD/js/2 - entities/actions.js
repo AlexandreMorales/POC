@@ -15,7 +15,7 @@ import {
   removeEntity,
 } from "./entities.js";
 import { ENTITY_INFO } from "./_infos.js";
-import { updateEntityImage } from "./render.js";
+import { updateEntityImage, updateEntityOpacity } from "./render.js";
 
 const ENTITY_ACTIONS_CONFIG = {
   delayToBurn: 1000,
@@ -77,39 +77,51 @@ export const moveEntities = (baseCell) => {
   const { indexToMove } = getMovementMaps(baseCell);
 
   ENTITIES.forEach((e) => {
-    if (!e.cell || e.deleted || !e.movementOptions?.speed) return;
-    const { targets, speed, random } = e.movementOptions;
+    if (!e.cell || e.deleted) return;
 
-    let nextCell = e.cell;
-    let nextIndex = 0;
+    moveEntity(e, indexToMove);
 
-    for (let index = 0; index < speed; index++) {
-      if (targets) {
-        const target = getClosestTarget(e);
-        if (!target) return;
-        const nextCellInfo = getClosestCell(e, nextCell, target.cell);
-        nextCell = nextCellInfo.cell;
-        nextIndex = nextCellInfo.index;
-        if (!nextCell) return;
-      } else if (random) {
-        nextIndex = getRandomInt(RENDER_INFO.currentPoly);
-        const aPos = nextCell.adjacentPos[RENDER_INFO.currentPoly];
+    updateEntityOpacity(e);
+  });
+};
+
+/**
+ * @param {Entity} e
+ * @param {{ [k: symbol]: number }} indexToMove
+ */
+const moveEntity = (e, indexToMove) => {
+  if (!e.movementOptions?.speed) return;
+  const { targets, speed, random } = e.movementOptions;
+
+  let nextCell = e.cell;
+  let nextIndex = 0;
+
+  for (let index = 0; index < speed; index++) {
+    if (targets) {
+      const target = getClosestTarget(e);
+      if (!target) return;
+      const nextCellInfo = getClosestCell(e, nextCell, target.cell);
+      nextCell = nextCellInfo.cell;
+      nextIndex = nextCellInfo.index;
+      if (!nextCell) return;
+    } else if (random) {
+      nextIndex = getRandomInt(RENDER_INFO.currentPoly);
+      const aPos = nextCell.adjacentPos[RENDER_INFO.currentPoly];
+      nextCell = getCell(aPos[nextIndex]);
+
+      for (let i = 0; i < aPos.length; i++) {
+        if (!cellIsBlocked(nextCell, e)) break;
+        nextIndex = getMod(nextIndex + 1, RENDER_INFO.currentPoly);
         nextCell = getCell(aPos[nextIndex]);
-
-        for (let i = 0; i < aPos.length; i++) {
-          if (!cellIsBlocked(nextCell, e)) break;
-          nextIndex = getMod(nextIndex + 1, RENDER_INFO.currentPoly);
-          nextCell = getCell(aPos[nextIndex]);
-        }
       }
     }
+  }
 
-    if (cellIsBlocked(nextCell, e)) return;
+  if (cellIsBlocked(nextCell, e)) return;
 
-    nextIndex = getMod(nextIndex, RENDER_INFO.currentPoly);
-    updateEntityImage(e, indexToMove[nextIndex]);
-    moveEntityToCell(e, nextCell);
-  });
+  nextIndex = getMod(nextIndex, RENDER_INFO.currentPoly);
+  updateEntityImage(e, indexToMove[nextIndex]);
+  moveEntityToCell(e, nextCell);
 };
 
 /**

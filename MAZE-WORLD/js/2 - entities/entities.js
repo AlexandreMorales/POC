@@ -9,6 +9,7 @@ import {
   removeEntityImage,
   setEntitySize,
   updateEntityImage,
+  updateEntityOpacity,
   updateEntityPoint,
 } from "./render.js";
 

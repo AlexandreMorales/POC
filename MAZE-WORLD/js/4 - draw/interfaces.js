@@ -5,8 +5,8 @@
  * @property {Pos} pos
  * @property {Color} color
  * @property {boolean} isInverted Only used for triangles
- * @property {boolean} shoulApplyDark
  * @property {boolean} isSelectedCell
+ * @property {number} modifier
  */
 
 /**

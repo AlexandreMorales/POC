@@ -5,6 +5,8 @@
   --entity-top: 0px;
   --entity-left: 0px;
 
+  --entity-opacity: 1;
+
   --entity-img: url(../images/spritesheet.png);
   --entity-spritesheet-width: 8;
 }
@@ -19,6 +21,7 @@
   object-position: 0 0;
   image-rendering: pixelated;
   user-select: none;
+  opacity: var(--entity-opacity);
 
   width: var(--entity-size);
   height: var(--entity-size);
