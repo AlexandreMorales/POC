@@ -91,7 +91,6 @@ const getNextCellIndexBasedOnCode = (code, useDiagonal) => {
   return getMod(aIndex, RENDER_INFO.currentPoly);
 };
 
-let lastMovement = /** @type {symbol} */ (null);
 let blockMovement = false;
 
 /**
@@ -108,10 +107,7 @@ export const moveBaseOnCode = (direction, useDiagonal) => {
 
   if (blockMovement) return;
 
-  if (lastMovement !== direction) {
-    lastMovement = direction;
-    makeEntityRun(PLAYER_ENTITY, lastMovement);
-  }
+  makeEntityRun(PLAYER_ENTITY, direction);
 
   const aModI = getNextCellIndexBasedOnCode(direction, useDiagonal);
   if (aModI === undefined) return;
@@ -132,18 +128,15 @@ export const MOVEMENT_VALUES = Object.values(MOVEMENT);
 export const stopMoving = () => {
   blockMovement = false;
   let lastSelection = PLAYER_ENTITY.currentDirection;
-  if (lastMovement) {
-    const movementMap = getMovementMap(PLAYER_ENTITY.cell);
+  const movementMap = getMovementMap(PLAYER_ENTITY.cell);
 
-    for (const movement of MOVEMENT_VALUES) {
-      if (movementMap[movement] === PLAYER_ENTITY.selectedCellIndex) {
-        lastSelection = movement;
-        break;
-      }
+  for (const movement of MOVEMENT_VALUES) {
+    if (movementMap[movement] === PLAYER_ENTITY.selectedCellIndex) {
+      lastSelection = movement;
+      break;
     }
-    updateEntityDirection(PLAYER_ENTITY, lastSelection);
-    lastMovement = null;
   }
+  updateEntityDirection(PLAYER_ENTITY, lastSelection);
 };
 
 /**

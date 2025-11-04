@@ -114,10 +114,20 @@ export const setEntitySize = (entity, ySide) => {
 const setEntityImageInfo = (entity) => {
   const imgInfo = getEntityImageInfo(entity);
 
-  if (imgInfo.pos) {
+  if (!imgInfo.src) {
     entity.img.style.removeProperty("--entity-img");
     entity.img.classList.remove("dont-use-spritesheet");
+  }
+
+  if (imgInfo.pos) {
     setImagePos(entity.img, imgInfo.pos);
+  } else if (imgInfo.posFn) {
+    if (!entity.leftFootWalk) entity.leftFootWalk = 0;
+    // only change the image every 4 cells
+    const leftFootWalk = Math.round(entity.leftFootWalk / 4) % 2 === 0;
+    const pos = imgInfo.posFn(leftFootWalk);
+    entity.leftFootWalk++;
+    setImagePos(entity.img, pos);
   } else if (imgInfo.src) {
     entity.img.style.setProperty("--entity-img", `url(${imgInfo.src})`);
     entity.img.classList.add("dont-use-spritesheet");

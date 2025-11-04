@@ -123,6 +123,7 @@ export const getSelectedCell = (entity) =>
  * @param {symbol} direction
  */
 export const updateEntityDirection = (entity, direction) => {
+  entity.leftFootWalk = 0;
   updateEntityImage(entity, direction);
   Object.values(entity.connectedEntities).forEach((e) => {
     updateEntityImage(e, MOVEMENT.RIGHT);

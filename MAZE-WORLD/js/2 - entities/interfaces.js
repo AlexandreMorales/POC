@@ -1,6 +1,7 @@
 /**
  * @typedef {Object} ImageInfo
  * @property {Pos} [pos]
+ * @property {(p: boolean) => Pos} [posFn]
  * @property {string} [src]
  */
 
@@ -23,6 +24,7 @@
  * @property {Cell | null} cell
  * @property {symbol} [currentDirection]
  * @property {string} [currentImgType]
+ * @property {number} [leftFootWalk]
  * @property {symbol[]} [movementsToCut]
  * @property {EntityMovementOptions} [movementOptions]
  * @property {number} [minTime] The min time that the entity can be spawn/live

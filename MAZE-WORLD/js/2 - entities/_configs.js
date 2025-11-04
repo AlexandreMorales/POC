@@ -33,10 +33,18 @@ export const ENTITY_IMAGES_MAP = /** @type {ImageMap} */ ({
       [MOVEMENT.UP]: { pos: { i: 4, j: 3 } },
     },
     [IMG_MAP_TYPES.RUNNING]: {
-      [MOVEMENT.DOWN]: { src: "../images/player/down-walk.gif" },
-      [MOVEMENT.LEFT]: { src: "../images/player/left-walk.gif" },
-      [MOVEMENT.RIGHT]: { src: "../images/player/right-walk.gif" },
-      [MOVEMENT.UP]: { src: "../images/player/up-walk.gif" },
+      [MOVEMENT.DOWN]: {
+        posFn: (left) => (left ? { i: 5, j: 0 } : { i: 5, j: 1 }),
+      },
+      [MOVEMENT.LEFT]: {
+        posFn: (left) => (left ? { i: 5, j: 2 } : { i: 5, j: 3 }),
+      },
+      [MOVEMENT.RIGHT]: {
+        posFn: (left) => (left ? { i: 5, j: 4 } : { i: 5, j: 5 }),
+      },
+      [MOVEMENT.UP]: {
+        posFn: (left) => (left ? { i: 5, j: 6 } : { i: 5, j: 7 }),
+      },
     },
   },
   [ENTITY_TYPES.TREE]: {

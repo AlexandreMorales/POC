@@ -11,9 +11,9 @@ export const POLYGONS_IMAGES = {
 };
 
 export const POLYGONS_ENTITY_POS = {
-  [KNOWN_POLYGONS.TRIANGLE]: /** @type {Pos} */ { i: 5, j: 2 },
-  [KNOWN_POLYGONS.SQUARE]: /** @type {Pos} */ { i: 5, j: 1 },
-  [KNOWN_POLYGONS.HEXAGON]: /** @type {Pos} */ { i: 5, j: 0 },
+  [KNOWN_POLYGONS.TRIANGLE]: /** @type {Pos} */ { i: 6, j: 2 },
+  [KNOWN_POLYGONS.SQUARE]: /** @type {Pos} */ { i: 6, j: 1 },
+  [KNOWN_POLYGONS.HEXAGON]: /** @type {Pos} */ { i: 6, j: 0 },
 };
 
 export const KNOWN_POLYGONS_VALUES = Object.values(KNOWN_POLYGONS);
@@ -32,7 +32,7 @@ export const MENU_CONFIG = {
   usePerspective: false,
   showSelectedCell: true,
   rain: false,
-  clouds: true,
+  clouds: false,
   digitalClock: false,
   music: false,
   mapGeneration: MAP_GENERATION.DISTANCE,

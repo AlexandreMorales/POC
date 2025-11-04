@@ -6,7 +6,7 @@
   --entity-left: 0px;
 
   --entity-img: url(../images/spritesheet.png);
-  --entity-spritesheet-width: 4;
+  --entity-spritesheet-width: 8;
 }
 
 .image {
