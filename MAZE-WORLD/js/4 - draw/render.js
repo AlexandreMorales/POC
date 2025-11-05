@@ -125,7 +125,7 @@ export const getFillStyle = (color, modifier = 1) =>
 export const getStyleModifier = (intensity) => {
   if (!ENTITY_INFO.timeOfDay) return 1;
   let modifier = 1 - ENTITY_INFO.timeOfDay / 100;
-  if (intensity >= 0) modifier = (1 - modifier) / intensity + modifier;
+  if (intensity >= 0) modifier = (1 - modifier) / (intensity || 1) + modifier;
   return modifier;
 };
 

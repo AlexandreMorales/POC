@@ -11,9 +11,9 @@ export const POLYGONS_IMAGES = {
 };
 
 export const POLYGONS_ENTITY_POS = {
-  [KNOWN_POLYGONS.TRIANGLE]: /** @type {Pos} */ { i: 6, j: 2 },
-  [KNOWN_POLYGONS.SQUARE]: /** @type {Pos} */ { i: 6, j: 1 },
-  [KNOWN_POLYGONS.HEXAGON]: /** @type {Pos} */ { i: 6, j: 0 },
+  [KNOWN_POLYGONS.TRIANGLE]: /** @type {Pos} */ { i: 7, j: 2 },
+  [KNOWN_POLYGONS.SQUARE]: /** @type {Pos} */ { i: 7, j: 1 },
+  [KNOWN_POLYGONS.HEXAGON]: /** @type {Pos} */ { i: 7, j: 0 },
 };
 
 export const KNOWN_POLYGONS_VALUES = Object.values(KNOWN_POLYGONS);

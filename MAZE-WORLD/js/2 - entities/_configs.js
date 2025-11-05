@@ -17,6 +17,7 @@ export const ENTITY_TYPES = {
 export const IMG_MAP_TYPES = {
   DEFAULT: "DEFAULT",
   RUNNING: "RUNNING",
+  USING: "USING",
 };
 
 export const BIOME_TYPES = {
@@ -29,22 +30,28 @@ export const ENTITY_IMAGES_MAP = /** @type {ImageMap} */ ({
     [IMG_MAP_TYPES.DEFAULT]: {
       [MOVEMENT.DOWN]: { pos: { i: 4, j: 0 } },
       [MOVEMENT.LEFT]: { pos: { i: 4, j: 1 } },
-      [MOVEMENT.RIGHT]: { pos: { i: 4, j: 2 } },
-      [MOVEMENT.UP]: { pos: { i: 4, j: 3 } },
+      [MOVEMENT.RIGHT]: { pos: { i: 4, j: 4 } },
+      [MOVEMENT.UP]: { pos: { i: 4, j: 5 } },
     },
     [IMG_MAP_TYPES.RUNNING]: {
       [MOVEMENT.DOWN]: {
-        posFn: (left) => (left ? { i: 5, j: 0 } : { i: 5, j: 1 }),
+        posFn: (left) => (left ? { i: 6, j: 0 } : { i: 6, j: 1 }),
       },
       [MOVEMENT.LEFT]: {
-        posFn: (left) => (left ? { i: 5, j: 2 } : { i: 5, j: 3 }),
+        posFn: (left) => (left ? { i: 6, j: 2 } : { i: 6, j: 3 }),
       },
       [MOVEMENT.RIGHT]: {
-        posFn: (left) => (left ? { i: 5, j: 4 } : { i: 5, j: 5 }),
+        posFn: (left) => (left ? { i: 6, j: 4 } : { i: 6, j: 5 }),
       },
       [MOVEMENT.UP]: {
-        posFn: (left) => (left ? { i: 5, j: 6 } : { i: 5, j: 7 }),
+        posFn: (left) => (left ? { i: 6, j: 6 } : { i: 6, j: 7 }),
       },
+    },
+    [IMG_MAP_TYPES.USING]: {
+      [MOVEMENT.DOWN]: { pos: { i: 5, j: 0 } },
+      [MOVEMENT.LEFT]: { pos: { i: 5, j: 1 } },
+      [MOVEMENT.RIGHT]: { pos: { i: 5, j: 2 } },
+      [MOVEMENT.UP]: { pos: { i: 5, j: 3 } },
     },
   },
   [ENTITY_TYPES.TREE]: {

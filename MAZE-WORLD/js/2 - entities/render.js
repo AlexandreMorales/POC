@@ -134,11 +134,8 @@ const setEntityImageInfo = (entity) => {
   if (imgInfo.pos) {
     setImagePos(entity.img, imgInfo.pos);
   } else if (imgInfo.posFn) {
-    if (!entity.leftFootWalk) entity.leftFootWalk = 0;
-    // only change the image every 4 cells
-    const leftFootWalk = Math.round(entity.leftFootWalk / 4) % 2 === 0;
-    const pos = imgInfo.posFn(leftFootWalk);
-    entity.leftFootWalk++;
+    const pos = imgInfo.posFn(!!entity.leftFootWalk);
+    entity.leftFootWalk = !entity.leftFootWalk;
     setImagePos(entity.img, pos);
   } else if (imgInfo.src) {
     entity.img.style.setProperty("--entity-img", `url(${imgInfo.src})`);

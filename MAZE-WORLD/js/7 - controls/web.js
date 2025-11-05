@@ -125,7 +125,7 @@ import { addDebugBlockToPoint } from "./debug.js";
   TOOLBAR_ACTIONS[5].onclick = () => useMap();
 
   canvasContainer.onclick = (e) => {
-    e = e || /** @type {MouseEvent} */ (window.event);
+    e = e || /** @type {PointerEvent} */ (window.event);
     if (MENU_CONFIG.debugMode) {
       const { left, top } = canvasContainer.getBoundingClientRect();
       const x = e.clientX - left;

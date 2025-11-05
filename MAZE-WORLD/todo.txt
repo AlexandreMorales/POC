@@ -1,14 +1,11 @@
 ------------------------------------- CURRENT -------------------------------------
 
-HOLD SELECTED ITEM
-
 SAME TYPE OF BLOCKS STAY ON THE BLOCK WITH COUNT
 
 
 ------------------------------------- SPRINT -------------------------------------
 
 FISHING V2
-    ANIMATION
     FISHING SPOTS ARE GIF ENTITIES (SPAWN ON MOVE)
     ADD LINE BETWEEN FISH AND ROD (SECOND CANVAS?)  
     WIN SCREEN

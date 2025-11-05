@@ -20,6 +20,7 @@ import {
   getOutBoat,
   getInBoat,
   getMovementMap,
+  makeEntityUse,
 } from "../2 - entities/index.js";
 import { getCenterCell } from "../3 - generation/index.js";
 import {
@@ -92,6 +93,7 @@ const getNextCellIndexBasedOnCode = (code, useDiagonal) => {
 };
 
 let blockMovement = false;
+let isMoving = false;
 
 /**
  * @param {symbol} direction
@@ -106,6 +108,7 @@ export const moveBaseOnCode = (direction, useDiagonal) => {
   }
 
   if (blockMovement) return;
+  isMoving = true;
 
   makeEntityRun(PLAYER_ENTITY, direction);
 
@@ -126,6 +129,7 @@ export const moveBaseOnCode = (direction, useDiagonal) => {
 
 export const MOVEMENT_VALUES = Object.values(MOVEMENT);
 export const stopMoving = () => {
+  if (!isMoving) return;
   blockMovement = false;
   let lastSelection = PLAYER_ENTITY.currentDirection;
   const movementMap = getMovementMap(PLAYER_ENTITY.cell);
@@ -136,6 +140,7 @@ export const stopMoving = () => {
       break;
     }
   }
+  isMoving = false;
   updateEntityDirection(PLAYER_ENTITY, lastSelection);
 };
 
@@ -196,6 +201,7 @@ export const dig = () => {
   if (!selectedCell?.block) return;
 
   if (selectedCell.entityType) {
+    makeEntityUse(PLAYER_ENTITY);
     removeEntitiesFromCell(selectedCell);
     return;
   }
@@ -204,6 +210,7 @@ export const dig = () => {
 
   const pickedBlock = { ...(selectedCell.wall || selectedCell) };
   addBlockToPlace(pickedBlock);
+  makeEntityUse(PLAYER_ENTITY);
 
   digAudio.play();
   if (selectedCell.wall) {
@@ -222,6 +229,7 @@ export const place = () => {
   const selectedCell = updateAndGetSelectedCell();
   if (selectedCell?.wall || selectedCell.entityType) return;
 
+  makeEntityUse(PLAYER_ENTITY);
   placeBlock(selectedCell);
 
   move();
@@ -271,6 +279,7 @@ export const useBoat = () => {
     getInBoat(PLAYER_ENTITY);
     move(selectedCell);
   } else if (canMove) {
+    makeEntityUse(PLAYER_ENTITY);
     addBoat(selectedCell, PLAYER_ENTITY);
   }
 };
@@ -285,7 +294,10 @@ export const useMap = (toggle) => {
 
 export const useFishingRod = () => {
   const selectedCell = updateAndGetSelectedCell();
-  if (selectedCell?.block?.isFluid) startFishing();
+  if (selectedCell?.block?.isFluid) {
+    makeEntityUse(PLAYER_ENTITY);
+    startFishing();
+  }
 };
 
 // Called when zooming, creation, set PolySides
