@@ -50,6 +50,31 @@ const addToTrackCount = (block) => {
   if (block?.trackType)
     tracksCount[block.trackType] = (tracksCount[block.trackType] || 0) + 1;
 };
+/**
+ * @param {Cell} cell
+ * @param {number} depth
+ * @returns {Cell[][]}
+ */
+const getAjacentCells = (cell, depth = 1) => {
+  const result = [[cell]];
+
+  for (let index = 0; index < depth; index++) {
+    const cells = /** @type {Cell[]} */ ([]);
+    const current = result[index];
+    for (const element of current) {
+      if (!element) continue;
+      const aCells = element.adjacentPos[RENDER_INFO.currentPoly].map(getCell);
+      cells.push(
+        ...aCells.filter(
+          (c) => !current.includes(c) && !cells.includes(c) && c !== cell
+        )
+      );
+    }
+    result.push(cells);
+  }
+
+  return result;
+};
 
 /**
  * @param {Entity} baseEntity
@@ -65,6 +90,11 @@ export const drawEveryCell = (baseEntity) => {
   // More range to encapsulate rotation
   const size = rows + columns;
 
+  const adjacentCells = getAjacentCells(
+    baseEntity.cell,
+    DRAW_CONFIG.lightDepth
+  );
+
   for (let i = -columns; i < size; i++) {
     const baseI = i + RENDER_INFO.iOffset;
     for (let j = -rows; j < size; j++) {
@@ -74,7 +104,12 @@ export const drawEveryCell = (baseEntity) => {
 
       if (shouldIntercalate && offsetCell && nJ % 2 === 0) nI = nI + 1;
 
-      drawCell(loadAndGetCell(pos), contextsLayers[0], baseEntity);
+      drawCell(
+        loadAndGetCell(pos),
+        contextsLayers[0],
+        baseEntity,
+        adjacentCells
+      );
     }
   }
 
@@ -118,8 +153,9 @@ const tweakFluids = debounce(() => {
  * @param {Cell} cell
  * @param {CanvasRenderingContext2D} context
  * @param {Entity} baseEntity
+ * @param {Cell[][]} adjacentCells
  */
-const drawCell = (cell, context, baseEntity) => {
+const drawCell = (cell, context, baseEntity, adjacentCells) => {
   const polyInfo = getPolyInfo();
   const isInverted = polyInfo.hasInverted && cell.isInverted;
 
@@ -132,8 +168,9 @@ const drawCell = (cell, context, baseEntity) => {
   const aCells = cell.adjacentPos[RENDER_INFO.currentPoly].map(getCell);
   const isSelectedCell =
     MENU_CONFIG.showSelectedCell && cell === getSelectedCell(baseEntity);
+
   cell.modifier = getStyleModifier(
-    cell !== baseEntity.cell && aCells.every((c) => c !== baseEntity.cell)
+    adjacentCells.findIndex((c) => c.includes(cell))
   );
 
   addToTrackCount(cell.wall?.block || cell.block);

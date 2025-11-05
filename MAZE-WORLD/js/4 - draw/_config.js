@@ -1,4 +1,5 @@
 export const DRAW_CONFIG = {
+  lightDepth: 2,
   maxLayer: 2,
   fluidSpeed: 500,
 };

@@ -119,11 +119,15 @@ export const getFillStyle = (color, modifier = 1) =>
       `${color.b * modifier})`;
 
 /**
- * @param {boolean} [shoulApplyDark]
+ * @param {number} intensity
  * @return {number}
  */
-export const getStyleModifier = (shoulApplyDark = false) =>
-  ENTITY_INFO.timeOfDay && shoulApplyDark ? 1 - ENTITY_INFO.timeOfDay / 100 : 1;
+export const getStyleModifier = (intensity) => {
+  if (!ENTITY_INFO.timeOfDay) return 1;
+  let modifier = 1 - ENTITY_INFO.timeOfDay / 100;
+  if (intensity >= 0) modifier = (1 - modifier) / intensity + modifier;
+  return modifier;
+};
 
 /**
  * @param {CanvasRenderingContext2D} context
