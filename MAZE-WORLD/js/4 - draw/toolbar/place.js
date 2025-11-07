@@ -3,16 +3,30 @@ import {
   KNOWN_POLYGONS_VALUES,
   RENDER_INFO,
 } from "../../1 - polygones/index.js";
-import { EMPTY_BLOCK } from "../../3 - generation/index.js";
+import { BLOCKS } from "../../3 - generation/index.js";
 
 import { applyBorders, clearCanvas, drawWall, drawWallTop } from "../render.js";
 import { blockToWall } from "../_utils.js";
 import { getMod } from "../../_utils.js";
 
+/**
+ * @param {Color} color1
+ * @param {Color} color2
+ * @returns {boolean}
+ */
+const areColorsEqual = (color1, color2) =>
+  color1.r === color2.r && color1.g === color2.g && color1.b === color2.b;
+
 const PLACE_CONFIG = {
   cellHeight: 24,
   canvasNum: 7,
 };
+const BLOCKS_LISTS = Object.values(BLOCKS)
+  .filter((b) => !b.isFluid)
+  .filter(
+    (b, i, a) =>
+      !a.find((b2, i2) => areColorsEqual(b.color, b2.color) && i < i2)
+  );
 PLACE_CONFIG.steps = 360 / PLACE_CONFIG.canvasNum;
 let PLACE_POLYS_INFO = /** @type {{ [k: number]: PolyInfoProp }} */ (null);
 
@@ -33,23 +47,13 @@ for (let i = 0; i < PLACE_CONFIG.canvasNum; i++) {
 
 placeContainer.ontouchend = () => {};
 
-const PLACE_BLOCKS = /** @type {CellBlock[]} */ ([]);
-
 /**
  * @returns {CellBlock}
  */
 export const getSelectedBlockToPlace = () => {
-  const block = PLACE_BLOCKS.splice(SELECTED_PLACE_BLOCKS, 1)[0];
-  showPlaceBlock();
-  return block;
-};
-
-/**
- * @param {CellBlock} block
- */
-export const addBlockToPlace = (block) => {
-  if (block) PLACE_BLOCKS.push(block);
-  showPlaceBlock();
+  const block =
+    BLOCKS_LISTS[getMod(SELECTED_PLACE_BLOCKS, BLOCKS_LISTS.length)];
+  return { block, color: block.color };
 };
 
 export const resetPlace = () => {
@@ -57,27 +61,12 @@ export const resetPlace = () => {
     p.width = placeContainer.parentElement.offsetWidth;
     p.height = placeContainer.parentElement.offsetHeight;
   });
-  showPlaceBlock();
   showSelectedPlaceBlocks();
-};
-
-const showPlaceBlock = () => {
-  placeCanvas.forEach((p) => clearCanvas(p));
-
-  placeContexts.forEach((p, i) =>
-    drawPlaceBlock(
-      p,
-      PLACE_BLOCKS[i] || {
-        color: EMPTY_BLOCK.color,
-        block: EMPTY_BLOCK,
-      }
-    )
-  );
 };
 
 /**
  * @param {CanvasRenderingContext2D} context
- * @param {CellBlock} block
+ * @param {Block} block
  */
 const drawPlaceBlock = (context, block) => {
   if (!PLACE_POLYS_INFO) {
@@ -90,7 +79,7 @@ const drawPlaceBlock = (context, block) => {
   const polyInfo = PLACE_POLYS_INFO[RENDER_INFO.currentPoly];
 
   const wall = blockToWall(
-    block,
+    { block, color: block.color },
     {
       x: placeContainer.parentElement.offsetWidth / 2,
       y: placeContainer.parentElement.offsetHeight / 1.75,
@@ -111,10 +100,7 @@ let PLACE_BLOCKS_DEG = 0;
  * @param {number} orientation
  */
 export const movePlaceBlocks = (orientation) => {
-  SELECTED_PLACE_BLOCKS = getMod(
-    SELECTED_PLACE_BLOCKS + orientation,
-    PLACE_CONFIG.canvasNum
-  );
+  SELECTED_PLACE_BLOCKS = SELECTED_PLACE_BLOCKS + orientation;
   PLACE_BLOCKS_DEG +=
     orientation > 0 ? PLACE_CONFIG.steps : -PLACE_CONFIG.steps;
 
@@ -128,10 +114,21 @@ export const movePlaceBlocks = (orientation) => {
 const showSelectedPlaceBlocks = () => {
   const showIndexes = [
     getMod(SELECTED_PLACE_BLOCKS - 1, PLACE_CONFIG.canvasNum),
-    SELECTED_PLACE_BLOCKS,
+    getMod(SELECTED_PLACE_BLOCKS, PLACE_CONFIG.canvasNum),
     getMod(SELECTED_PLACE_BLOCKS + 1, PLACE_CONFIG.canvasNum),
   ];
-  placeCanvas.forEach((p, i) =>
-    p.classList[showIndexes.includes(i) ? "add" : "remove"]("active")
-  );
+  const drawIndexes = [
+    getMod(SELECTED_PLACE_BLOCKS - 1, BLOCKS_LISTS.length),
+    getMod(SELECTED_PLACE_BLOCKS, BLOCKS_LISTS.length),
+    getMod(SELECTED_PLACE_BLOCKS + 1, BLOCKS_LISTS.length),
+  ];
+
+  placeCanvas.forEach((p, i) => {
+    p.classList[showIndexes.includes(i) ? "add" : "remove"]("active");
+  });
+
+  showIndexes.forEach((index, i) => {
+    clearCanvas(placeCanvas[index]);
+    drawPlaceBlock(placeContexts[index], BLOCKS_LISTS[drawIndexes[i]]);
+  });
 };

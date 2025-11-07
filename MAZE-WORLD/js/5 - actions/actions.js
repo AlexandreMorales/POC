@@ -31,7 +31,6 @@ import {
   updateWeather,
   updateCompass,
   COMPASS_CONFIG,
-  addBlockToPlace,
   startFishing,
   IS_FISHING_ACTIVE,
   toggleFullMap,
@@ -208,8 +207,6 @@ export const dig = () => {
 
   if (selectedCell.block.isFluid) return;
 
-  const pickedBlock = { ...(selectedCell.wall || selectedCell) };
-  addBlockToPlace(pickedBlock);
   makeEntityUse(PLAYER_ENTITY);
 
   digAudio.play();

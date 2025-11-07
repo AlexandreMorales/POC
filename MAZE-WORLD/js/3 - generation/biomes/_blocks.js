@@ -92,12 +92,6 @@ export const BLOCKS = /** @type {{ [k: string]: Block }} */ ({
     isFluid: true,
     trackType: TRACK_TYPES.TRACK4,
   },
-  BEACH_SAND: {
-    color: hexToRgb(" #ab976a"),
-    layer: 0,
-    spawnableEntities: [ENEMY_SPAWN],
-    trackType: TRACK_TYPES.TRACK3,
-  },
   LOW_GRASS: {
     color: hexToRgb(" #457950"),
     layer: 0,
@@ -121,6 +115,12 @@ export const BLOCKS = /** @type {{ [k: string]: Block }} */ ({
     trackType: TRACK_TYPES.TRACK6,
   },
   ROCK: { color: hexToRgb(" #CBC0BB"), layer: 1 },
+  BEACH_SAND: {
+    color: hexToRgb(" #ab976a"),
+    layer: 0,
+    spawnableEntities: [ENEMY_SPAWN],
+    trackType: TRACK_TYPES.TRACK3,
+  },
 
   // Snow
   FROZEN_WATER: {
