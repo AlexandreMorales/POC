@@ -67,11 +67,37 @@ const getAdjacentPos = ({ i, j }, isInverted) => {
 
 /**
  * @param {Pos} pos
+ * @param {boolean} isInverted
+ * @returns {{ [k: number]: Pos[] }}
+ */
+const getAdjacentPosWithCorners = ({ i, j }, isInverted) => {
+  return {
+    ...getAdjacentPos({ i, j }, isInverted),
+    [KNOWN_POLYGONS.SQUARE]: [
+      { i: i - 1, j: j - 1 },
+      { i: i - 1, j },
+      { i: i - 1, j: j + 1 },
+      { i, j: j + 1 },
+      { i: i + 1, j: j + 1 },
+      { i: i + 1, j },
+      { i: i + 1, j: j - 1 },
+      { i, j: j - 1 },
+    ],
+  };
+};
+
+/**
+ * @param {Pos} pos
  * @returns {CellProps}
  */
 export const createCellProps = (pos) => {
   const isInverted = isCellInverted(pos);
-  return { pos, isInverted, adjacentPos: getAdjacentPos(pos, isInverted) };
+  return {
+    pos,
+    isInverted,
+    adjacentPos: getAdjacentPos(pos, isInverted),
+    adjacentPosWithCorners: getAdjacentPosWithCorners(pos, isInverted),
+  };
 };
 
 /**

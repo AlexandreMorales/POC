@@ -27,6 +27,7 @@
  * @typedef {Object} CellProps
  * @property {Pos} pos
  * @property {{ [k: number]: Pos[] }} adjacentPos Pos of adjacent cells
+ * @property {{ [k: number]: Pos[] }} adjacentPosWithCorners Pos of adjacent cells with corners
  * @property {boolean} isInverted Only used for triangles
  */
 

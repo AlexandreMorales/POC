@@ -63,7 +63,8 @@ const getAjacentCells = (cell, depth = 1) => {
     const current = result[index];
     for (const element of current) {
       if (!element) continue;
-      const aCells = element.adjacentPos[RENDER_INFO.currentPoly].map(getCell);
+      const aCells =
+        element.adjacentPosWithCorners[RENDER_INFO.currentPoly].map(getCell);
       cells.push(
         ...aCells.filter(
           (c) => !current.includes(c) && !cells.includes(c) && c !== cell
