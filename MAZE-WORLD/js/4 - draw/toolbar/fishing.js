@@ -13,6 +13,12 @@ const fishingCanvas = /** @type {HTMLCanvasElement} */ (
 );
 const fishingContext = fishingCanvas.getContext("2d");
 
+const fishingLineCanvas = /** @type {HTMLCanvasElement} */ (
+  document.getElementById("fishing-line-canvas")
+);
+const fishingLineContext = fishingLineCanvas.getContext("2d");
+fishingLineContext.strokeStyle = "black";
+
 const fishingContainer = document.getElementById("fishing-container");
 const fishingRodImg = /** @type {HTMLElement} */ (
   document.getElementById("fishing-rod")
@@ -41,8 +47,26 @@ let FISHING_IS_CIRCLE = false;
  * @param {{ height: number, width: number  }} size
  */
 const setFishingCanvasSize = ({ height, width }) => {
-  fishingCanvas.height = height;
-  fishingCanvas.width = width;
+  fishingLineCanvas.height = fishingCanvas.height = height;
+  fishingLineCanvas.width = fishingCanvas.width = width;
+};
+
+/**
+ * @returns {Point}
+ */
+const getFishingRodPoint = () =>
+  FISHING_IS_CIRCLE
+    ? fishingMazeObj.getCirclePoint()
+    : fishingMazeObj.getLastMazeCell().point;
+
+const drawFishingLine = () => {
+  fishingLineCanvas.height = fishingLineCanvas.height;
+  const fishPoint = fishingMazeObj.getCurrentMazeCell().point;
+  const rodPoint = getFishingRodPoint();
+
+  fishingLineContext.moveTo(fishPoint.x, fishPoint.y);
+  fishingLineContext.lineTo(rodPoint.x, rodPoint.y);
+  fishingLineContext.stroke();
 };
 
 const initFishingImages = () => {
@@ -56,14 +80,8 @@ const initFishingImages = () => {
     true,
     ySide
   );
-  setImagePoint(
-    fishingRodImg,
-    FISHING_IS_CIRCLE
-      ? fishingMazeObj.getCirclePoint()
-      : fishingMazeObj.getLastMazeCell().point,
-    true,
-    ySide
-  );
+  setImagePoint(fishingRodImg, getFishingRodPoint(), true, ySide);
+  drawFishingLine();
 };
 
 export const stopFishing = () => {
@@ -188,6 +206,7 @@ export const moveFishing = (code, useDiagonal) => {
     if (fishingMazeObj.isMazeSolved()) stopFishing();
 
     setImagePoint(fishingFishImg, nextCell.point, true, ySide);
+    drawFishingLine();
 
     canMoveFishing = false;
     setTimeout(() => {
