@@ -48,6 +48,7 @@ export const displayWinAnimation = (entity, itemPos) => {
 
   const img = document.createElement("div");
   img.className = "image won-item";
+  img.style.marginTop = `-${ySide}px`;
 
   setImagePos(img, itemPos);
   container.appendChild(img);

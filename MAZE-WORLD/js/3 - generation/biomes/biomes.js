@@ -26,7 +26,7 @@ const BIOMES_RAW = /** @type {{ [k: string]: Biome }} */ ({
     name: "OCEAN",
     mapColor: BLOCKS.WATER.color,
     minValue: -0.2,
-    minDistance: 100,
+    minDistance: 75,
     higherGroundBlock: BLOCKS.MID_GRASS,
     ranges: [
       addPropsToBlock(BLOCKS.DEEP_WATER, { max: -0.1 }),
@@ -41,7 +41,7 @@ const BIOMES_RAW = /** @type {{ [k: string]: Biome }} */ ({
     name: "SNOW",
     mapColor: BLOCKS.ICE.color,
     minValue: 0.2,
-    minDistance: 300,
+    minDistance: 150,
     higherGroundBlock: BLOCKS.ICE,
     negativeJ: false,
     ranges: [
@@ -55,7 +55,7 @@ const BIOMES_RAW = /** @type {{ [k: string]: Biome }} */ ({
     name: "DESERT",
     mapColor: BLOCKS.SAND.color,
     minValue: 0,
-    minDistance: 300,
+    minDistance: 150,
     higherGroundBlock: BLOCKS.TERRACOTA,
     negativeJ: true,
     ranges: [
