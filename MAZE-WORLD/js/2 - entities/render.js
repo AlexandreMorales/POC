@@ -35,6 +35,33 @@ export const createEntityImage = (entity) => {
 
 /**
  * @param {Entity} entity
+ * @param {Pos} itemPos
+ * @returns {() => void}
+ */
+export const displayWinAnimation = (entity, itemPos) => {
+  const { hasInverted, ySide } = getPolyInfo();
+  const point = calculatePointBasedOnPos(
+    entity.cell.pos,
+    hasInverted && entity.cell.isInverted,
+    PLAYER_ENTITY.cell
+  );
+
+  const img = document.createElement("div");
+  img.className = "image won-item";
+
+  setImagePos(img, itemPos);
+  container.appendChild(img);
+
+  setEntityImageSize(img, ySide / 2);
+  setImagePoint(img, point, false, ySide / 2);
+
+  return () => {
+    container.removeChild(img);
+  };
+};
+
+/**
+ * @param {Entity} entity
  */
 export const removeEntityImage = (entity) => {
   if (entity.img) container.removeChild(entity.img);
@@ -213,7 +240,9 @@ const getEntityImageInfo = (entity) => {
   const mapType =
     typeMap[entity.currentImgType] || typeMap[IMG_MAP_TYPES.DEFAULT];
 
-  return mapType[entity.currentDirection || MOVEMENT.DOWN];
+  return (
+    mapType[entity.currentDirection || MOVEMENT.DOWN] || mapType[MOVEMENT.DOWN]
+  );
 };
 
 /**

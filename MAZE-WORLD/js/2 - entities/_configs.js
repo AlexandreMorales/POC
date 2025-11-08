@@ -18,6 +18,8 @@ export const IMG_MAP_TYPES = {
   DEFAULT: "DEFAULT",
   RUNNING: "RUNNING",
   USING: "USING",
+  WINNING: "WINNING",
+  LOSING: "LOSING",
 };
 
 export const BIOME_TYPES = {
@@ -52,6 +54,12 @@ export const ENTITY_IMAGES_MAP = /** @type {ImageMap} */ ({
       [MOVEMENT.LEFT]: { pos: { i: 5, j: 1 } },
       [MOVEMENT.RIGHT]: { pos: { i: 5, j: 2 } },
       [MOVEMENT.UP]: { pos: { i: 5, j: 3 } },
+    },
+    [IMG_MAP_TYPES.WINNING]: {
+      [MOVEMENT.DOWN]: { pos: { i: 4, j: 3 } },
+    },
+    [IMG_MAP_TYPES.LOSING]: {
+      [MOVEMENT.DOWN]: { pos: { i: 4, j: 2 } },
     },
   },
   [ENTITY_TYPES.TREE]: {

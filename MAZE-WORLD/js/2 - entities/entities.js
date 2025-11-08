@@ -6,6 +6,7 @@ import { ENTITY_INFO } from "./_infos.js";
 import {
   createEntityImage,
   cutEntityImage,
+  displayWinAnimation,
   removeEntityImage,
   setEntitySize,
   updateEntityImage,
@@ -137,6 +138,29 @@ export const makeEntityUse = (entity) => {
   setTimeout(() => {
     updateEntityImage(entity, entity.currentDirection);
   }, 250);
+};
+
+/**
+ * @param {Entity} entity
+ * @param {Pos} itemPos
+ */
+export const makeEntityWin = (entity, itemPos) => {
+  updateEntityImage(entity, entity.currentDirection, IMG_MAP_TYPES.WINNING);
+  const callback = displayWinAnimation(entity, itemPos);
+  setTimeout(() => {
+    updateEntityImage(entity, entity.currentDirection);
+    callback();
+  }, 1000);
+};
+
+/**
+ * @param {Entity} entity
+ */
+export const makeEntityLose = (entity) => {
+  updateEntityImage(entity, entity.currentDirection, IMG_MAP_TYPES.LOSING);
+  setTimeout(() => {
+    updateEntityImage(entity, entity.currentDirection);
+  }, 1000);
 };
 
 /**

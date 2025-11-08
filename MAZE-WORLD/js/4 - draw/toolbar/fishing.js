@@ -2,8 +2,13 @@ import {
   setEntityImageSize,
   setImagePoint,
   getMovementMap,
+  setImagePos,
+  PLAYER_ENTITY,
+  makeEntityWin,
+  makeEntityLose,
 } from "../../2 - entities/index.js";
 import { BLOCKS, createMazeObj } from "../../3 - generation/index.js";
+
 import { tweakColor } from "../../_utils.js";
 import { DRAW_CONFIG } from "../_config.js";
 import { drawCellMaze } from "../drawMaze.js";
@@ -23,9 +28,11 @@ const fishingContainer = document.getElementById("fishing-container");
 const fishingRodImg = /** @type {HTMLElement} */ (
   document.getElementById("fishing-rod")
 );
+const fishingRodPos = /** @type {Pos} */ ({ i: 8, j: 0 });
 const fishingFishImg = /** @type {HTMLElement} */ (
   document.getElementById("fishing-fish")
 );
+const fishingFishPos = /** @type {Pos} */ ({ i: 2, j: 1 });
 
 const FISHING_CONFIG = {
   mazeSize: 7,
@@ -72,15 +79,19 @@ const drawFishingLine = () => {
 const initFishingImages = () => {
   const { ySide } = fishingMazeObj.getMazePolyInfo();
 
-  setEntityImageSize(fishingFishImg, ySide);
+  setImagePos(fishingRodImg, fishingRodPos);
   setEntityImageSize(fishingRodImg, ySide);
+  setImagePoint(fishingRodImg, getFishingRodPoint(), true, ySide);
+
+  setImagePos(fishingFishImg, fishingFishPos);
+  setEntityImageSize(fishingFishImg, ySide);
   setImagePoint(
     fishingFishImg,
     fishingMazeObj.getCurrentMazeCell().point,
     true,
     ySide
   );
-  setImagePoint(fishingRodImg, getFishingRodPoint(), true, ySide);
+
   drawFishingLine();
 };
 
@@ -133,7 +144,10 @@ const initFishingTimer = (height) => {
       "--fishing-progress-bar-height",
       `${currentHeight}px`
     );
-    if (currentHeight <= 0) stopFishing();
+    if (currentHeight <= 0) {
+      stopFishing();
+      makeEntityLose(PLAYER_ENTITY);
+    }
   }, FISHING_CONFIG.timerDelay);
 };
 
@@ -203,7 +217,11 @@ export const moveFishing = (code, useDiagonal) => {
 
     if (!nextCell) return;
 
-    if (fishingMazeObj.isMazeSolved()) stopFishing();
+    if (fishingMazeObj.isMazeSolved()) {
+      stopFishing();
+      makeEntityWin(PLAYER_ENTITY, fishingFishPos);
+      return;
+    }
 
     setImagePoint(fishingFishImg, nextCell.point, true, ySide);
     drawFishingLine();
