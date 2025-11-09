@@ -8,12 +8,15 @@
 
 /**
  * @typedef {Object} Block
+ * @property {string} name
  * @property {Color} color
  * @property {number} layer
  * @property {boolean} [isFluid]
  * @property {SpawnableEntities[]} [spawnableEntities]
  * @property {string} [trackType]
  * @property {string} [biomeType]
+ * @property {boolean} [indestructible]
+ * @property {(c: Cell) => void} [onDestroy]
  */
 
 /**
@@ -36,6 +39,7 @@
  * @property {number} layer
  * @property {CellBlock} wall The block above this one
  * @property {string} entityType The type of the entity on top of the cell
+ * @property {boolean} [hasBomb]
  */
 
 /**

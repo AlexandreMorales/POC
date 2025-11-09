@@ -6,7 +6,7 @@ import {
   RENDER_INFO,
 } from "../1 - polygones/index.js";
 import { getSelectedCell, updateEntities } from "../2 - entities/index.js";
-import { loadAndGetCell } from "../3 - generation/index.js";
+import { MINE_BLOCKS, loadAndGetCell } from "../3 - generation/index.js";
 import { debounce, getMod, isPointOutside, tweakColor } from "../_utils.js";
 
 import { DRAW_CONFIG } from "./_config.js";
@@ -22,6 +22,7 @@ import {
   setFavicon,
   updateConfigs,
   getStyleModifier,
+  showMineValue,
 } from "./render.js";
 import { updateTracks } from "./sounds.js";
 import { updateBiomeMap } from "./toolbar/index.js";
@@ -225,4 +226,16 @@ const drawCell = (cell, context, baseEntity, adjacentCells) => {
   if (cell.block?.isFluid) fluids.push(drawable);
 
   drawItem(context, drawable);
+
+  if (cell.block === MINE_BLOCKS.MINES_LOW) {
+    const aCellsCorner =
+      cell.adjacentPosWithCorners[RENDER_INFO.currentPoly].map(getCell);
+    showMineValue(
+      context,
+      aCellsCorner.reduce((acc, c) => (c.hasBomb ? acc + 1 : acc), 0),
+      point,
+      isInverted,
+      polyInfo.ySide
+    );
+  }
 };

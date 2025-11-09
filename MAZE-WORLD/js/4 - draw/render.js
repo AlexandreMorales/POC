@@ -217,3 +217,34 @@ const showChunks = (context, pos, point, points) => {
     applyBorders(context, point, points);
   }
 };
+
+const mineValueColors = [
+  "blue",
+  "green",
+  "red",
+  "darkblue",
+  "brown",
+  "darkred",
+  "black",
+  "grey",
+];
+/**
+ * @param {CanvasRenderingContext2D} context
+ * @param {number} value
+ * @param {Point} point
+ * @param {boolean} isInverted
+ * @param {number} ySide
+ */
+export const showMineValue = (context, value, point, isInverted, ySide) => {
+  if (value) {
+    context.fillStyle = mineValueColors[value - 1];
+    context.font = `bold ${ySide}px Arial`;
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillText(
+      `${value}`,
+      point.x,
+      isInverted ? point.y + ySide / 2 : point.y
+    );
+  }
+};

@@ -5,7 +5,7 @@ import { BLOCKS } from "./_blocks.js";
  * @param {BlockProps} props
  * @returns {BlockEntity}
  */
-const addPropsToBlock = (block, props) => ({ ...block, ...props });
+export const addPropsToBlock = (block, props) => ({ ...block, ...props });
 
 const BIOMES_RAW = /** @type {{ [k: string]: Biome }} */ ({
   FOREST: {

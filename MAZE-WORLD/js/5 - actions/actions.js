@@ -22,7 +22,7 @@ import {
   getMovementMap,
   makeEntityUse,
 } from "../2 - entities/index.js";
-import { getCenterCell } from "../3 - generation/index.js";
+import { destroyWall, getCenterCell } from "../3 - generation/index.js";
 import {
   resetCanvas,
   drawEveryCell,
@@ -206,12 +206,15 @@ export const dig = () => {
   }
 
   if (selectedCell.block.isFluid) return;
+  if (selectedCell.wall) {
+    if (selectedCell.wall.block.indestructible) return;
+  } else if (selectedCell.block.indestructible) return;
 
   makeEntityUse(PLAYER_ENTITY);
 
   digAudio.play();
   if (selectedCell.wall) {
-    selectedCell.wall = null;
+    destroyWall(selectedCell);
   } else {
     selectedCell.block = null;
     selectedCell.color = null;

@@ -36,6 +36,11 @@
  */
 
 /**
+ * @typedef {Object} MinesObj
+ * @property {(pos: Pos) => boolean} isBomb
+ */
+
+/**
  * @typedef {Object} CellMazeCircleProps
  * @property {Point} topLeftPoint
  * @property {Point} topRightPoint

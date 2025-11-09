@@ -4,7 +4,7 @@ import { BIOME_TYPES, ENTITY_TYPES } from "../../2 - entities/index.js";
  * @param {string} hexColor
  * @returns {Color}
  */
-const hexToRgb = (hexColor) => {
+export const hexToRgb = (hexColor) => {
   let hex = hexColor.trim().slice(1);
   let r = parseInt(hex.substring(0, 2), 16);
   let g = parseInt(hex.substring(2, 4), 16);
@@ -80,6 +80,7 @@ export const EMPTY_BLOCK = /** @type {Block} */ ({
 // Adding space on the rgb color so VScode shows the color
 export const BLOCKS = /** @type {{ [k: string]: Block }} */ ({
   DEEP_WATER: {
+    name: "DEEP_WATER",
     color: hexToRgb(" #256299"),
     layer: 0,
     isFluid: true,
@@ -87,35 +88,45 @@ export const BLOCKS = /** @type {{ [k: string]: Block }} */ ({
     trackType: TRACK_TYPES.TRACK5,
   },
   WATER: {
+    name: "WATER",
     color: hexToRgb(" #2375b4"),
     layer: 0,
     isFluid: true,
     trackType: TRACK_TYPES.TRACK4,
   },
   LOW_GRASS: {
+    name: "LOW_GRASS",
     color: hexToRgb(" #457950"),
     layer: 0,
     spawnableEntities: FOREST_SPAWNS,
     trackType: TRACK_TYPES.TRACK2,
   },
   MID_GRASS: {
+    name: "MID_GRASS",
     color: hexToRgb(" #2d673e"),
     layer: 0,
     spawnableEntities: FOREST_SPAWNS,
     trackType: TRACK_TYPES.TRACK1,
   },
   HIGH_GRASS: {
+    name: "HIGH_GRASS",
     color: hexToRgb(" #2d673e"),
     layer: 1,
     trackType: TRACK_TYPES.TRACK1,
   },
   DIRT: {
+    name: "DIRT",
     color: hexToRgb(" #3F573A"),
     layer: 1,
     trackType: TRACK_TYPES.TRACK6,
   },
-  ROCK: { color: hexToRgb(" #CBC0BB"), layer: 1 },
+  ROCK: {
+    name: "ROCK",
+    color: hexToRgb(" #CBC0BB"),
+    layer: 1,
+  },
   BEACH_SAND: {
+    name: "BEACH_SAND",
     color: hexToRgb(" #ab976a"),
     layer: 0,
     spawnableEntities: [ENEMY_SPAWN],
@@ -124,30 +135,35 @@ export const BLOCKS = /** @type {{ [k: string]: Block }} */ ({
 
   // Snow
   FROZEN_WATER: {
+    name: "FROZEN_WATER",
     color: hexToRgb(" #94F2F4"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK11,
     ...SNOW_PROPS,
   },
   FROZEN_SEA_SHORE: {
+    name: "FROZEN_SEA_SHORE",
     color: hexToRgb(" #A0E6EC"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK8,
     ...SNOW_PROPS,
   },
   SLUSH: {
+    name: "SLUSH",
     color: hexToRgb(" #D0ECEB"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK8,
     ...SNOW_PROPS,
   },
   ICE: {
+    name: "ICE",
     color: hexToRgb(" #ECFFFD"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK7,
     ...SNOW_PROPS,
   },
   HIGH_ICE: {
+    name: "HIGH_ICE",
     color: hexToRgb(" #ECFFFD"),
     layer: 1,
     trackType: TRACK_TYPES.TRACK7,
@@ -156,30 +172,35 @@ export const BLOCKS = /** @type {{ [k: string]: Block }} */ ({
 
   // Desert
   DUST: {
+    name: "DUST",
     color: hexToRgb(" #DAA98B"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK16,
     ...DESERT_PROPS,
   },
   SAND: {
+    name: "SAND",
     color: hexToRgb(" #EC912E"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK14,
     ...DESERT_PROPS,
   },
   DARK_SAND: {
+    name: "DARK_SAND",
     color: hexToRgb(" #CC7025"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK14,
     ...DESERT_PROPS,
   },
   TERRACOTA: {
+    name: "TERRACOTA",
     color: hexToRgb(" #9F561A"),
     layer: 0,
     trackType: TRACK_TYPES.TRACK15,
     ...DESERT_PROPS,
   },
   HIGH_TERRACOTA: {
+    name: "HIGH_TERRACOTA",
     color: hexToRgb(" #9F561A"),
     layer: 1,
     trackType: TRACK_TYPES.TRACK14,

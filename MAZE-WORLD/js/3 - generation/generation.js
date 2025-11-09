@@ -12,7 +12,12 @@ import { getPosDistance, tweakColor } from "../_utils.js";
 import { GENERATION_CONFIG } from "./_configs.js";
 import { getChunkStart } from "./_utils.js";
 import { getValue, PERLIN_VECTORS } from "./perlin.js";
-import { addBiomeToMap, BIOMES } from "./biomes/index.js";
+import {
+  addBiomeToMap,
+  BIOMES,
+  createMinesObj,
+  MINE_BIOMES,
+} from "./biomes/index.js";
 
 /**
  * @param {Pos} param
@@ -171,6 +176,9 @@ const loadChunk = (initialPos) => {
   );
 
   const biomeMap = /** @type {{ [k: string]: number }} */ ({});
+  let minesObj = /** @type {MinesObj} */ (null);
+
+  // if (offsetPos.i === -50 && offsetPos.j === -50) minesObj = createMinesObj();
 
   for (let i = 0; i < GENERATION_CONFIG.chunkSize; i++) {
     const nI = i + offsetPos.i;
@@ -178,7 +186,7 @@ const loadChunk = (initialPos) => {
       const nJ = j + offsetPos.j;
       const pos = { i: nI, j: nJ };
 
-      const biome = getBiome(pos);
+      const biome = minesObj ? MINE_BIOMES.MINES : getBiome(pos);
       biomeMap[biome.name] = (biomeMap[biome.name] || 0) + 1;
       const value = getValue(nI, nJ, PERLIN_VECTORS.BLOCK);
       const originalBlock = biome.ranges.find((r) => value <= r.max);
@@ -186,6 +194,7 @@ const loadChunk = (initialPos) => {
       const cellBlock = isHighBlock ? biome.higherGroundBlock : originalBlock;
 
       const cell = createCell(pos, cellBlock);
+      if (minesObj) cell.hasBomb = minesObj.isBomb({ i, j });
       addCell(pos, cell);
 
       if (isHighBlock)
@@ -263,4 +272,17 @@ export const spawnEntities = (baseCell) => {
     if (!!cell?.block && !cell.wall && !cell.entityType)
       createEntitiesForCell(cell, true);
   });
+};
+
+/**
+ * @param {Cell} cell
+ */
+export const destroyWall = (cell) => {
+  const onDestroy = cell.wall?.block?.onDestroy;
+
+  if (cell.wall) {
+    cell.wall = null;
+  }
+
+  if (onDestroy) onDestroy(cell);
 };
