@@ -16,6 +16,7 @@ import {
   stopMoving,
   useBoat,
   useFishingRod,
+  useGun,
   useMap,
 } from "../5 - actions/index.js";
 
@@ -42,6 +43,7 @@ import { addDebugBlockToPoint } from "./debug.js";
     document.getElementById("toolbar-place"),
     document.getElementById("toolbar-fishing"),
     document.getElementById("toolbar-boat"),
+    document.getElementById("toolbar-gun"),
     document.getElementById("toolbar-map"),
   ];
   const MOVEMENT_KEYS = Object.keys(KEY_MOVEMENT_MAP);
@@ -122,7 +124,8 @@ import { addDebugBlockToPoint } from "./debug.js";
   };
   TOOLBAR_ACTIONS[3].onclick = () => useFishingRod();
   TOOLBAR_ACTIONS[4].onclick = () => useBoat();
-  TOOLBAR_ACTIONS[5].onclick = () => useMap();
+  TOOLBAR_ACTIONS[5].onclick = () => useGun();
+  TOOLBAR_ACTIONS[6].onclick = () => useMap();
 
   canvasContainer.onclick = (e) => {
     e = e || /** @type {PointerEvent} */ (window.event);

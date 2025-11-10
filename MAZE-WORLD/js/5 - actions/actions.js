@@ -13,7 +13,7 @@ import {
   PLAYER_ENTITY,
   makeEntityRun,
   updateEntityDirection,
-  removeEntitiesFromCell,
+  getEntitiesFromCell,
   setEntitiesSize,
   addBoat,
   cellIsBlocked,
@@ -21,6 +21,7 @@ import {
   getInBoat,
   getMovementMap,
   makeEntityUse,
+  hurtEntity,
 } from "../2 - entities/index.js";
 import { destroyWall, getCenterCell } from "../3 - generation/index.js";
 import {
@@ -37,6 +38,7 @@ import {
   moveFishing,
   resetPlace,
   getSelectedBlockToPlace,
+  drawCircleOnCell,
 } from "../4 - draw/index.js";
 import { getMod } from "../_utils.js";
 
@@ -46,6 +48,8 @@ const digAudio = new Audio("sounds/actions/dig.mp3");
 digAudio.volume = 0.25;
 const punchAudio = new Audio("sounds/actions/punch.mp3");
 punchAudio.volume = 0.25;
+const gunShotAudio = new Audio("sounds/actions/gun-shot.mp3");
+gunShotAudio.volume = 1;
 const rotateAudio = new Audio("sounds/actions/rotate.mp3");
 rotateAudio.volume = 0.25;
 
@@ -201,7 +205,8 @@ export const dig = () => {
 
   if (selectedCell.entityType) {
     makeEntityUse(PLAYER_ENTITY);
-    removeEntitiesFromCell(selectedCell);
+    const entities = getEntitiesFromCell(selectedCell);
+    entities.forEach((e) => hurtEntity(e, 1));
     punchAudio.play();
     move();
     return;
@@ -284,6 +289,29 @@ export const useBoat = () => {
     makeEntityUse(PLAYER_ENTITY);
     addBoat(selectedCell, PLAYER_ENTITY);
   }
+};
+
+export const useGun = () => {
+  const range = getPolyInfo().hasInverted ? 1 : 10;
+  updateAndGetSelectedCell();
+  gunShotAudio.currentTime = 0;
+
+  let { cell, selectedCellIndex } = PLAYER_ENTITY;
+  for (let i = 0; i < range; i++) {
+    const nextCell = getCell(getPosByIndex(cell, selectedCellIndex));
+    if (nextCell.wall) break;
+
+    cell = nextCell;
+    drawCircleOnCell(cell, PLAYER_ENTITY);
+    if (cell.entityType) {
+      const entities = getEntitiesFromCell(cell);
+      entities.forEach((e) => hurtEntity(e, 1));
+      break;
+    }
+  }
+
+  gunShotAudio.play();
+  move();
 };
 
 /**

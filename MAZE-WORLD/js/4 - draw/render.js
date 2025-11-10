@@ -248,3 +248,15 @@ export const showMineValue = (context, value, point, isInverted, ySide) => {
     );
   }
 };
+
+/**
+ * @param {CanvasRenderingContext2D} context
+ * @param {Point} point
+ * @param {number} radius
+ */
+export const drawCircle = (context, point, radius) => {
+  context.beginPath();
+  context.arc(point.x, point.y, radius, 0, 2 * Math.PI);
+  context.fillStyle = "black";
+  context.fill();
+};

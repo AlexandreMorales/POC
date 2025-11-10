@@ -163,11 +163,10 @@ const getMovementMaps = (
   let bottomRightI = bottomI - 1;
 
   if (hasInverted) {
-    const isInverted = baseCell.isInverted;
-    topLeftI = bottomLeftI = topI + (isInverted ? 1 : 2);
-    topRightI = bottomRightI = topI + (isInverted ? 2 : 1);
-    bottomI = isInverted ? topI : undefined;
-    topI = isInverted ? undefined : topI;
+    topLeftI = bottomLeftI = topI + (baseCell.isInverted ? 1 : 2);
+    topRightI = bottomRightI = topI + (baseCell.isInverted ? 2 : 1);
+    bottomI = baseCell.isInverted ? topI : undefined;
+    topI = baseCell.isInverted ? undefined : topI;
   }
 
   return {

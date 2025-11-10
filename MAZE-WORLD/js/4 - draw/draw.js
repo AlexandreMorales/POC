@@ -23,6 +23,7 @@ import {
   updateConfigs,
   getStyleModifier,
   showMineValue,
+  drawCircle,
 } from "./render.js";
 import { updateTracks } from "./sounds.js";
 import { updateBiomeMap } from "./toolbar/index.js";
@@ -96,6 +97,7 @@ export const drawEveryCell = (baseEntity) => {
     baseEntity.cell,
     DRAW_CONFIG.lightDepth
   );
+  const selectedCell = getSelectedCell(baseEntity);
 
   for (let i = -columns; i < size; i++) {
     const baseI = i + RENDER_INFO.iOffset;
@@ -110,7 +112,8 @@ export const drawEveryCell = (baseEntity) => {
         loadAndGetCell(pos),
         contextsLayers[0],
         baseEntity,
-        adjacentCells
+        adjacentCells,
+        selectedCell
       );
     }
   }
@@ -156,8 +159,9 @@ const tweakFluids = debounce(() => {
  * @param {CanvasRenderingContext2D} context
  * @param {Entity} baseEntity
  * @param {Cell[][]} adjacentCells
+ * @param {Cell} selectedCell
  */
-const drawCell = (cell, context, baseEntity, adjacentCells) => {
+const drawCell = (cell, context, baseEntity, adjacentCells, selectedCell) => {
   const polyInfo = getPolyInfo();
   const isInverted = polyInfo.hasInverted && cell.isInverted;
 
@@ -168,8 +172,7 @@ const drawCell = (cell, context, baseEntity, adjacentCells) => {
 
   const points = isInverted ? polyInfo.invertedPoints : polyInfo.points;
   const aCells = cell.adjacentPos[RENDER_INFO.currentPoly].map(getCell);
-  const isSelectedCell =
-    MENU_CONFIG.showSelectedCell && cell === getSelectedCell(baseEntity);
+  const isSelectedCell = MENU_CONFIG.showSelectedCell && cell === selectedCell;
 
   cell.modifier = getStyleModifier(
     adjacentCells.findIndex((c) => c.includes(cell))
@@ -238,4 +241,20 @@ const drawCell = (cell, context, baseEntity, adjacentCells) => {
       polyInfo.ySide
     );
   }
+};
+
+/**
+ * @param {Cell} cell
+ * @param {Entity} baseEntity
+ */
+export const drawCircleOnCell = (cell, baseEntity) => {
+  const { hasInverted, ySide } = getPolyInfo();
+
+  const point = calculatePointBasedOnPos(
+    cell.pos,
+    hasInverted && cell.isInverted,
+    baseEntity.cell
+  );
+
+  drawCircle(contextsLayers[0], point, ySide / 4);
 };

@@ -56,15 +56,12 @@ export const removeEntity = (entity) => {
  * @param {Cell} cell
  * @returns {Entity[]}
  */
-export const removeEntitiesFromCell = (cell) => {
-  const removedEntities = /** @type {Entity[]} */ ([]);
+export const getEntitiesFromCell = (cell) => {
+  const entities = /** @type {Entity[]} */ ([]);
   ENTITIES.forEach((entity) => {
-    if (entity.cell === cell) {
-      removeEntity(entity);
-      removedEntities.push(entity);
-    }
+    if (entity.cell === cell) entities.push(entity);
   });
-  return removedEntities;
+  return entities;
 };
 
 /**
