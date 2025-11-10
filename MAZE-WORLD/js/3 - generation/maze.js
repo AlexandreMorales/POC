@@ -61,12 +61,12 @@ export const createMazeObj = (mazeInfos, mazeCircleInfos) => {
   // GRID
   /**
    * @param {Pos} pos
-   * @return {CellMaze}
+   * @returns {CellMaze}
    */
   const getMazeCell = ({ i, j }) => MAZE_GRID[i]?.[j];
 
   /**
-   * @return {Generator<Pos>}
+   * @returns {Generator<Pos>}
    */
   function* iterateOverMaze() {
     const rows = getMazeRows();
@@ -109,7 +109,7 @@ export const createMazeObj = (mazeInfos, mazeCircleInfos) => {
 
   /**
    * @param {Pos} pos
-   * @return {Point}
+   * @returns {Point}
    */
   const calculateMazePoint = ({ i, j }) => {
     const { calcX, calcY, ySide, shouldIntercalate } = getMazePolyInfo();

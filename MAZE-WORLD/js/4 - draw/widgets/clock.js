@@ -57,7 +57,7 @@ export const passTime = () => {
 };
 
 /**
- * @return {{ hour: number, hour24: number, minute: number }}
+ * @returns {{ hour: number, hour24: number, minute: number }}
  */
 const getTime = () => {
   const hourRaw = (12 * ENTITY_INFO.timeOfDay) / CLOCK_CONFIG.midNightHour;

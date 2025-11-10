@@ -24,7 +24,7 @@ const ENTITY_ACTIONS_CONFIG = {
 
 /**
  * @param {Entity} entity
- * @return {Entity}
+ * @returns {Entity}
  */
 const getClosestTarget = (entity) => {
   let minDistance = Infinity;
@@ -48,7 +48,7 @@ const getClosestTarget = (entity) => {
  * @param {Entity} entity
  * @param {Cell} cell
  * @param {Cell} targetCell
- * @return {{ cell: Cell, index: number }}
+ * @returns {{ cell: Cell, index: number }}
  */
 const getClosestCell = (entity, cell, targetCell) => {
   let minDistance = Infinity;

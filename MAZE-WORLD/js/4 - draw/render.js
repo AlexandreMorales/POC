@@ -108,7 +108,7 @@ export const drawItem = (
 /**
  * @param {Color} color
  * @param {number} [modifier]
- * @return {string}
+ * @returns {string}
  */
 export const getFillStyle = (color, modifier = 1) =>
   color === EMPTY_BLOCK.color
@@ -120,7 +120,7 @@ export const getFillStyle = (color, modifier = 1) =>
 
 /**
  * @param {number} intensity
- * @return {number}
+ * @returns {number}
  */
 export const getStyleModifier = (intensity) => {
   if (!ENTITY_INFO.timeOfDay) return 1;

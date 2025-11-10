@@ -122,7 +122,7 @@ export const updateEntityOpacity = (entity) => {
 
 /**
  * @param {number} [ySide]
- * @return {number}
+ * @returns {number}
  */
 const getEntitySize = (ySide) =>
   Math.round((ySide || getPolyInfo().ySide) * 2.5);

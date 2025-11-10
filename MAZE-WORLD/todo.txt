@@ -1,7 +1,5 @@
 ------------------------------------- CURRENT -------------------------------------
 
-COMBAT
-    ATTACK (MEELE AND RANGE)
 
 
 ------------------------------------- SPRINT -------------------------------------
@@ -16,14 +14,11 @@ AUDIO V2
     HELL, ELDRITCH, FUNGUS AUDIOS
 
 
-
-
 ------------------------------------- TECH DEBT -------------------------------------
 
 REVIEW movementsToCut AND movementOptions
 REMOVE getSelectedCell FROM DRAW LOOP
 REPLACE selectedCellIndex WITH direction
- * @return  TO returns
 MOVE COLORS TO JS FILE THAT SET PROPERTY ON BODY (CHANGE ON DRAWS AND RENDERS)
 ADD CURRENT DIRECTION TO ENTITY (REMOVE DEFAULT)
 TRANSFORM CELL ENTITY TYPE INTO ARRAY?

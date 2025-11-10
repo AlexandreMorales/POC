@@ -6,7 +6,7 @@ import { RENDER_CONFIG } from "./_config.js";
  * @param {Point} point
  * @param {Partial<Wall> & { layer?: number }} [wallParams]
  * @param {PolyInfoProp} [polyInfo]
- * @return {Wall}
+ * @returns {Wall}
  */
 export const blockToWall = (block, point, wallParams = {}, polyInfo) => {
   polyInfo = polyInfo || getPolyInfo();

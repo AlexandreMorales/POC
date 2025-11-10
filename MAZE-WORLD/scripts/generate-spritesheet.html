@@ -19,7 +19,7 @@
       /**
        * @param {string} url
        * @param {string} doc
-       * @return {Promise<void>}
+       * @returns {Promise<void>}
        */
       async function parseDoc(url, doc) {
         const urls = [
@@ -50,7 +50,7 @@
 
       /**
        * @param {string} url
-       * @return {Promise<void>}
+       * @returns {Promise<void>}
        */
       async function loadDoc(url) {
         return new Promise((resolve) => {
@@ -68,7 +68,7 @@
 
       /**
        * @param {string} url
-       * @return {Promise<HTMLImageElement>}
+       * @returns {Promise<HTMLImageElement>}
        */
       async function loadImage(url) {
         return new Promise((r) => {

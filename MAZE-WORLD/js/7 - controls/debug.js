@@ -70,7 +70,7 @@ const calcI = (y, ySide, shouldIntercalate, evenJ) => {
 
 /**
  * @param {Point} point
- * @return {Pos}
+ * @returns {Pos}
  */
 const calculatePosBasedOnPoint = ({ x, y }) => {
   const { xSide, ySide, shouldIntercalate, polySide } = getPolyInfo();

@@ -10,7 +10,7 @@ export const getPolyInfo = () => POLYS_INFO[RENDER_INFO.currentPoly];
  * @param {Pos} pos
  * @param {boolean} isInverted
  * @param {Cell} baseCell
- * @return {Point}
+ * @returns {Point}
  */
 export const calculatePointBasedOnPos = ({ i, j }, isInverted, baseCell) => {
   const { calcX, calcY, ySide, shouldIntercalate } = getPolyInfo();
@@ -40,7 +40,7 @@ export const getPosByIndex = (cell, index) =>
  * @param {Point} points
  * @param {boolean} isInverted
  * @param {Cell} baseCell
- * @return {Point}
+ * @returns {Point}
  */
 const applyRotation = ({ x, y }, isInverted, baseCell) => {
   if (!RENDER_INFO.rotationTurns) return { x, y };

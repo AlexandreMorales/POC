@@ -4,7 +4,7 @@ export const INITIAL_POS = /** @type {Pos} */ ({ i: 0, j: 0 });
 
 /**
  * @param {Pos} pos
- * @return {Cell}
+ * @returns {Cell}
  */
 export const getCell = ({ i, j }) => GRID[i]?.[j];
 
