@@ -75,10 +75,10 @@ export const ENTITY_IMAGES_MAP = /** @type {ImageMap} */ ({
   },
   [ENTITY_TYPES.RABBIT]: {
     [IMG_MAP_TYPES.DEFAULT]: {
-      [MOVEMENT.DOWN]: { pos: { i: 2, j: 2 } },
-      [MOVEMENT.LEFT]: { pos: { i: 2, j: 3 } },
-      [MOVEMENT.RIGHT]: { pos: { i: 2, j: 2 } },
-      [MOVEMENT.UP]: { pos: { i: 2, j: 3 } },
+      [MOVEMENT.DOWN]: { pos: { i: 2, j: 4 } },
+      [MOVEMENT.LEFT]: { pos: { i: 2, j: 5 } },
+      [MOVEMENT.RIGHT]: { pos: { i: 2, j: 4 } },
+      [MOVEMENT.UP]: { pos: { i: 2, j: 5 } },
     },
   },
   [ENTITY_TYPES.ENEMY]: {

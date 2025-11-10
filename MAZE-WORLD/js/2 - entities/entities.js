@@ -3,6 +3,7 @@ import { MENU_CONFIG, getPosByIndex } from "../1 - polygones/index.js";
 
 import { ENTITY_TYPES, IMG_MAP_TYPES, MOVEMENT } from "./_configs.js";
 import { ENTITY_INFO } from "./_infos.js";
+import { PLAYER_CONFIG, PLAYER_ENTITY } from "./entities/player.js";
 import {
   createEntityImage,
   cutEntityImage,
@@ -11,6 +12,7 @@ import {
   setEntitySize,
   updateEntityImage,
   updateEntityPoint,
+  updatePlayerHearts,
 } from "./render.js";
 
 export const ENTITIES = /** @type {Set<Entity>} */ (new Set());
@@ -81,6 +83,7 @@ export const createEntity = (cell, id, type, entityParams = {}) => {
     type,
     connectedEntities: {},
     currentImgType: cell.block?.biomeType,
+    health: 1,
     ...entityParams,
   });
   createEntityImage(entity);
@@ -142,11 +145,28 @@ export const makeEntityUse = (entity) => {
 
 /**
  * @param {Entity} entity
- * @param {Pos} itemPos
  */
-export const makeEntityWin = (entity, itemPos) => {
+const updateEntityHealth = (entity) => {
+  if (entity === PLAYER_ENTITY) {
+    if (entity.health > PLAYER_CONFIG.maxHealth)
+      entity.health = PLAYER_CONFIG.maxHealth;
+    updatePlayerHearts();
+  } else if (entity.health <= 0) removeEntity(entity);
+};
+
+/**
+ * @param {Entity} entity
+ * @param {Item} item
+ */
+export const giveItemToEntity = (entity, item) => {
   updateEntityImage(entity, entity.currentDirection, IMG_MAP_TYPES.WINNING);
-  const callback = displayWinAnimation(entity, itemPos);
+  const callback = displayWinAnimation(entity, item.imgPos);
+
+  if (item.health) {
+    entity.health += item.health;
+    updateEntityHealth(entity);
+  }
+
   setTimeout(() => {
     updateEntityImage(entity, entity.currentDirection);
     callback();
@@ -155,12 +175,17 @@ export const makeEntityWin = (entity, itemPos) => {
 
 /**
  * @param {Entity} entity
+ * @param {number} damage
  */
-export const makeEntityLose = (entity) => {
+export const hurtEntity = (entity, damage) => {
   updateEntityImage(entity, entity.currentDirection, IMG_MAP_TYPES.LOSING);
-  setTimeout(() => {
-    updateEntityImage(entity, entity.currentDirection);
-  }, 1000);
+  entity.health -= damage;
+  updateEntityHealth(entity);
+
+  if (entity.health > 0)
+    setTimeout(() => {
+      updateEntityImage(entity, entity.currentDirection);
+    }, 1000);
 };
 
 /**

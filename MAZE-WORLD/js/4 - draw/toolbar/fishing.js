@@ -4,8 +4,8 @@ import {
   getMovementMap,
   setImagePos,
   PLAYER_ENTITY,
-  makeEntityWin,
-  makeEntityLose,
+  giveItemToEntity,
+  hurtEntity,
 } from "../../2 - entities/index.js";
 import { BLOCKS, createMazeObj } from "../../3 - generation/index.js";
 
@@ -146,7 +146,7 @@ const initFishingTimer = (height) => {
     );
     if (currentHeight <= 0) {
       stopFishing();
-      makeEntityLose(PLAYER_ENTITY);
+      hurtEntity(PLAYER_ENTITY, 1);
     }
   }, FISHING_CONFIG.timerDelay);
 };
@@ -219,7 +219,7 @@ export const moveFishing = (code, useDiagonal) => {
 
     if (fishingMazeObj.isMazeSolved()) {
       stopFishing();
-      makeEntityWin(PLAYER_ENTITY, fishingFishPos);
+      giveItemToEntity(PLAYER_ENTITY, { imgPos: fishingFishPos, health: 1 });
       return;
     }
 

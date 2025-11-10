@@ -11,6 +11,7 @@ import {
   cellIsBlocked,
   createEntity,
   ENTITIES,
+  hurtEntity,
   moveEntityToCell,
   removeEntity,
 } from "./entities.js";
@@ -58,7 +59,11 @@ const getClosestCell = (entity, cell, targetCell) => {
   for (let index = 0; index < aPos.length; index++) {
     const pos = aPos[index];
     const aCell = getCell(pos);
-    if (cellIsBlocked(aCell, entity)) continue;
+    if (
+      cellIsBlocked(aCell, entity) &&
+      aCell.entityType !== targetCell.entityType
+    )
+      continue;
     const distance = getPosDistance(aCell.pos, targetCell.pos);
     if (distance < minDistance) {
       selectedCell = aCell;
@@ -91,14 +96,15 @@ export const moveEntities = (baseCell) => {
  */
 const moveEntity = (e, indexToMove) => {
   if (!e.movementOptions?.speed) return;
-  const { targets, speed, random } = e.movementOptions;
+  const { targets, speed, random, damage } = e.movementOptions;
 
   let nextCell = e.cell;
   let nextIndex = 0;
+  let target = /** @type {Entity} */ (null);
 
   for (let index = 0; index < speed; index++) {
     if (targets) {
-      const target = getClosestTarget(e);
+      target = getClosestTarget(e);
       if (!target) return;
       const nextCellInfo = getClosestCell(e, nextCell, target.cell);
       nextCell = nextCellInfo.cell;
@@ -115,6 +121,11 @@ const moveEntity = (e, indexToMove) => {
         nextCell = getCell(aPos[nextIndex]);
       }
     }
+  }
+
+  if (target && nextCell.entityType === target.type && damage) {
+    removeEntity(e);
+    hurtEntity(target, damage);
   }
 
   if (cellIsBlocked(nextCell, e)) return;

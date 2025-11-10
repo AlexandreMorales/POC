@@ -2,13 +2,15 @@
   --toolbar-item-size: 50px;
 }
 
-#toolbar {
+#bottom-container {
   position: absolute;
   bottom: 7vh;
   left: 50%;
   transform: translate(-50%);
   z-index: calc(var(--player-z-index) + 2);
+}
 
+#toolbar {
   display: flex;
   background-color: var(--background-color);
   padding: 10px;

@@ -36,7 +36,7 @@ let canMove = true;
  * @param {Cell} [nextCell]
  */
 export const move = (nextCell) => {
-  if (canMove) {
+  if (canMove && PLAYER_ENTITY.health > 0) {
     canMove = false;
     if (nextCell) moveCurrentCell(PLAYER_ENTITY.cell, nextCell);
     if (MENU_CONFIG.passTime) passTime();

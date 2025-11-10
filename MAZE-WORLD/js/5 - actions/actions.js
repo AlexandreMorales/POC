@@ -44,15 +44,20 @@ import { move, moveCurrentCell } from "./movement.js";
 
 const digAudio = new Audio("sounds/actions/dig.mp3");
 digAudio.volume = 0.25;
+const punchAudio = new Audio("sounds/actions/punch.mp3");
+punchAudio.volume = 0.25;
 const rotateAudio = new Audio("sounds/actions/rotate.mp3");
 rotateAudio.volume = 0.25;
 
 let canRotate = true;
+
+const canDoActions = () => PLAYER_ENTITY.health > 0;
+
 /**
  * @param {number} orientation
  */
 export const rotate = (orientation) => {
-  if (!IS_FISHING_ACTIVE && canRotate) {
+  if (canRotate) {
     canRotate = false;
     RENDER_INFO.rotationTurns = PLAYER_ENTITY.selectedCellIndex = getMod(
       RENDER_INFO.rotationTurns + orientation,
@@ -91,7 +96,6 @@ const getNextCellIndexBasedOnCode = (code, useDiagonal) => {
   return getMod(aIndex, RENDER_INFO.currentPoly);
 };
 
-let blockMovement = false;
 let isMoving = false;
 
 /**
@@ -99,14 +103,13 @@ let isMoving = false;
  * @param {boolean} [useDiagonal]
  */
 export const moveBaseOnCode = (direction, useDiagonal) => {
-  if (!direction) return;
+  if (!direction || !canDoActions()) return;
 
   if (IS_FISHING_ACTIVE) {
     moveFishing(direction, useDiagonal);
-    blockMovement = true;
+    return;
   }
 
-  if (blockMovement) return;
   isMoving = true;
 
   makeEntityRun(PLAYER_ENTITY, direction);
@@ -129,7 +132,6 @@ export const moveBaseOnCode = (direction, useDiagonal) => {
 export const MOVEMENT_VALUES = Object.values(MOVEMENT);
 export const stopMoving = () => {
   if (!isMoving) return;
-  blockMovement = false;
   let lastSelection = PLAYER_ENTITY.currentDirection;
   const movementMap = getMovementMap(PLAYER_ENTITY.cell);
 
@@ -148,7 +150,7 @@ export const stopMoving = () => {
  * @param {boolean} [useDiagonal]
  */
 export const changeSelectedOnCode = (direction, useDiagonal) => {
-  if (IS_FISHING_ACTIVE || !direction) return;
+  if (!direction) return;
 
   const aModI = getNextCellIndexBasedOnCode(direction, useDiagonal);
   if (aModI === undefined || aModI === PLAYER_ENTITY.selectedCellIndex) return;
@@ -169,8 +171,6 @@ export const getNextPolygon = () =>
   ];
 
 export const changePolySides = () => {
-  if (IS_FISHING_ACTIVE) return;
-
   RENDER_INFO.currentPoly = getNextPolygon();
 
   RENDER_INFO.rotationTurns = 0;
@@ -193,7 +193,7 @@ const updateAndGetSelectedCell = () => {
 };
 
 export const dig = () => {
-  if (IS_FISHING_ACTIVE) return;
+  if (IS_FISHING_ACTIVE || !canDoActions()) return;
 
   const selectedCell = updateAndGetSelectedCell();
 
@@ -202,6 +202,8 @@ export const dig = () => {
   if (selectedCell.entityType) {
     makeEntityUse(PLAYER_ENTITY);
     removeEntitiesFromCell(selectedCell);
+    punchAudio.play();
+    move();
     return;
   }
 
@@ -224,7 +226,7 @@ export const dig = () => {
 };
 
 export const place = () => {
-  if (IS_FISHING_ACTIVE) return;
+  if (IS_FISHING_ACTIVE || !canDoActions()) return;
 
   const selectedCell = updateAndGetSelectedCell();
   if (selectedCell?.wall || selectedCell.entityType) return;
@@ -262,7 +264,7 @@ export const placeBlock = (cell, block, color) => {
 };
 
 export const useBoat = () => {
-  if (IS_FISHING_ACTIVE) return;
+  if (IS_FISHING_ACTIVE || !canDoActions()) return;
 
   const selectedCell = updateAndGetSelectedCell();
   const canMove = !selectedCell.wall && selectedCell.block;
@@ -288,11 +290,13 @@ export const useBoat = () => {
  * @param {boolean} [toggle]
  */
 export const useMap = (toggle) => {
-  if (IS_FISHING_ACTIVE) return;
+  if (IS_FISHING_ACTIVE || !canDoActions()) return;
   toggleFullMap(toggle);
 };
 
 export const useFishingRod = () => {
+  if (!canDoActions()) return;
+
   const selectedCell = updateAndGetSelectedCell();
   if (selectedCell?.block?.isFluid) {
     makeEntityUse(PLAYER_ENTITY);

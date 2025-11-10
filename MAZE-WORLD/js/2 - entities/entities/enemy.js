@@ -15,6 +15,7 @@ export const addEnemy = (cell) => {
       movementOptions: {
         speed: 1,
         targets: new Set([ENTITY_TYPES.PLAYER]),
+        damage: 1,
       },
     }
   );

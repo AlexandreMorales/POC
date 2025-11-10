@@ -13,6 +13,7 @@
  * @typedef {Object} EntityMovementOptions
  * @property {Set<string>} [targets] List of entity types that the entity will try to go to the nearest
  * @property {boolean} [random] If the entity moves randomnly
+ * @property {number} [damage]
  * @property {number} speed Blocks per turn that it can move
  */
 
@@ -22,6 +23,7 @@
  * @property {string} type
  * @property {HTMLElement} img
  * @property {Cell | null} cell
+ * @property {number} health
  * @property {symbol} [currentDirection]
  * @property {string} [currentImgType]
  * @property {boolean} [leftFootWalk]
@@ -37,4 +39,10 @@
  * @property {boolean} [isConnected]
  *
  * @property {number} [selectedCellIndex] Cell in which the entity can interact
+ */
+
+/**
+ * @typedef {Object} Item
+ * @property {Pos} imgPos
+ * @property {number} [health]
  */

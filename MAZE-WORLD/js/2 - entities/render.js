@@ -6,9 +6,9 @@ import {
   RENDER_INFO,
 } from "../1 - polygones/index.js";
 
+import { PLAYER_CONFIG, PLAYER_ENTITY } from "./entities/index.js";
 import { isPointOutside } from "../_utils.js";
 import { ENTITY_IMAGES_MAP, IMG_MAP_TYPES, MOVEMENT } from "./_configs.js";
-import { PLAYER_ENTITY } from "./entities/player.js";
 
 const CUT_MOVEMENTS_MAP = {
   [MOVEMENT.DOWN]: "marginTop",
@@ -20,13 +20,21 @@ const CUT_MOVEMENTS_MAP = {
 const container = document.getElementById("entities");
 
 /**
+ * @returns {HTMLElement}
+ */
+const createImageElement = () => {
+  const img = document.createElement("div");
+  img.className = "image";
+  return img;
+};
+
+/**
  * @param {Entity} entity
  */
 export const createEntityImage = (entity) => {
-  const img = document.createElement("div");
+  const img = createImageElement();
   img.id = entity.id;
   img.style.zIndex = `${entity.zIndex || 2}`;
-  img.className = "image";
   container.appendChild(img);
 
   entity.img = img;
@@ -46,8 +54,8 @@ export const displayWinAnimation = (entity, itemPos) => {
     PLAYER_ENTITY.cell
   );
 
-  const img = document.createElement("div");
-  img.className = "image won-item";
+  const img = createImageElement();
+  img.classList.add("won-item");
   img.style.marginTop = `-${ySide}px`;
 
   setImagePos(img, itemPos);
@@ -275,3 +283,23 @@ export const cutEntityImage = (entity, direction) => {
     }
   }
 };
+
+const playerHealthContainer = document.getElementById("health-container");
+
+export const updatePlayerHearts = () => {
+  playerHealthContainer.innerHTML = "";
+  let curretnHealth = PLAYER_ENTITY.health;
+  for (let i = 0; i < PLAYER_CONFIG.maxHealth; i++) {
+    const heartImg = createImageElement();
+    if (curretnHealth) {
+      setImagePos(heartImg, { i: 2, j: 3 });
+      heartImg.classList.add("filled");
+      curretnHealth--;
+    } else {
+      setImagePos(heartImg, { i: 2, j: 2 });
+    }
+    playerHealthContainer.appendChild(heartImg);
+  }
+};
+
+updatePlayerHearts();
