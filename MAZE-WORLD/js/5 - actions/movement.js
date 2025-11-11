@@ -36,10 +36,12 @@ let canMove = true;
  * @param {Cell} [nextCell]
  */
 export const move = (nextCell) => {
-  if (canMove && PLAYER_ENTITY.health > 0) {
+  if (canMove) {
     canMove = false;
-    if (nextCell) moveCurrentCell(PLAYER_ENTITY.cell, nextCell);
-    if (MENU_CONFIG.passTime) passTime();
+    if (PLAYER_ENTITY.health > 0) {
+      if (nextCell) moveCurrentCell(PLAYER_ENTITY.cell, nextCell);
+      if (MENU_CONFIG.passTime) passTime();
+    }
 
     setTimeout(() => {
       drawEveryCell(PLAYER_ENTITY);

@@ -278,13 +278,11 @@ export const spawnEntities = (baseCell) => {
 
 /**
  * @param {Cell} cell
+ * @param {Entity} entity
  */
-export const destroyWall = (cell) => {
+export const destroyWall = (cell, entity) => {
   const onDestroy = cell.wall?.block?.onDestroy;
 
-  if (cell.wall) {
-    cell.wall = null;
-  }
-
-  if (onDestroy) onDestroy(cell);
+  if (cell.wall) cell.wall = null;
+  if (onDestroy) onDestroy(cell, entity);
 };

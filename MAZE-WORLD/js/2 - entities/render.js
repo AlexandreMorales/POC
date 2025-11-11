@@ -287,19 +287,23 @@ export const cutEntityImage = (entity, direction) => {
 const playerHealthContainer = document.getElementById("health-container");
 
 export const updatePlayerHearts = () => {
-  playerHealthContainer.innerHTML = "";
-  let curretnHealth = PLAYER_ENTITY.health;
+  let currentHealth = PLAYER_ENTITY.health;
   for (let i = 0; i < PLAYER_CONFIG.maxHealth; i++) {
-    const heartImg = createImageElement();
-    if (curretnHealth) {
-      setImagePos(heartImg, { i: 2, j: 3 });
+    const heartImg = playerHealthContainer.children[i];
+    if (currentHealth) {
       heartImg.classList.add("filled");
-      curretnHealth--;
+      currentHealth--;
     } else {
-      setImagePos(heartImg, { i: 2, j: 2 });
+      heartImg.classList.remove("filled");
     }
-    playerHealthContainer.appendChild(heartImg);
   }
 };
+const initPlayerHealth = () => {
+  for (let i = 0; i < PLAYER_CONFIG.maxHealth; i++) {
+    const heartImg = createImageElement();
+    playerHealthContainer.appendChild(heartImg);
+  }
+  updatePlayerHearts();
+};
 
-updatePlayerHearts();
+initPlayerHealth();

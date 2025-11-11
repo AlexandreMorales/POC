@@ -17,7 +17,8 @@
  * @property {string} [biomeType]
  * @property {boolean} [indestructible]
  * @property {boolean} [staticColor]
- * @property {(c: Cell) => void} [onDestroy]
+ * @property {(c: Cell, e: Entity) => void} [onDestroy]
+ * @property {(c: Cell) => { color: string, value: string }} [valueOnDraw]
  */
 
 /**

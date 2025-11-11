@@ -49,7 +49,7 @@ digAudio.volume = 0.25;
 const punchAudio = new Audio("sounds/actions/punch.mp3");
 punchAudio.volume = 0.25;
 const gunShotAudio = new Audio("sounds/actions/gun-shot.mp3");
-gunShotAudio.volume = 1;
+gunShotAudio.volume = 0.05;
 const rotateAudio = new Audio("sounds/actions/rotate.mp3");
 rotateAudio.volume = 0.25;
 
@@ -154,7 +154,7 @@ export const stopMoving = () => {
  * @param {boolean} [useDiagonal]
  */
 export const changeSelectedOnCode = (direction, useDiagonal) => {
-  if (!direction) return;
+  if (!direction || !canDoActions()) return;
 
   const aModI = getNextCellIndexBasedOnCode(direction, useDiagonal);
   if (aModI === undefined || aModI === PLAYER_ENTITY.selectedCellIndex) return;
@@ -221,7 +221,7 @@ export const dig = () => {
 
   digAudio.play();
   if (selectedCell.wall) {
-    destroyWall(selectedCell);
+    destroyWall(selectedCell, PLAYER_ENTITY);
   } else {
     selectedCell.block = null;
     selectedCell.color = null;
@@ -317,10 +317,7 @@ export const useGun = () => {
 /**
  * @param {boolean} [toggle]
  */
-export const useMap = (toggle) => {
-  if (IS_FISHING_ACTIVE || !canDoActions()) return;
-  toggleFullMap(toggle);
-};
+export const useMap = (toggle) => toggleFullMap(toggle);
 
 export const useFishingRod = () => {
   if (!canDoActions()) return;

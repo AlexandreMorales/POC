@@ -124,10 +124,12 @@ export const getSelectedCell = (entity) =>
  * @param {symbol} direction
  */
 export const updateEntityDirection = (entity, direction) => {
-  updateEntityImage(entity, direction);
-  Object.values(entity.connectedEntities).forEach((e) => {
-    updateEntityImage(e, MOVEMENT.RIGHT);
-  });
+  if (entity.health > 0) {
+    updateEntityImage(entity, direction);
+    Object.values(entity.connectedEntities).forEach((e) => {
+      updateEntityImage(e, MOVEMENT.RIGHT);
+    });
+  }
 };
 
 /**
@@ -136,7 +138,7 @@ export const updateEntityDirection = (entity, direction) => {
 export const makeEntityUse = (entity) => {
   updateEntityImage(entity, entity.currentDirection, IMG_MAP_TYPES.USING);
   setTimeout(() => {
-    updateEntityImage(entity, entity.currentDirection);
+    if (entity.health > 0) updateEntityImage(entity, entity.currentDirection);
   }, 250);
 };
 
@@ -165,7 +167,8 @@ export const giveItemToEntity = (entity, item) => {
   }
 
   setTimeout(() => {
-    updateEntityImage(entity, entity.currentDirection);
+    if (entity.health > 0) updateEntityImage(entity, entity.currentDirection);
+
     callback();
   }, 1000);
 };

@@ -217,32 +217,29 @@ const showChunks = (context, pos, point, points) => {
     applyBorders(context, point, points);
   }
 };
-
-const mineValueColors = [
-  "blue",
-  "green",
-  "red",
-  "darkblue",
-  "brown",
-  "darkred",
-  "black",
-  "grey",
-];
 /**
  * @param {CanvasRenderingContext2D} context
- * @param {number} value
+ * @param {string} value
  * @param {Point} point
  * @param {boolean} isInverted
  * @param {number} ySide
+ * @param {string} color
  */
-export const showMineValue = (context, value, point, isInverted, ySide) => {
+export const showCellValue = (
+  context,
+  value,
+  point,
+  isInverted,
+  ySide,
+  color
+) => {
   if (value) {
-    context.fillStyle = mineValueColors[value - 1];
+    context.fillStyle = color;
     context.font = `bold ${ySide}px Arial`;
     context.textAlign = "center";
     context.textBaseline = "middle";
     context.fillText(
-      `${value}`,
+      value,
       point.x,
       isInverted ? point.y + ySide / 2 : point.y
     );
@@ -253,10 +250,11 @@ export const showMineValue = (context, value, point, isInverted, ySide) => {
  * @param {CanvasRenderingContext2D} context
  * @param {Point} point
  * @param {number} radius
+ * @param {string} [color]
  */
-export const drawCircle = (context, point, radius) => {
+export const drawCircle = (context, point, radius, color = "black") => {
   context.beginPath();
   context.arc(point.x, point.y, radius, 0, 2 * Math.PI);
-  context.fillStyle = "black";
+  context.fillStyle = color;
   context.fill();
 };
