@@ -29,6 +29,10 @@ export const getOutBoat = (entity) => {
  */
 export const addBoat = (cell, entity) => {
   let boatEntity = BOAT_ENTITIES[entity.id];
+  if (boatEntity?.health <= 0) {
+    boatEntity = null;
+    delete BOAT_ENTITIES[entity.id];
+  }
   if (!boatEntity)
     boatEntity = BOAT_ENTITIES[entity.id] = createEntity(
       cell,
