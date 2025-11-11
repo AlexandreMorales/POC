@@ -16,6 +16,7 @@
  * @property {string} [trackType]
  * @property {string} [biomeType]
  * @property {boolean} [indestructible]
+ * @property {boolean} [staticColor]
  * @property {(c: Cell) => void} [onDestroy]
  */
 

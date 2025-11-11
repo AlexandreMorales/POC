@@ -59,12 +59,14 @@ export const MINE_BLOCKS = /** @type {{ [k: string]: Block }} */ ({
     color: hexToRgb(" #d3d3d3"),
     layer: 0,
     indestructible: true,
+    staticColor: true,
     isFluid: false,
   },
   MINES_HIGH: {
     name: "MINES_HIGH",
     color: hexToRgb(" #d3d3d3"),
     layer: 1,
+    staticColor: true,
     isFluid: false,
     onDestroy: (cell) => {
       const aCells =
@@ -76,9 +78,9 @@ export const MINE_BLOCKS = /** @type {{ [k: string]: Block }} */ ({
         .map(getCell)
         .filter((c) => c.wall?.block?.name === "MINES_HIGH" && !c.hasBomb)
         .forEach((c) => {
-          const onDestroy = c.wall.block.onDestroy;
+          const onDestroy = c.wall?.block?.onDestroy;
           c.wall = null;
-          onDestroy(c);
+          if (onDestroy) onDestroy(c);
         });
     },
   },

@@ -120,7 +120,7 @@ const createCell = (pos, block) => {
     if (block) {
       cell.block = block;
       cell.layer = block.layer;
-      cell.color = tweakColor(block.color);
+      cell.color = block.staticColor ? block.color : tweakColor(block.color);
     }
   }
 
@@ -178,7 +178,7 @@ const loadChunk = (initialPos) => {
   const biomeMap = /** @type {{ [k: string]: number }} */ ({});
   let minesObj = /** @type {MinesObj} */ (null);
 
-  // if (offsetPos.i === -50 && offsetPos.j === -50) minesObj = createMinesObj();
+  if (offsetPos.i === 100 && offsetPos.j === 100) minesObj = createMinesObj();
 
   for (let i = 0; i < GENERATION_CONFIG.chunkSize; i++) {
     const nI = i + offsetPos.i;
@@ -200,7 +200,9 @@ const loadChunk = (initialPos) => {
       if (isHighBlock)
         cell.wall = {
           block: originalBlock,
-          color: tweakColor(originalBlock.color),
+          color: originalBlock.staticColor
+            ? originalBlock.color
+            : tweakColor(originalBlock.color),
         };
       else createEntitiesForCell(cell);
     }
