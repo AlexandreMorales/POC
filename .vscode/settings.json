@@ -8,6 +8,14 @@
       {
         "match": "MAZE-WORLD/.*.css",
         "cmd": "node MAZE-WORLD/scripts/minify-css.js"
+      },
+      {
+        "match": "JOKENPO/.*.js",
+        "cmd": "node JOKENPO/scripts/minify-js.js"
+      },
+      {
+        "match": "JOKENPO/.*.css",
+        "cmd": "node JOKENPO/scripts/minify-css.js"
       }
     ]
   }

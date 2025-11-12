@@ -1,0 +1,88 @@
+* {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+}
+
+html,
+body {
+  overscroll-behavior: contain;
+  position: fixed;
+}
+
+.image {
+  --entity-size: 16px;
+  --entity-top: 0px;
+  --entity-left: 0px;
+
+  --entity-img: url(../images/spritesheet.png);
+  --entity-spritesheet-width: 3;
+
+  --entity-background-size: calc(
+    var(--entity-spritesheet-width) * var(--entity-size)
+  );
+
+  position: absolute;
+  object-fit: cover;
+  object-position: 0 0;
+  image-rendering: pixelated;
+  user-select: none;
+
+  width: var(--entity-size);
+  height: var(--entity-size);
+
+  top: var(--entity-top);
+  left: var(--entity-left);
+
+  background-repeat: no-repeat;
+  background-image: var(--entity-img);
+  background-size: var(--entity-background-size);
+  background-position: calc(var(--entity-position-j) * var(--entity-size) * -1)
+    calc(var(--entity-position-i) * var(--entity-size) * -1);
+}
+
+.image.paper {
+  --entity-position-i: 0;
+  --entity-position-j: 0;
+}
+
+.image.rock {
+  --entity-position-i: 0;
+  --entity-position-j: 1;
+}
+
+.image.scissor {
+  --entity-position-i: 0;
+  --entity-position-j: 2;
+}
+
+.image.fire {
+  --entity-position-i: 1;
+  --entity-position-j: 0;
+}
+
+.image.log {
+  --entity-position-i: 1;
+  --entity-position-j: 1;
+}
+
+.image.water {
+  --entity-position-i: 1;
+  --entity-position-j: 2;
+}
+
+#main-container {
+  --container-margin: 20px;
+
+  position: relative;
+  margin: var(--container-margin);
+  width: calc(100vw - 2 * var(--container-margin));
+  height: calc(100vh - 2 * var(--container-margin));
+  border: 1px solid black;
+}
