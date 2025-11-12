@@ -1,5 +1,6 @@
 ------------------------------------- CURRENT -------------------------------------
 
+    LABYRINTH (RANDOM WITH INDESTRUCTIBLE WALLS AROUND AND THICK BORDERS)
 
 
 ------------------------------------- SPRINT -------------------------------------
@@ -17,7 +18,6 @@ AUDIO V2
 ------------------------------------- TECH DEBT -------------------------------------
 
 REVIEW movementsToCut AND movementOptions
-REMOVE getSelectedCell FROM DRAW LOOP
 REPLACE selectedCellIndex WITH direction
 MOVE COLORS TO JS FILE THAT SET PROPERTY ON BODY (CHANGE ON DRAWS AND RENDERS)
 ADD CURRENT DIRECTION TO ENTITY (REMOVE DEFAULT)
@@ -83,7 +83,6 @@ BIOMES V3
     HELL (LAVA) (Y POSITIVE/NEGATIVE)
     ELDRITCH (LIKE THE END) (Y POSITIVE/NEGATIVE)
     FUNGUS (SPREAD EVERY HOUR 0) (RANDOM INCREASE WITH DISTANCE SURRONDED BY NULL BLOCKS)
-    LABYRINTH (RANDOM WITH INDESTRUCTIBLE WALLS AROUND AND THICK BORDERS)
 
 TOOLBAR V4
     TORCH (LIGHT APPLY AFTER THE NIGHT DAY CYCLE)
