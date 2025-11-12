@@ -2,8 +2,10 @@ import {
   entitiesList,
   entitiesTouching,
   entityKillEntity,
+  getEntitySize,
   setEntityPoint,
 } from "../0 - entities/index.js";
+import { CONFIGS } from "../_configs.js";
 import { getPointDistance, movePointTowards } from "../_utils.js";
 
 /**
@@ -58,7 +60,12 @@ export const makeEntitiesMove = () => {
     if (!target) return;
     setEntityPoint(
       entity,
-      movePointTowards(entity.pointTop, target.pointTop, distance, entity.speed)
+      movePointTowards(
+        entity.pointTop,
+        target.pointTop,
+        distance,
+        (entity.speed * CONFIGS.speed * getEntitySize()) / 20
+      )
     );
   });
 };

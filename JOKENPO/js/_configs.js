@@ -1,3 +1,4 @@
 export const CONFIGS = {
-  amount: 200,
+  amount: 250,
+  speed: 2,
 };

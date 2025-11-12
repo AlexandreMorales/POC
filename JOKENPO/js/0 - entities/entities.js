@@ -1,7 +1,24 @@
-import { ENTITIES } from "./_configs.js";
-import { removeEntity, setEntityType } from "./render.js";
+import { CONFIGS } from "../_configs.js";
+import { ENTITIES, ENTITY_TYPES } from "./_configs.js";
+import {
+  clearArena,
+  createEntity,
+  removeEntity,
+  setEntityType,
+} from "./render.js";
 
-export const entitiesList = /** @type {Entity[]} */ ([]);
+export let entitiesList = /** @type {Entity[]} */ ([]);
+
+export const initEntities = () => {
+  clearArena();
+  entitiesList = [];
+
+  for (let i = 0; i < CONFIGS.amount; i++) {
+    entitiesList.push(createEntity(ENTITIES[ENTITY_TYPES.ROCK]));
+    entitiesList.push(createEntity(ENTITIES[ENTITY_TYPES.PAPER]));
+    entitiesList.push(createEntity(ENTITIES[ENTITY_TYPES.SCISSOR]));
+  }
+};
 
 /**
  * @param {Entity} entityA

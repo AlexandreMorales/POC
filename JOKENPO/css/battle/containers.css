@@ -1,15 +1,40 @@
 #main-container {
   --container-margin: 20px;
 
+  display: flex;
+
   margin: var(--container-margin);
   width: calc(100vw - 2 * var(--container-margin));
   height: calc(100vh - 2 * var(--container-margin));
-  border: 1px solid black;
 }
 
 #battle-container {
   position: relative;
-  width: 100%;
+  width: 90%;
   height: 100%;
   border: 1px solid black;
+}
+
+#settings-container {
+  padding-left: 20px;
+  height: 100%;
+  width: 10%;
+}
+
+#settings-container > * {
+  margin-bottom: 10px;
+}
+
+@media (max-width: 450px) {
+  #main-container {
+    flex-direction: column;
+  }
+  #battle-container {
+    width: 100%;
+    height: 90%;
+  }
+  #settings-container {
+    height: 10%;
+    width: 100%;
+  }
 }

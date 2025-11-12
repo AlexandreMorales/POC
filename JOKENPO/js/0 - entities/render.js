@@ -7,9 +7,9 @@ const battleRect = battleContainer.getBoundingClientRect();
 /**
  * @returns {number}
  */
-const getEntitySize = () => {
-  return (battleRect.width * battleRect.height) / CONFIGS.amount ** 2;
-};
+export const getEntitySize = () =>
+  // divide by 3 because the maount add 1 of each
+  Math.sqrt((battleRect.width * battleRect.height) / CONFIGS.amount) / 3;
 
 /**
  * @param {Entity} entity
