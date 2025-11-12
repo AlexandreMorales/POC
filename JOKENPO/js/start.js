@@ -1,15 +1,23 @@
-import { entitiesList, initEntities } from "./0 - entities/index.js";
-import { checkTouches, makeEntitiesMove } from "./1 - movement/index.js";
+import { CONFIGS } from "./_configs.js";
+import {
+  clearArena,
+  entitiesList,
+  initEntities,
+  moveEntities,
+} from "./entities/index.js";
+import { initDvd, moveDvd } from "./extra/index.js";
 
 let interval = /** @type {NodeJS.Timeout} */ (null);
 
 export const start = () => {
   clearInterval(interval);
+  clearArena();
   initEntities();
+  if (CONFIGS.withDvd) initDvd();
 
   interval = setInterval(() => {
-    checkTouches();
-    makeEntitiesMove();
+    moveEntities();
+    if (CONFIGS.withDvd) moveDvd();
 
     const types = new Set(entitiesList.map((e) => e.group));
     if (types.size === 1) {

@@ -1,0 +1,20 @@
+.image.dvd.blue {
+  --entity-position-i: 2;
+  --entity-position-j: 0;
+}
+.image.dvd.green {
+  --entity-position-i: 2;
+  --entity-position-j: 1;
+}
+.image.dvd.orange {
+  --entity-position-i: 2;
+  --entity-position-j: 2;
+}
+.image.dvd.purple {
+  --entity-position-i: 2;
+  --entity-position-j: 3;
+}
+.image.dvd.red {
+  --entity-position-i: 2;
+  --entity-position-j: 4;
+}

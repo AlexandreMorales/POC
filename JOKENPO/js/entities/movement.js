@@ -1,12 +1,11 @@
+import { CONFIGS } from "../_configs.js";
+import { getPointDistance, movePointTowards } from "../_utils.js";
 import {
   entitiesList,
   entitiesTouching,
   entityKillEntity,
-  getEntitySize,
-  setEntityPoint,
-} from "../0 - entities/index.js";
-import { CONFIGS } from "../_configs.js";
-import { getPointDistance, movePointTowards } from "../_utils.js";
+} from "./entities.js";
+import { setEntityPoint } from "./render.js";
 
 /**
  * @param {Entity} entity
@@ -34,7 +33,7 @@ const getClosestTarget = (entity, entities) => {
   return { target: selectedTarget, distance: minDistance };
 };
 
-export const checkTouches = () => {
+const checkTouches = () => {
   const freshEntities = [...entitiesList];
   freshEntities.forEach((entityA) => {
     if (!entityA.element) return;
@@ -54,7 +53,8 @@ export const checkTouches = () => {
   });
 };
 
-export const makeEntitiesMove = () => {
+export const moveEntities = () => {
+  checkTouches();
   entitiesList.forEach((entity) => {
     const { target, distance } = getClosestTarget(entity, entitiesList);
     if (!target) return;
@@ -64,7 +64,7 @@ export const makeEntitiesMove = () => {
         entity.pointTop,
         target.pointTop,
         distance,
-        (entity.speed * CONFIGS.speed * getEntitySize()) / 20
+        (entity.speed * CONFIGS.speed * entity.size) / 20
       )
     );
   });

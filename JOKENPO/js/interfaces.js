@@ -10,6 +10,7 @@
  * @property {string} type
  * @property {string[]} kills
  * @property {number} speed
+ * @property {number} size
  * @property {HTMLElement} [element]
  * @property {Point} [pointTop]
  * @property {Point} [pointBottom]

@@ -1,16 +1,10 @@
 import { CONFIGS } from "../_configs.js";
 import { ENTITIES, ENTITY_TYPES } from "./_configs.js";
-import {
-  clearArena,
-  createEntity,
-  removeEntity,
-  setEntityType,
-} from "./render.js";
+import { createEntity, removeEntity, setEntityType } from "./render.js";
 
 export let entitiesList = /** @type {Entity[]} */ ([]);
 
 export const initEntities = () => {
-  clearArena();
   entitiesList = [];
 
   for (let i = 0; i < CONFIGS.amount; i++) {
@@ -52,7 +46,7 @@ const killEntity = (entity) => {
  * @param {Entity} entity
  */
 const evolveEntity = (entity) => {
-  if (!entity.evolution) return;
+  if (!entity.evolution || !CONFIGS.withEvolutions) return;
 
   if (entity.killCount >= entity.evolution.minKills) {
     let source = ENTITIES[entity.evolution.evolution];

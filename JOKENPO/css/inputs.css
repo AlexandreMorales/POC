@@ -1,0 +1,70 @@
+:root {
+  --input-thumb-color: #fff;
+  --input-empty-color: #dfe1e4;
+  --input-empty-color-hover: #c9cbcd;
+  --active-color: #6e79d6;
+  --active-color-hover: #535db3;
+
+  --input-transition: all 100ms ease-out;
+  --input-border-radius: 72px;
+
+  --input-height: 20px;
+  --input-width: 50px;
+}
+
+label {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+}
+
+label[for] {
+  cursor: pointer;
+}
+
+label > * {
+  flex: 1;
+}
+
+label input,
+label select {
+  margin-left: 12px;
+}
+
+input[type="number"] {
+  appearance: none;
+  background-color: var(--input-empty-color);
+  border-style: none;
+  flex-shrink: 0;
+  position: relative;
+  outline: none;
+
+  height: var(--input-height);
+  max-width: var(--input-width);
+  border-radius: var(--input-border-radius);
+
+  padding: 0 5px;
+}
+
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+button {
+  appearance: none;
+  background-color: var(--active-color);
+  border-style: none;
+  position: relative;
+
+  height: var(--input-height);
+  border-radius: var(--input-border-radius);
+
+  padding: 0 10px;
+
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: var(--active-color-hover);
+}

@@ -1,8 +1,5 @@
 import { CONFIGS } from "../_configs.js";
-import { randomInt } from "../_utils.js";
-
-const battleContainer = document.getElementById("battle-container");
-const battleRect = battleContainer.getBoundingClientRect();
+import { battleContainer, battleRect, randomInt } from "../_utils.js";
 
 /**
  * @returns {number}
@@ -19,9 +16,8 @@ export const setEntityPoint = (entity, point) => {
   entity.element.style.setProperty("--entity-top", `${point.y}px`);
   entity.element.style.setProperty("--entity-left", `${point.x}px`);
 
-  const entitySize = getEntitySize();
   entity.pointTop = point;
-  entity.pointBottom = { x: point.x + entitySize, y: point.y + entitySize };
+  entity.pointBottom = { x: point.x + entity.size, y: point.y + entity.size };
 };
 
 /**
@@ -44,7 +40,7 @@ export const createEntity = (baseEntity) => {
   element.style.setProperty("--entity-size", `${entitySize}px`);
   battleContainer.appendChild(element);
 
-  const entity = { ...baseEntity, element };
+  const entity = { ...baseEntity, element, size: entitySize };
   setEntityType(entity);
 
   setEntityPoint(entity, {

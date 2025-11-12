@@ -6,9 +6,17 @@ const settingsInputs = /** @type {{ [k: string]: HTMLInputElement }} */ ({});
 
 Object.keys(CONFIGS).forEach((prop) => {
   const input = document.createElement("input");
-  input.type = "number";
+  switch (typeof CONFIGS[prop]) {
+    case "number":
+      input.type = "number";
+      input.value = `${CONFIGS[prop]}`;
+      break;
+    case "boolean":
+      input.type = "checkbox";
+      input.checked = CONFIGS[prop];
+      break;
+  }
   input.id = `config-${prop}`;
-  input.value = CONFIGS[prop];
   settingsInputs[prop] = input;
 
   const label = document.createElement("label");
@@ -23,7 +31,16 @@ const startButton = document.createElement("button");
 startButton.innerHTML = "START";
 startButton.onclick = () => {
   Object.keys(CONFIGS).forEach((prop) => {
-    CONFIGS[prop] = settingsInputs[prop].value;
+    console.log(prop, typeof CONFIGS[prop], CONFIGS[prop]);
+    switch (typeof CONFIGS[prop]) {
+      case "number":
+        CONFIGS[prop] = +settingsInputs[prop].value;
+        break;
+      case "boolean":
+        CONFIGS[prop] = settingsInputs[prop].checked;
+        break;
+    }
+    console.log("depois", typeof CONFIGS[prop], CONFIGS[prop]);
   });
   start();
 };

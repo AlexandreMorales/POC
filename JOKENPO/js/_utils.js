@@ -32,3 +32,6 @@ export const movePointTowards = (point, targetPoint, distance, speed) => {
     y: point.y + normalizedDirection.y * speed,
   };
 };
+
+export const battleContainer = document.getElementById("battle-container");
+export const battleRect = battleContainer.getBoundingClientRect();
