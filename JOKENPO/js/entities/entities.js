@@ -1,30 +1,56 @@
 import { CONFIGS } from "../_configs.js";
 import { getRandomValueFromList } from "../_utils.js";
-import { ENTITIES, ENTITY_TYPES } from "./_configs.js";
+import { ENTITIES, ENTITY_TYPES, PLAYER_ENTITY } from "./_configs.js";
 import { createEntity, removeEntity, setEntityType } from "./render.js";
 
 export let entitiesList = /** @type {Entity[]} */ ([]);
-const spawnableEntities = [
-  ENTITY_TYPES.ROCK,
-  ENTITY_TYPES.PAPER,
-  ENTITY_TYPES.SCISSOR,
-];
 
-export const createEntitiesBatch = () => {
+/**
+ * @param {boolean} withEvolutions
+ * @returns {string[]}
+ */
+const getSpawnableTypes = (withEvolutions = false) => {
+  withEvolutions = CONFIGS.withEvolutions && withEvolutions;
+  const spawnableTypes = [
+    ENTITY_TYPES.ROCK,
+    ENTITY_TYPES.PAPER,
+    ENTITY_TYPES.SCISSOR,
+  ];
+  if (withEvolutions)
+    spawnableTypes.push(
+      ENTITY_TYPES.WATER,
+      ENTITY_TYPES.LOG,
+      ENTITY_TYPES.FIRE
+    );
+  if (!CONFIGS.repeatPlayerType) {
+    const typeI = spawnableTypes.indexOf(PLAYER_ENTITY.type);
+    if (typeI > -1) spawnableTypes.splice(typeI, 1);
+    const groupI = spawnableTypes.indexOf(PLAYER_ENTITY.group);
+    if (groupI > -1) spawnableTypes.splice(groupI, 1);
+  }
+  return spawnableTypes;
+};
+
+/**
+ * @param {boolean} withEvolutions
+ */
+export const createEntitiesBatch = (withEvolutions) => {
+  const spawnableTypes = getSpawnableTypes(withEvolutions);
   for (let i = 0; i < 50; i++) {
     entitiesList.push(
-      createEntity(ENTITIES[getRandomValueFromList(spawnableEntities)])
+      createEntity(ENTITIES[getRandomValueFromList(spawnableTypes)])
     );
   }
 };
 
 export const initEntities = () => {
   entitiesList = [];
+  const spawnableTypes = getSpawnableTypes();
 
   for (let i = 0; i < CONFIGS.amount; i++) {
-    entitiesList.push(createEntity(ENTITIES[ENTITY_TYPES.ROCK]));
-    entitiesList.push(createEntity(ENTITIES[ENTITY_TYPES.PAPER]));
-    entitiesList.push(createEntity(ENTITIES[ENTITY_TYPES.SCISSOR]));
+    for (let j = 0; j < spawnableTypes.length; j++) {
+      entitiesList.push(createEntity(ENTITIES[spawnableTypes[j]]));
+    }
   }
 };
 

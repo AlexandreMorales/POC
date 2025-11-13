@@ -9,7 +9,7 @@ import {
   movePlayer,
   PLAYER_ENTITY,
 } from "./entities/index.js";
-import { createDvd, moveDvds } from "./extra/index.js";
+import { createDvd, initDvds, moveDvds } from "./extra/index.js";
 
 let battleInterval = /** @type {NodeJS.Timeout} */ (null);
 
@@ -19,7 +19,10 @@ export const start = () => {
   clearArena();
   if (CONFIGS.withPlayer) initPlayer();
   initEntities();
-  if (CONFIGS.withDvd) createDvd();
+  if (CONFIGS.withDvd) {
+    initDvds();
+    createDvd();
+  }
 
   battleInterval = setInterval(() => {
     moveEntities();
@@ -34,7 +37,7 @@ export const start = () => {
       movePlayer();
       timePassed++;
 
-      if (timePassed % 50 === 0) createEntitiesBatch();
+      if (timePassed % 25 === 0) createEntitiesBatch(timePassed > 250);
       if (timePassed % 600 === 0) createDvd();
     } else {
       const types = new Set(entitiesList.map((e) => e.group));

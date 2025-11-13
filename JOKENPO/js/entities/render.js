@@ -8,11 +8,14 @@ import {
 import { PLAYER_ENTITY } from "./_configs.js";
 
 /**
+ * @param {Entity} entity
  * @returns {number}
  */
-export const getEntitySize = () =>
-  // divide by 3 because the maount add 1 of each
-  Math.sqrt((battleRect.width * battleRect.height) / CONFIGS.amount) / 3;
+const getEntitySize = (entity) =>
+  entity === PLAYER_ENTITY || PLAYER_ENTITY.element
+    ? 25
+    : // divide by 3 because the maount add 1 of each
+      Math.sqrt((battleRect.width * battleRect.height) / CONFIGS.amount) / 3;
 
 /**
  * @param {Entity} entity
@@ -33,6 +36,8 @@ export const setEntityType = (entity) => {
   if (!entity.element) return;
   entity.element.className = `image`;
   entity.element.classList.add(entity.type);
+
+  if (entity === PLAYER_ENTITY) entity.element.classList.add("player");
 };
 
 /**
@@ -59,8 +64,7 @@ export const getRandomPointForEntity = (entity) => {
  * @returns {Entity}
  */
 export const createEntity = (baseEntity) => {
-  const entitySize =
-    baseEntity === baseEntity || PLAYER_ENTITY.element ? 25 : getEntitySize();
+  const entitySize = getEntitySize(baseEntity);
 
   const element = document.createElement("DIV");
   element.style.setProperty("--entity-size", `${entitySize}px`);

@@ -20,7 +20,7 @@ const DVD_ENTITY = /** @type {DvdEntity} */ ({
   ],
   speed: 10,
 });
-const dvdList = /** @type {DvdEntity[]} */ ([]);
+let dvdList = /** @type {DvdEntity[]} */ ([]);
 
 const dvdColors = ["red", "blue", "green", "purple", "orange"];
 
@@ -31,6 +31,10 @@ const setDvdClass = (dvdEntity) => {
   dvdEntity.element.className = `image dvd ${getRandomValueFromList(
     dvdColors
   )}`;
+};
+
+export const initDvds = () => {
+  dvdList = [];
 };
 
 export const createDvd = () => {

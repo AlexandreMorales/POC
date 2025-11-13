@@ -7,12 +7,7 @@ export const ENTITY_TYPES = {
   FIRE: "fire",
 };
 
-export const PLAYER_ENTITY = /** @type {Entity} */ ({
-  group: ENTITY_TYPES.SCISSOR,
-  type: ENTITY_TYPES.SCISSOR,
-  kills: [ENTITY_TYPES.PAPER],
-  speed: 1.5,
-});
+export const PLAYER_ENTITY = /** @type {Entity} */ ({});
 
 export const ENTITIES = /** @type {{ [k: string]: Entity }} */ ({
   [ENTITY_TYPES.ROCK]: {
