@@ -3,4 +3,5 @@ export const CONFIGS = {
   speed: 2,
   withDvd: false,
   withEvolutions: false,
+  withPlayer: true,
 };

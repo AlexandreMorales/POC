@@ -7,6 +7,13 @@ export const ENTITY_TYPES = {
   FIRE: "fire",
 };
 
+export const PLAYER_ENTITY = /** @type {Entity} */ ({
+  group: ENTITY_TYPES.SCISSOR,
+  type: ENTITY_TYPES.SCISSOR,
+  kills: [ENTITY_TYPES.PAPER],
+  speed: 1.5,
+});
+
 export const ENTITIES = /** @type {{ [k: string]: Entity }} */ ({
   [ENTITY_TYPES.ROCK]: {
     group: ENTITY_TYPES.ROCK,
@@ -27,7 +34,6 @@ export const ENTITIES = /** @type {{ [k: string]: Entity }} */ ({
     type: ENTITY_TYPES.SCISSOR,
     kills: [ENTITY_TYPES.PAPER],
     speed: 1,
-    killsToEvolve: 7,
     evolution: { minKills: 7, evolution: ENTITY_TYPES.FIRE },
   },
 

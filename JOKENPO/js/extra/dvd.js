@@ -1,14 +1,15 @@
-import { battleContainer, battleRect, randomInt } from "../_utils";
+import { battleContainer, battleRect, getRandomValueFromList } from "../_utils";
 import {
   entitiesList,
   entitiesTouching,
   ENTITY_TYPES,
   entityKillEntity,
-  getEntitySize,
+  getRandomPointForEntity,
+  PLAYER_ENTITY,
   setEntityPoint,
 } from "../entities/index";
 
-const dvdEntity = /** @type {Entity & { speedX: number, speedY: number }} */ ({
+const DVD_ENTITY = /** @type {DvdEntity} */ ({
   kills: [
     ENTITY_TYPES.ROCK,
     ENTITY_TYPES.PAPER,
@@ -19,35 +20,40 @@ const dvdEntity = /** @type {Entity & { speedX: number, speedY: number }} */ ({
   ],
   speed: 10,
 });
+const dvdList = /** @type {DvdEntity[]} */ ([]);
 
 const dvdColors = ["red", "blue", "green", "purple", "orange"];
 
-const setDvdClass = () => {
-  dvdEntity.element.className = `image dvd ${
-    dvdColors[Math.floor(Math.random() * dvdColors.length)]
-  }`;
+/**
+ * @param {DvdEntity} dvdEntity
+ */
+const setDvdClass = (dvdEntity) => {
+  dvdEntity.element.className = `image dvd ${getRandomValueFromList(
+    dvdColors
+  )}`;
 };
 
-export const initDvd = () => {
+export const createDvd = () => {
   const entitySize = 150;
 
   const element = document.createElement("DIV");
   element.style.setProperty("--entity-size", `${entitySize}px`);
   battleContainer.appendChild(element);
 
-  dvdEntity.size = entitySize;
-  dvdEntity.element = element;
+  const dvdEntity = { ...DVD_ENTITY, element, size: entitySize };
   dvdEntity.speedX = dvdEntity.speedY = dvdEntity.speed;
 
-  setEntityPoint(dvdEntity, {
-    x: randomInt(0, battleRect.width - entitySize),
-    y: randomInt(0, battleRect.height - entitySize),
-  });
-  setDvdClass();
+  dvdList.push(dvdEntity);
+
+  setEntityPoint(dvdEntity, getRandomPointForEntity(dvdEntity));
+  setDvdClass(dvdEntity);
 };
 
-const checkDvdTouch = () => {
-  const freshEntities = [...entitiesList];
+/**
+ * @param {DvdEntity} dvdEntity
+ * @param {Entity[]} freshEntities
+ */
+const checkDvdTouch = (dvdEntity, freshEntities) => {
   freshEntities.forEach((entity) => {
     if (!entity.element) return;
     if (entitiesTouching(dvdEntity, entity)) {
@@ -56,23 +62,28 @@ const checkDvdTouch = () => {
   });
 };
 
-export const moveDvd = () => {
-  checkDvdTouch();
+export const moveDvds = () => {
+  const freshEntities = [...entitiesList];
+  if (PLAYER_ENTITY.element) freshEntities.push(PLAYER_ENTITY);
 
-  const newPoint = /** @type {Point} */ ({
-    x: dvdEntity.pointTop.x + dvdEntity.speedX,
-    y: dvdEntity.pointTop.y + dvdEntity.speedY,
+  dvdList.forEach((dvdEntity) => {
+    checkDvdTouch(dvdEntity, freshEntities);
+
+    const newPoint = /** @type {Point} */ ({
+      x: dvdEntity.pointTop.x + dvdEntity.speedX,
+      y: dvdEntity.pointTop.y + dvdEntity.speedY,
+    });
+
+    if (newPoint.x + dvdEntity.size >= battleRect.width || newPoint.x <= 0) {
+      dvdEntity.speedX *= -1; // Reverse X direction
+      setDvdClass(dvdEntity);
+    }
+
+    if (newPoint.y + dvdEntity.size >= battleRect.height || newPoint.y <= 0) {
+      dvdEntity.speedY *= -1; // Reverse Y direction
+      setDvdClass(dvdEntity);
+    }
+
+    setEntityPoint(dvdEntity, newPoint);
   });
-
-  if (newPoint.x + dvdEntity.size >= battleRect.width || newPoint.x <= 0) {
-    dvdEntity.speedX *= -1; // Reverse X direction
-    setDvdClass();
-  }
-
-  if (newPoint.y + dvdEntity.size >= battleRect.height || newPoint.y <= 0) {
-    dvdEntity.speedY *= -1; // Reverse Y direction
-    setDvdClass();
-  }
-
-  setEntityPoint(dvdEntity, newPoint);
 };

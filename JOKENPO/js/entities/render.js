@@ -1,5 +1,11 @@
 import { CONFIGS } from "../_configs.js";
-import { battleContainer, battleRect, randomInt } from "../_utils.js";
+import {
+  battleContainer,
+  battleRect,
+  getPointDistance,
+  randomInt,
+} from "../_utils.js";
+import { PLAYER_ENTITY } from "./_configs.js";
 
 /**
  * @returns {number}
@@ -30,11 +36,31 @@ export const setEntityType = (entity) => {
 };
 
 /**
+ * @param {Entity} entity
+ * @returns {Point}
+ */
+export const getRandomPointForEntity = (entity) => {
+  let point = {
+    x: randomInt(0, battleRect.width - entity.size),
+    y: randomInt(0, battleRect.height - entity.size),
+  };
+  if (
+    PLAYER_ENTITY.element &&
+    entity !== PLAYER_ENTITY &&
+    getPointDistance(PLAYER_ENTITY.pointTop, point) <
+      (PLAYER_ENTITY.size + entity.size) * 3
+  )
+    point = getRandomPointForEntity(entity);
+  return point;
+};
+
+/**
  * @param {Entity} baseEntity
  * @returns {Entity}
  */
 export const createEntity = (baseEntity) => {
-  const entitySize = getEntitySize();
+  const entitySize =
+    baseEntity === baseEntity || PLAYER_ENTITY.element ? 25 : getEntitySize();
 
   const element = document.createElement("DIV");
   element.style.setProperty("--entity-size", `${entitySize}px`);
@@ -43,10 +69,7 @@ export const createEntity = (baseEntity) => {
   const entity = { ...baseEntity, element, size: entitySize };
   setEntityType(entity);
 
-  setEntityPoint(entity, {
-    x: randomInt(0, battleRect.width - entitySize),
-    y: randomInt(0, battleRect.height - entitySize),
-  });
+  setEntityPoint(entity, getRandomPointForEntity(entity));
   return entity;
 };
 

@@ -1,8 +1,22 @@
 import { CONFIGS } from "../_configs.js";
+import { getRandomValueFromList } from "../_utils.js";
 import { ENTITIES, ENTITY_TYPES } from "./_configs.js";
 import { createEntity, removeEntity, setEntityType } from "./render.js";
 
 export let entitiesList = /** @type {Entity[]} */ ([]);
+const spawnableEntities = [
+  ENTITY_TYPES.ROCK,
+  ENTITY_TYPES.PAPER,
+  ENTITY_TYPES.SCISSOR,
+];
+
+export const createEntitiesBatch = () => {
+  for (let i = 0; i < 50; i++) {
+    entitiesList.push(
+      createEntity(ENTITIES[getRandomValueFromList(spawnableEntities)])
+    );
+  }
+};
 
 export const initEntities = () => {
   entitiesList = [];

@@ -17,3 +17,7 @@
  * @property {number} [killCount]
  * @property {{ minKills: number, evolution: string }} [evolution]
  */
+
+/**
+ * @typedef {Entity & { speedX: number, speedY: number }} DvdEntity
+ */

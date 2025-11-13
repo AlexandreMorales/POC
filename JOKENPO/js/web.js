@@ -1,4 +1,5 @@
 import { CONFIGS } from "./_configs.js";
+import { PLAYER_MOVEMENT } from "./entities/index.js";
 import { start } from "./start.js";
 
 const settingsContainer = document.getElementById("settings-container");
@@ -31,7 +32,6 @@ const startButton = document.createElement("button");
 startButton.innerHTML = "START";
 startButton.onclick = () => {
   Object.keys(CONFIGS).forEach((prop) => {
-    console.log(prop, typeof CONFIGS[prop], CONFIGS[prop]);
     switch (typeof CONFIGS[prop]) {
       case "number":
         CONFIGS[prop] = +settingsInputs[prop].value;
@@ -40,8 +40,26 @@ startButton.onclick = () => {
         CONFIGS[prop] = settingsInputs[prop].checked;
         break;
     }
-    console.log("depois", typeof CONFIGS[prop], CONFIGS[prop]);
   });
   start();
 };
 settingsContainer.appendChild(startButton);
+
+const ARROW_MOVEMENT_MAP = {
+  ["ArrowUp"]: "up",
+  ["ArrowLeft"]: "left",
+  ["ArrowDown"]: "down",
+  ["ArrowRight"]: "right",
+};
+document.onkeydown = (e) => {
+  e = e || /** @type {KeyboardEvent} */ (window.event);
+  if (e.code.startsWith("Arrow")) {
+    PLAYER_MOVEMENT[ARROW_MOVEMENT_MAP[e.code]] = true;
+  }
+};
+document.onkeyup = (e) => {
+  e = e || /** @type {KeyboardEvent} */ (window.event);
+  if (e.code.startsWith("Arrow")) {
+    PLAYER_MOVEMENT[ARROW_MOVEMENT_MAP[e.code]] = false;
+  }
+};

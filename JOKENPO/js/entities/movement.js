@@ -1,5 +1,6 @@
 import { CONFIGS } from "../_configs.js";
 import { getPointDistance, movePointTowards } from "../_utils.js";
+import { PLAYER_ENTITY } from "./_configs.js";
 import {
   entitiesList,
   entitiesTouching,
@@ -35,6 +36,7 @@ const getClosestTarget = (entity, entities) => {
 
 const checkTouches = () => {
   const freshEntities = [...entitiesList];
+  if (PLAYER_ENTITY.element) freshEntities.push(PLAYER_ENTITY);
   freshEntities.forEach((entityA) => {
     if (!entityA.element) return;
     freshEntities.forEach((entityB) => {
@@ -55,8 +57,10 @@ const checkTouches = () => {
 
 export const moveEntities = () => {
   checkTouches();
+  const freshEntities = [...entitiesList];
+  if (PLAYER_ENTITY.element) freshEntities.push(PLAYER_ENTITY);
   entitiesList.forEach((entity) => {
-    const { target, distance } = getClosestTarget(entity, entitiesList);
+    const { target, distance } = getClosestTarget(entity, freshEntities);
     if (!target) return;
     setEntityPoint(
       entity,

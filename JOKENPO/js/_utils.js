@@ -7,6 +7,13 @@ export const randomInt = (min, max) =>
   Math.floor(Math.random() * (max - min + 1) + min);
 
 /**
+ * @param {string[]} list
+ * @returns {string}
+ */
+export const getRandomValueFromList = (list) =>
+  list[Math.floor(Math.random() * list.length)];
+
+/**
  * @param {Point} point1
  * @param {Point} point2
  * @returns {number}

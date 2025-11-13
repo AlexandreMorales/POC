@@ -29,6 +29,11 @@
     calc(var(--entity-position-i) * var(--entity-size) * -1);
 }
 
+.image.player {
+  border: 2px solid black;
+  z-index: 4;
+}
+
 .image.paper {
   --entity-position-i: 0;
   --entity-position-j: 0;
