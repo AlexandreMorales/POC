@@ -18,7 +18,7 @@ const DVD_ENTITY = /** @type {DvdEntity} */ ({
     ENTITY_TYPES.LOG,
     ENTITY_TYPES.FIRE,
   ],
-  speed: 10,
+  speed: 7,
 });
 let dvdList = /** @type {DvdEntity[]} */ ([]);
 
@@ -40,7 +40,7 @@ export const initDvds = () => {
 export const createDvd = () => {
   const entitySize = 150;
 
-  const element = document.createElement("DIV");
+  const element = document.createElement("div");
   element.style.setProperty("--entity-size", `${entitySize}px`);
   battleContainer.appendChild(element);
 

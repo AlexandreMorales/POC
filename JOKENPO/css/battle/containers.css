@@ -1,6 +1,8 @@
-#main-container {
+:root {
   --container-margin: 20px;
+}
 
+#main-container {
   display: flex;
 
   margin: var(--container-margin);
@@ -10,18 +12,18 @@
 
 #battle-container {
   position: relative;
-  width: 90%;
+  width: 85%;
   height: 100%;
   border: 1px solid black;
 }
 
-#settings-container {
-  padding-left: 20px;
+#infos-container {
+  padding-left: var(--container-margin);
   height: 100%;
-  width: 10%;
+  width: 15%;
 }
 
-#settings-container > * {
+#infos-container > * {
   margin-bottom: 10px;
 }
 
@@ -31,10 +33,12 @@
   }
   #battle-container {
     width: 100%;
-    height: 90%;
+    height: 100%;
   }
-  #settings-container {
-    height: 10%;
+  #infos-container {
+    padding-left: 0;
+    padding-top: var(--container-margin);
+    height: 100%;
     width: 100%;
   }
 }

@@ -1,5 +1,5 @@
-import { CONFIGS } from "../_configs.js";
 import { getRandomValueFromList } from "../_utils.js";
+import { SHOP_CONFIG } from "../shop.js";
 import { ENTITIES, ENTITY_TYPES, PLAYER_ENTITY } from "./_configs.js";
 import { createEntity, removeEntity, setEntityType } from "./render.js";
 
@@ -10,7 +10,6 @@ export let entitiesList = /** @type {Entity[]} */ ([]);
  * @returns {string[]}
  */
 const getSpawnableTypes = (withEvolutions = false) => {
-  withEvolutions = CONFIGS.withEvolutions && withEvolutions;
   const spawnableTypes = [
     ENTITY_TYPES.ROCK,
     ENTITY_TYPES.PAPER,
@@ -22,7 +21,7 @@ const getSpawnableTypes = (withEvolutions = false) => {
       ENTITY_TYPES.LOG,
       ENTITY_TYPES.FIRE
     );
-  if (!CONFIGS.repeatPlayerType) {
+  if (!SHOP_CONFIG.repeatPlayerType) {
     const typeI = spawnableTypes.indexOf(PLAYER_ENTITY.type);
     if (typeI > -1) spawnableTypes.splice(typeI, 1);
     const groupI = spawnableTypes.indexOf(PLAYER_ENTITY.group);
@@ -36,7 +35,7 @@ const getSpawnableTypes = (withEvolutions = false) => {
  */
 export const createEntitiesBatch = (withEvolutions) => {
   const spawnableTypes = getSpawnableTypes(withEvolutions);
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < SHOP_CONFIG.entitiesPerSpawn; i++) {
     entitiesList.push(
       createEntity(ENTITIES[getRandomValueFromList(spawnableTypes)])
     );
@@ -47,7 +46,7 @@ export const initEntities = () => {
   entitiesList = [];
   const spawnableTypes = getSpawnableTypes();
 
-  for (let i = 0; i < CONFIGS.amount; i++) {
+  for (let i = 0; i < SHOP_CONFIG.initialSpawn; i++) {
     for (let j = 0; j < spawnableTypes.length; j++) {
       entitiesList.push(createEntity(ENTITIES[spawnableTypes[j]]));
     }
@@ -86,7 +85,7 @@ const killEntity = (entity) => {
  * @param {Entity} entity
  */
 const evolveEntity = (entity) => {
-  if (!entity.evolution || !CONFIGS.withEvolutions) return;
+  if (!entity.evolution) return;
 
   if (entity.killCount >= entity.evolution.minKills) {
     let source = ENTITIES[entity.evolution.evolution];
@@ -105,4 +104,6 @@ export const entityKillEntity = (entityA, entityB) => {
   killEntity(entityB);
   entityA.killCount = (entityA.killCount || 0) + 1;
   evolveEntity(entityA);
+  if (entityA === PLAYER_ENTITY)
+    SHOP_CONFIG.points += SHOP_CONFIG.pointsPerKill;
 };

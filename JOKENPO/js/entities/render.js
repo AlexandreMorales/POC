@@ -1,21 +1,19 @@
-import { CONFIGS } from "../_configs.js";
 import {
   battleContainer,
   battleRect,
   getPointDistance,
   randomInt,
 } from "../_utils.js";
+import { SHOP_CONFIG } from "../shop.js";
 import { PLAYER_ENTITY } from "./_configs.js";
 
 /**
- * @param {Entity} entity
  * @returns {number}
  */
-const getEntitySize = (entity) =>
-  entity === PLAYER_ENTITY || PLAYER_ENTITY.element
-    ? 25
-    : // divide by 3 because the maount add 1 of each
-      Math.sqrt((battleRect.width * battleRect.height) / CONFIGS.amount) / 3;
+const getEntitySize = () =>
+  // divide by 3 because the maount add 1 of each
+  Math.sqrt((battleRect.width * battleRect.height) / SHOP_CONFIG.initialSpawn) /
+  3;
 
 /**
  * @param {Entity} entity
@@ -60,20 +58,35 @@ export const getRandomPointForEntity = (entity) => {
 };
 
 /**
+ * @param {number} entitySize
+ * @returns {Point}
+ */
+const getMiddlePoint = (entitySize) => {
+  return {
+    x: battleRect.width / 2 - entitySize / 2,
+    y: battleRect.height / 2 - entitySize / 2,
+  };
+};
+
+/**
  * @param {Entity} baseEntity
+ * @param {boolean} onMiddle
  * @returns {Entity}
  */
-export const createEntity = (baseEntity) => {
-  const entitySize = getEntitySize(baseEntity);
+export const createEntity = (baseEntity, onMiddle = false) => {
+  const entitySize = getEntitySize();
 
-  const element = document.createElement("DIV");
+  const element = document.createElement("div");
   element.style.setProperty("--entity-size", `${entitySize}px`);
   battleContainer.appendChild(element);
 
   const entity = { ...baseEntity, element, size: entitySize };
   setEntityType(entity);
 
-  setEntityPoint(entity, getRandomPointForEntity(entity));
+  setEntityPoint(
+    entity,
+    onMiddle ? getMiddlePoint(entitySize) : getRandomPointForEntity(entity)
+  );
   return entity;
 };
 

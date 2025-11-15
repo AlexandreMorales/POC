@@ -21,3 +21,15 @@
 /**
  * @typedef {Entity & { speedX: number, speedY: number }} DvdEntity
  */
+
+/**
+ * @typedef {Object} ShopItem
+ * @property {string} title
+ * @property {(option: number, item: ShopItem) => void} effect
+ * @property {number} [chosenValue]
+ * @property {number} [value]
+ * @property {(option: number) => number} [valueFn]
+ * @property {number[]} [options]
+ * @property {boolean} [deleted]
+ * @property {boolean} [disabled]
+ */

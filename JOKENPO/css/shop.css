@@ -1,0 +1,53 @@
+#shop-dialog {
+  margin: auto;
+  padding: 20px;
+  border: 1px solid;
+}
+
+#shop-dialog[open] {
+  opacity: 1;
+  transform: scale(1);
+  animation: fadein 1s ease-in forwards;
+}
+
+#shop-dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+#shop-dialog[open]::backdrop {
+  animation: fadein 0.5s ease-in forwards;
+}
+
+@keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+#shop-items-container {
+  display: flex;
+}
+
+.shop-item {
+  padding: 10px;
+  border: 1px solid;
+  margin-right: 10px;
+  margin-bottom: 20px;
+
+  width: 200px;
+  height: 100px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  cursor: pointer;
+}
+
+.shop-item.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}

@@ -1,8 +1,6 @@
-import { CONFIGS } from "./_configs.js";
 import {
   clearArena,
   createEntitiesBatch,
-  entitiesList,
   initEntities,
   initPlayer,
   moveEntities,
@@ -10,6 +8,7 @@ import {
   PLAYER_ENTITY,
 } from "./entities/index.js";
 import { createDvd, initDvds, moveDvds } from "./extra/index.js";
+import { showInfos, showPoints, SHOP_CONFIG, openShop } from "./shop.js";
 
 let battleInterval = /** @type {NodeJS.Timeout} */ (null);
 
@@ -17,35 +16,36 @@ export const start = () => {
   let timePassed = 0;
   clearInterval(battleInterval);
   clearArena();
-  if (CONFIGS.withPlayer) initPlayer();
+  initPlayer();
   initEntities();
-  if (CONFIGS.withDvd) {
-    initDvds();
-    createDvd();
-  }
+  initDvds();
+
+  showInfos();
+  const pointsMod = 20;
+  const spawnMod = 20 * SHOP_CONFIG.secondsToSpawn;
+  const dvdSpawnMod = 20 * SHOP_CONFIG.secondsToDvdSpawn;
+  const evolutionSpawnLimit = 20 * SHOP_CONFIG.secondsToEvolutionSpawn;
 
   battleInterval = setInterval(() => {
     moveEntities();
     moveDvds();
 
-    if (CONFIGS.withPlayer) {
-      if (!PLAYER_ENTITY.element) {
-        clearInterval(battleInterval);
-        return;
-      }
-
-      movePlayer();
-      timePassed++;
-
-      if (timePassed % 25 === 0) createEntitiesBatch(timePassed > 250);
-      if (timePassed % 600 === 0) createDvd();
-    } else {
-      const types = new Set(entitiesList.map((e) => e.group));
-      if (types.size === 1) {
-        console.log(`${[...types][0].toUpperCase()}S WINS!`);
-        clearInterval(battleInterval);
-      }
+    if (!PLAYER_ENTITY.element) {
+      clearInterval(battleInterval);
+      openShop(() => start());
+      return;
     }
+
+    movePlayer();
+    timePassed++;
+
+    if (timePassed % spawnMod === 0)
+      createEntitiesBatch(timePassed > evolutionSpawnLimit);
+    if (timePassed % dvdSpawnMod === 0) createDvd();
+    if (timePassed % pointsMod === 0)
+      SHOP_CONFIG.points += SHOP_CONFIG.pointsPerSecond;
+
+    showPoints();
   }, 50);
 };
 

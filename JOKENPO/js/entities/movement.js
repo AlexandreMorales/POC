@@ -1,5 +1,5 @@
-import { CONFIGS } from "../_configs.js";
 import { getPointDistance, movePointTowards } from "../_utils.js";
+import { SHOP_CONFIG } from "../shop.js";
 import { PLAYER_ENTITY } from "./_configs.js";
 import {
   entitiesList,
@@ -68,7 +68,7 @@ export const moveEntities = () => {
         entity.pointTop,
         target.pointTop,
         distance,
-        (entity.speed * CONFIGS.speed * entity.size) / 20
+        (entity.speed * SHOP_CONFIG.allSpeed * entity.size) / 20
       )
     );
   });
