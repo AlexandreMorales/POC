@@ -8,7 +8,7 @@ export const SHOP_CONFIG = {
   initialSpawn: 250,
   entitiesPerSpawn: 50,
   secondsToSpawn: 4,
-  secondsToDvdSpawn: 30,
+  secondsToDvdSpawn: 20,
   secondsToEvolutionSpawn: 15,
   repeatPlayerType: true,
 
@@ -17,6 +17,8 @@ export const SHOP_CONFIG = {
   killsToEvolve: 10,
 
   shopOptions: 3,
+  shopRerolls: 0,
+  shopRerollsPrice: 5,
 };
 
 const pointsP = document.getElementById("points");
@@ -26,9 +28,21 @@ const shopDialog = /** @type {HTMLDialogElement} */ (
 );
 const shopItemsContainer = document.getElementById("shop-items-container");
 const shopCloseBtn = document.getElementById("shop-close");
+const shopRerollBtn = /** @type {HTMLButtonElement} */ (
+  document.getElementById("shop-reroll")
+);
+const shopRerollPrice = document.getElementById("shop-reroll-price");
 
 export const showPoints = () => {
   pointsP.innerText = `${SHOP_CONFIG.points}`;
+};
+
+/**
+ * @param {number} price
+ */
+const deductPoints = (price) => {
+  SHOP_CONFIG.points -= price;
+  showPoints();
 };
 
 export const showInfos = () => {
@@ -54,12 +68,6 @@ export const SHOP_ITEMS = /** @type {ShopItem[]} */ ([
 
   {
     title: "More {x}%&nbsp; speed",
-    options: [0.1, 0.5, 1],
-    valueFn: (option) => option * 100,
-    effect: (option) => (SHOP_CONFIG.playerSpeed += option),
-  },
-  {
-    title: "More {x}%&nbsp; overall speed",
     options: [0.1, 0.5, 1],
     valueFn: (option) => option * 100,
     effect: (option) => (SHOP_CONFIG.playerSpeed += option),
@@ -112,11 +120,13 @@ const createShopItem = (item, refreshItems) => {
   if (SHOP_CONFIG.points > value)
     itemContainer.onclick = () => {
       if (SHOP_CONFIG.points > value && !item.disabled) {
-        SHOP_CONFIG.points -= value;
+        deductPoints(value);
         item.effect(option, item);
         item.disabled = true;
-        showPoints();
         refreshItems();
+
+        showInfos();
+        updateRerollText();
       }
     };
   else itemContainer.classList.add("disabled");
@@ -127,10 +137,7 @@ const createShopItem = (item, refreshItems) => {
   return itemContainer;
 };
 
-/**
- * @param {() => void} callback
- */
-export const openShop = (callback) => {
+const loadShop = () => {
   shopItemsContainer.innerHTML = "";
 
   const shoptItems = [...SHOP_ITEMS.filter((item) => !item.deleted)];
@@ -152,6 +159,41 @@ export const openShop = (callback) => {
     shopItemsContainer.appendChild(div);
     selectedItems.push({ item, div });
   }
+};
+
+const getRerollPrice = () =>
+  SHOP_CONFIG.shopRerolls * SHOP_CONFIG.shopRerollsPrice;
+
+const updateRerollText = () => {
+  const rerollPrice = getRerollPrice();
+  shopRerollPrice.innerText = `${rerollPrice}`;
+  if (SHOP_CONFIG.points < rerollPrice) shopRerollBtn.disabled = true;
+};
+
+const updateRerollButton = () => {
+  SHOP_CONFIG.shopRerolls = 0;
+  shopRerollBtn.disabled = false;
+  updateRerollText();
+
+  shopRerollBtn.onclick = () => {
+    const rerollPrice = getRerollPrice();
+    if (SHOP_CONFIG.points > rerollPrice) {
+      deductPoints(rerollPrice);
+      SHOP_CONFIG.shopRerolls++;
+
+      loadShop();
+
+      updateRerollText();
+    }
+  };
+};
+
+/**
+ * @param {() => void} callback
+ */
+export const openShop = (callback) => {
+  loadShop();
+  updateRerollButton();
 
   shopDialog.showModal();
   shopCloseBtn.onclick = () => {

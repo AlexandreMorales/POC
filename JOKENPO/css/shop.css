@@ -34,7 +34,6 @@
 .shop-item {
   padding: 10px;
   border: 1px solid;
-  margin-right: 10px;
   margin-bottom: 20px;
 
   width: 200px;
@@ -47,7 +46,20 @@
   cursor: pointer;
 }
 
+.shop-item:not(:last-child) {
+  margin-right: 10px;
+}
+
 .shop-item.disabled {
   pointer-events: none;
   opacity: 0.5;
+}
+
+#shop-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+#shop-reroll {
+  display: flex;
 }

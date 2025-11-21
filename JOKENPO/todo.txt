@@ -1,2 +1,14 @@
+DASH - shift, store item
+FIX OUT OF BOUNDS
+DIALOG ONLY IN BATTLE CONTAINER
+FIX FLOATING POINT - +(20.1 + 0.1).toFixed(2)
+USE E NUMBERS - (tes/+`1e${`${tes}`.length-1}`).toFixed(2)+(`e${`${tes}`.length-1}`)
+DAHAKA/SNAIL - increase speed to chase player
+RANDOM TYPE WHEN START (OR ABILITY TO CHANGE TYPE)
+MORE SHOP OPTIONS
+IDLE MODE - no dvd, always span, choose type to win 0.01 points per kill 
+BALATRO UI
+SHOW CONTROLS
+SHOW HIERARCHY - normal, evoutions
+OBJECTIVE
 MOBILE SUPPORT
-REFRESH STORE

@@ -31,3 +31,11 @@ button {
 button:hover {
   background-color: var(--active-color-hover);
 }
+
+button:disabled {
+  cursor: default;
+}
+
+button:disabled:hover {
+  background-color: var(--active-color);
+}
